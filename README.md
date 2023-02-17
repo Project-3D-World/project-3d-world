@@ -48,3 +48,6 @@ SendGrid - 2 points
 **Final**:
 - Features for group collaboration
 - Push notification and email notification
+
+## Our choice of reactive frontend framework
+Angular
