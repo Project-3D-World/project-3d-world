@@ -1,6 +1,6 @@
-import { Router } from 'express';
+import { Router } from "express";
 
-import { getMongoSession } from '../datasource.js';
+import { getMongoSession } from "../datasource.js";
 
 const db = await getMongoSession();
 
