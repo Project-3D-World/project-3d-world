@@ -1,4 +1,4 @@
-import { MongoClient } from 'mongodb';
+import { MongoClient } from "mongodb";
 
 const mongoURI = "mongodb://127.0.0.1:27017"; // default uri
 const dbName = "buildVerse";
@@ -8,9 +8,9 @@ let dbInstance = null;
 
 export const openMongoSession = async function () {
   if (!dbInstance) {
-    console.log('Connecting to MongoDB...');
+    console.log("Connecting to MongoDB...");
     await client.connect();
-    console.log('Connected to MongoDB');
+    console.log("Connected to MongoDB");
     dbInstance = client.db(dbName);
   }
 };

@@ -1,27 +1,26 @@
-import express from 'express';
-import bodyParser from 'body-parser';
-import morgan from 'morgan';
+import express from "express";
+import bodyParser from "body-parser";
+import morgan from "morgan";
 
-import { openMongoSession, closeMongoSession } from './datasource.js';
+import { openMongoSession, closeMongoSession } from "./datasource.js";
 
-import { usersRouter } from './routers/users_router.js';
+import { usersRouter } from "./routers/users_router.js";
 
 const port = 3000; // default port
 const app = express();
 
 app.use(bodyParser.json());
-app.use(morgan('dev')); // add request logger
+app.use(morgan("dev")); // add request logger
 
 // open MongoDB session
 try {
-  await openMongoSession();  
+  await openMongoSession();
 } catch (err) {
   console.error(err);
 }
 
 // TODO: add other routers
-app.use('/api/users', usersRouter);
-
+app.use("/api/users", usersRouter);
 
 // start server
 const server = app.listen(port, () => {
@@ -32,8 +31,8 @@ const server = app.listen(port, () => {
 const cleanup = async () => {
   await closeMongoSession();
   server.close(() => {
-    console.log('Server closed');
+    console.log("Server closed");
   });
 };
-process.on('SIGINT', cleanup);
-process.on('SIGTERM', cleanup);
+process.on("SIGINT", cleanup);
+process.on("SIGTERM", cleanup);
