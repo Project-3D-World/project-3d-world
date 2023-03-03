@@ -1,7 +1,9 @@
 import { MongoClient } from "mongodb";
 
-const mongoURI = "mongodb://127.0.0.1:27017"; // default uri
-const dbName = "buildVerse";
+import { config } from "./config.js";
+
+const mongoURI = config.mongoURI;
+const dbName = config.mongoDbName;
 
 const client = new MongoClient(mongoURI, { useUnifiedTopology: true });
 let dbInstance = null;
