@@ -1,29 +1,28 @@
-import { MongoClient } from "mongodb";
+import mongoose from "mongoose";
 
 import { config } from "./config.js";
 
 const mongoURI = config.mongoURI;
-const dbName = config.mongoDbName;
+const mongoDbName = config.mongoDbName;
 
-const client = new MongoClient(mongoURI, { useUnifiedTopology: true });
-let dbInstance = null;
+let mongo_client = null; // this client will be used for sharedb later
 
 export const openMongoSession = async function () {
-  if (!dbInstance) {
+  if (!mongo_client) {
     console.log("Connecting to MongoDB...");
-    await client.connect();
+    await mongoose.connect(mongoURI, {
+      dbName: mongoDbName,
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+    });
     console.log("Connected to MongoDB");
-    dbInstance = client.db(dbName);
+    mongo_client = mongoose.connection.client;
   }
 };
 
-export const getMongoSession = async function () {
-  return dbInstance;
-};
-
 export const closeMongoSession = async function () {
-  if (dbInstance) {
-    await client.close();
-    dbInstance = null;
+  if (mongo_client) {
+    await mongoose.disconnect();
+    mongo_client = null;
   }
 };

@@ -1,8 +1,6 @@
 import { Router } from "express";
 
-import { getMongoSession } from "../datasource.js";
-
-const db = await getMongoSession();
+// TODO: Create a mongoose model for users and import it here
 
 export const usersRouter = Router();
 
