@@ -4,3 +4,6 @@ Thumbs.db
 
 # node.js
 node_modules
+
+# .env
+.env
