@@ -1,17 +1,15 @@
 <header>
-    <a href = "/" id = "title">Auth0 Angular</a>
-    <div *ngIf="auth.isAuthenticated$ | async; else loggedOut">
-        <button class="btn btn-warning" (click)="auth.logout()">
-          Log out
-        </button>
-    </div>
+  <a href="/" id="title">Auth0 Angular</a>
+  <div *ngIf="auth.isAuthenticated$ | async; else loggedOut">
+    <button class="btn btn-warning" (click)="auth.logout()">Log out</button>
+  </div>
 
-    <ng-template #loggedOut>
-        <button class="btn btn-primary" (click)="loginWithRedirect()">Log in</button>
-    </ng-template>
-    <button class="btn btn-warning" (click)="auth.logout()">
-        Log out
-      </button>
+  <ng-template #loggedOut>
+    <button class="btn btn-primary" (click)="loginWithRedirect()">
+      Log in
+    </button>
+  </ng-template>
+  <button class="btn btn-warning" (click)="auth.logout()">Log out</button>
 </header>
 
-  <p id="error-box"></p>
+<p id="error-box"></p>
