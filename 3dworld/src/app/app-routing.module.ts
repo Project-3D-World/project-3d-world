@@ -3,17 +3,19 @@ import { RouterModule, Routes } from '@angular/router';
 import { IndexComponent } from './pages/index/index.component';
 import { SignInComponent } from './pages/sign-in/sign-in.component';
 
-const routes: Routes = [{
-  path:'',
-  component:IndexComponent,
-},
-{
-  path:'sign-in',
-  component:SignInComponent,
-}];
+const routes: Routes = [
+  {
+    path: '',
+    component: IndexComponent,
+  },
+  {
+    path: 'sign-in',
+    component: SignInComponent,
+  },
+];
 
 @NgModule({
   imports: [RouterModule.forRoot(routes)],
-  exports: [RouterModule]
+  exports: [RouterModule],
 })
-export class AppRoutingModule { }
+export class AppRoutingModule {}
