@@ -1,7 +1,7 @@
 import express from "express";
 import bodyParser from "body-parser";
 import morgan from "morgan";
-
+import session from "express-session";
 import { openMongoSession, closeMongoSession } from "./datasource.js";
 
 import { usersRouter } from "./routers/users_router.js";
@@ -11,7 +11,12 @@ const app = express();
 
 app.use(bodyParser.json());
 app.use(morgan("dev")); // add request logger
-
+//create session
+app.use(session({
+  secret:"Please change this secret",
+  resave:false,
+  saveUninitialized:true,
+}));
 // open MongoDB session
 try {
   await openMongoSession();
