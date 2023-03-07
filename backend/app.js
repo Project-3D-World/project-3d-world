@@ -12,11 +12,13 @@ const app = express();
 app.use(bodyParser.json());
 app.use(morgan("dev")); // add request logger
 //create session
-app.use(session({
-  secret:"Please change this secret",
-  resave:false,
-  saveUninitialized:true,
-}));
+app.use(
+  session({
+    secret: "Please change this secret",
+    resave: false,
+    saveUninitialized: true,
+  })
+);
 // open MongoDB session
 try {
   await openMongoSession();
