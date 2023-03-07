@@ -30,7 +30,7 @@ const worldSchema = new mongoose.Schema({
   rules: String,
   chunks: {
     type: [chunkSchema],
-    validate: chunksValidator,
+    validate: [chunksValidator, "Duplicate chunk locations"],
   },
 });
 
