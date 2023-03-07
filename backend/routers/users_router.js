@@ -19,53 +19,51 @@ usersRouter.delete("/:id", async (req, res) => {});
 
 //signup
 usersRouter.post("/signup", async (req, res) => {
-    //displayName:req.body.displayName
-    //sub = req.body.sub
-    //claims = []
+  //displayName:req.body.displayName
+  //sub = req.body.sub
+  //claims = []
 
-    const user = new User({
-        sub:req.body.sub,
-        displayName:req.body.displayName,
-        claims:[],
-    });
+  const user = new User({
+    sub: req.body.sub,
+    displayName: req.body.displayName,
+    claims: [],
+  });
 
-    try{
-        await user.save();
-    }
-    catch{
-        return res.status(422).json({error:"user creation failed"});
-    }
-    res.json(user);
-
-
+  try {
+    await user.save();
+  } catch {
+    return res.status(422).json({ error: "user creation failed" });
+  }
+  res.json(user);
 });
 //signin
 usersRouter.post("/signin", async (req, res) => {
-    //sub = req.body.sub
+  //sub = req.body.sub
 
-    const user = await User.findOne({
-        sub:req.body.sub
-    });
+  const user = await User.findOne({
+    sub: req.body.sub,
+  });
 
-    if(user === null){
-        return res.status(404).json({error:`User with sub : ${req.body.sub} not found`});
-    }
-    req.session.sub = user.sub;
-    req.session.displayName = user.displayName;
-    req.session.claims = user.claims;
-    console.log("Session started")
-    console.log("-----------------------------------------------");
-    console.log(`Req.session.sub is set to ${req.session.sub}`);
-    console.log(`Req.session.displayName is set to ${req.session.displayName}`);
-    console.log(`Req.session.claims is set to ${req.session.claims}`);
-    return res.json(user);
+  if (user === null) {
+    return res
+      .status(404)
+      .json({ error: `User with sub : ${req.body.sub} not found` });
+  }
+  req.session.sub = user.sub;
+  req.session.displayName = user.displayName;
+  req.session.claims = user.claims;
+  console.log("Session started");
+  console.log("-----------------------------------------------");
+  console.log(`Req.session.sub is set to ${req.session.sub}`);
+  console.log(`Req.session.displayName is set to ${req.session.displayName}`);
+  console.log(`Req.session.claims is set to ${req.session.claims}`);
+  return res.json(user);
 });
 
-
-usersRouter.get('/signout', function(req,res,next){
-    console.log("started");
-    req.session.destroy();
-    console.log("Session ended");
-    console.log("-----------------------------------------------");
-    res.redirect("/");
-})
+usersRouter.get("/signout", function (req, res, next) {
+  console.log("started");
+  req.session.destroy();
+  console.log("Session ended");
+  console.log("-----------------------------------------------");
+  res.redirect("/");
+});
