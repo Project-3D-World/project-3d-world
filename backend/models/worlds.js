@@ -8,6 +8,17 @@ const chunkSchema = new mongoose.Schema({
   chunkFile: { type: mongoose.ObjectId, required: true },
 });
 
+const chunksValidator = function (chunks) {
+  // the chunks must be unique by their location
+  const locations = new Set();
+  for (const chunk of chunks) {
+    if (locations.has(location)) {
+      return false;
+    }
+    locations.add(location);
+  }
+};
+
 const worldSchema = new mongoose.Schema({
   name: { type: String, required: true },
   chunkSize: {
@@ -17,7 +28,10 @@ const worldSchema = new mongoose.Schema({
   },
   theme: String,
   rules: String,
-  chunks: [chunkSchema],
+  chunks: {
+    type: [chunkSchema],
+    validate: chunksValidator,
+  },
 });
 
 export const World = mongoose.model("World", worldSchema);
