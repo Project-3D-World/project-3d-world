@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import { Grid } from "gridfs-stream";
 
 import { config } from "./config.js";
 
@@ -6,6 +7,7 @@ const mongoURI = config.mongoURI;
 const mongoDbName = config.mongoDbName;
 
 let mongo_client = null; // this client will be used for sharedb later
+let gfs = null;
 
 export const openMongoSession = async function () {
   if (!mongo_client) {
@@ -16,7 +18,10 @@ export const openMongoSession = async function () {
       useUnifiedTopology: true,
     });
     console.log("Connected to MongoDB");
-    mongo_client = mongoose.connection.client;
+    mongoose.connection.once("open", () => {
+      mongo_client = mongoose.connection.client;
+      gfs = Grid(conn.db, mongoose.mongo);
+    });
   }
 };
 
@@ -25,4 +30,8 @@ export const closeMongoSession = async function () {
     await mongoose.disconnect();
     mongo_client = null;
   }
+};
+
+export const getGfs = function () {
+  return gfs;
 };
