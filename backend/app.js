@@ -5,6 +5,7 @@ import session from "express-session";
 import { openMongoSession, closeMongoSession } from "./datasource.js";
 
 import { usersRouter } from "./routers/users_router.js";
+import { worldsRouter } from "./routers/worlds_router.js";
 
 const port = 3000; // default port
 const app = express();
@@ -28,6 +29,7 @@ try {
 
 // TODO: add other routers
 app.use("/api/users", usersRouter);
+app.use("/api/worlds", worldsRouter);
 
 // start server
 const server = app.listen(port, () => {
