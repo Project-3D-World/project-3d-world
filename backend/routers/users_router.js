@@ -59,7 +59,7 @@ usersRouter.get("/signout", function (req, res, next) {
   req.session.destroy();
   console.log("Session ended");
   console.log("-----------------------------------------------");
-  res.redirect("/");
+  res.json({ message: "Signed out" });
 });
 
 usersRouter.get("/me", async (req, res) => {
