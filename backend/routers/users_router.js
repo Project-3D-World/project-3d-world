@@ -6,23 +6,18 @@ export const usersRouter = Router();
 
 // TODO: add users routes
 
-//getting all
-usersRouter.get("/", async (req, res) => {});
-//getting one
-usersRouter.get("/:id", async (req, res) => {});
-
-//updating one
-usersRouter.patch("/:id", async (req, res) => {});
-
-//deleting one
-usersRouter.delete("/:id", async (req, res) => {});
 
 //signup
 usersRouter.post("/signup", async (req, res) => {
   //displayName:req.body.displayName
   //sub = req.body.sub
   //claims = []
-
+  const user1 = await User.findOne({
+    displayName:req.body.displayName
+  });
+  if(user1 !== null){
+    return res.status(422).json({error:"displayName already taken"});
+  }
   const user = new User({
     sub: req.body.sub,
     displayName: req.body.displayName,
@@ -67,3 +62,25 @@ usersRouter.get("/signout", function (req, res, next) {
   console.log("-----------------------------------------------");
   res.redirect("/");
 });
+
+usersRouter.get("/me",async (req,res)=>{
+  return res.json({
+    sub:req.session.sub,
+    displayName:req.session.displayName
+  })
+})
+//getting all
+usersRouter.get("/", async (req, res) => {
+  const users = await User.find();
+  return res.json(users);
+});
+//getting one
+usersRouter.get("/:id", async (req, res) => {});
+
+//updating one
+usersRouter.patch("/:id", async (req, res) => {});
+
+//deleting one
+usersRouter.delete("/:id", async (req, res) => {});
+
+
