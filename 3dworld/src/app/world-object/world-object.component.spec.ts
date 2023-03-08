@@ -8,9 +8,8 @@ describe('WorldObjectComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ WorldObjectComponent ]
-    })
-    .compileComponents();
+      declarations: [WorldObjectComponent],
+    }).compileComponents();
 
     fixture = TestBed.createComponent(WorldObjectComponent);
     component = fixture.componentInstance;
