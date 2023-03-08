@@ -8,12 +8,14 @@ import { IndexComponent } from './pages/index/index.component';
 import { SignInComponent } from './pages/sign-in/sign-in.component';
 import { AuthModule } from '@auth0/auth0-angular';
 import { environment } from 'src/environments/environment';
+import { WorldObjectComponent } from './world-object/world-object.component';
 @NgModule({
   declarations: [
     AppComponent,
     HeaderComponent,
     IndexComponent,
     SignInComponent,
+    WorldObjectComponent,
   ],
   imports: [
     BrowserModule,
