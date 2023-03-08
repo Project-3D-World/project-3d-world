@@ -5,25 +5,20 @@ const chunkSchema = new mongoose.Schema({
     x: { type: Number, required: true },
     z: { type: Number, required: true },
   },
-  chunkFile: { type: mongoose.ObjectId, required: true, default: null },
-  claimedBy: { type: mongoose.ObjectId, required: true, default: null },
+  chunkFile: { type: mongoose.ObjectId, default: null },
+  claimedBy: { type: mongoose.ObjectId, default: null },
 });
 
 const chunksValidator = function (chunks) {
   // the chunks must be unique by their location
   const locations = new Set();
-  for (const chunk of chunks) {
-    if (
-      typeof chunk.location.x !== "number" ||
-      typeof chunk.location.z !== "number"
-    ) {
+  for (const c of chunks) {
+    if (locations.has(c.location)) {
       return false;
     }
-    if (locations.has(location)) {
-      return false;
-    }
-    locations.add(location);
+    locations.add(c.location);
   }
+  return true;
 };
 
 const worldSchema = new mongoose.Schema({

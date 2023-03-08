@@ -1,8 +1,9 @@
 import { Router } from "express";
+import mongoose from "mongoose";
 
 import { getGfs } from "../datasource.js";
 import { World } from "../models/worlds.js";
-import { User } from "../models/users.js";
+// import { User } from "../models/users.js";
 
 const gfs = getGfs();
 
@@ -13,7 +14,7 @@ export const worldsRouter = Router();
 /* GET /api/worlds */
 worldsRouter.get("/", async (req, res) => {
   const worlds = await World.find().lean();
-  res.json(worlds);
+  res.json({ worlds });
 });
 
 /* GET /api/worlds/:id/map */
@@ -45,10 +46,12 @@ worldsRouter.post("/", async (req, res) => {
     res.status(400).json({ error: "Invalid chunk size" });
     return;
   }
+  if (req.body.chunks === 0) {
+    res.status(400).json({ error: "No chunks provided" });
+    return;
+  }
   const chunks = req.body.chunks.map((c) => {
-    return {
-      location: { x: c.x, z: c.z },
-    };
+    return { location: { x: c.x, z: c.z } };
   });
 
   const world = new World({
@@ -56,14 +59,15 @@ worldsRouter.post("/", async (req, res) => {
     chunkSize: req.body.chunkSize,
     description: req.body.description,
     rules: req.body.rules,
+    chunks,
   });
-  world.chunks.push(...chunks);
 
   try {
     await world.save();
   } catch (err) {
     if (err.name === "ValidationError") {
       res.status(400).json({ error: err.message });
+      return;
     }
   }
   res.json(world);
@@ -89,16 +93,20 @@ worldsRouter.patch("/:worldId/chunks/:chunkId", async (req, res) => {
     res.status(404).json({ error: "Chunk not found" });
     return;
   }
-  if (chunk.claimedBy) {
+  if (chunk.claimedBy !== null) {
     res.status(400).json({ error: "Chunk already claimed" });
     return;
   }
-  user.claims.push({ world: worldId, chunk: chunkId });
-  chunk.claimedBy = userId;
+
+  const world_id = new mongoose.Types.ObjectId(worldId);
+  const chunk_id = new mongoose.Types.ObjectId(chunkId);
+  user.claims.push({ world: world_id, chunk: chunk_id });
+  chunk.claimedBy = new mongoose.Types.ObjectId(userId);
+
   await world.save();
   await user.save();
   res.json({
-    msg: "Chunk claimed",
+    message: "Chunk claimed",
   });
 });
 
