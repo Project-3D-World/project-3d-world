@@ -8,7 +8,7 @@ import { Location } from '@angular/common';
   styleUrls: ['./header.component.scss'],
 })
 export class HeaderComponent {
-  constructor(public auth: AuthService, private location:Location) {}
+  constructor(public auth: AuthService, private location: Location) {}
   ngOnInit(): void {}
 
   async loginWithRedirect(): Promise<void> {

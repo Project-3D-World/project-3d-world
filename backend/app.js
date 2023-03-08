@@ -27,8 +27,6 @@ const corsOptions = {
 };
 app.use(cors(corsOptions));
 
-
-
 // open MongoDB session
 try {
   await openMongoSession();

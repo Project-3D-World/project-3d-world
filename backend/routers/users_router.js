@@ -6,17 +6,16 @@ export const usersRouter = Router();
 
 // TODO: add users routes
 
-
 //signup
 usersRouter.post("/signup", async (req, res) => {
   //displayName:req.body.displayName
   //sub = req.body.sub
   //claims = []
   const user1 = await User.findOne({
-    displayName:req.body.displayName
+    displayName: req.body.displayName,
   });
-  if(user1 !== null){
-    return res.status(422).json({error:"displayName already taken"});
+  if (user1 !== null) {
+    return res.status(422).json({ error: "displayName already taken" });
   }
   const user = new User({
     sub: req.body.sub,
@@ -63,12 +62,12 @@ usersRouter.get("/signout", function (req, res, next) {
   res.redirect("/");
 });
 
-usersRouter.get("/me",async (req,res)=>{
+usersRouter.get("/me", async (req, res) => {
   return res.json({
-    sub:req.session.sub,
-    displayName:req.session.displayName
-  })
-})
+    sub: req.session.sub,
+    displayName: req.session.displayName,
+  });
+});
 //getting all
 usersRouter.get("/", async (req, res) => {
   const users = await User.find();
@@ -82,5 +81,3 @@ usersRouter.patch("/:id", async (req, res) => {});
 
 //deleting one
 usersRouter.delete("/:id", async (req, res) => {});
-
-
