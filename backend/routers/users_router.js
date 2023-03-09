@@ -45,12 +45,13 @@ usersRouter.post("/signin", async (req, res) => {
   }
   req.session.sub = user.sub;
   req.session.displayName = user.displayName;
-  req.session.claims = user.claims;
+  const userId = user._id.toString();
+  req.session.userId = userId;
   console.log("Session started");
   console.log("-----------------------------------------------");
   console.log(`Req.session.sub is set to ${req.session.sub}`);
   console.log(`Req.session.displayName is set to ${req.session.displayName}`);
-  console.log(`Req.session.claims is set to ${req.session.claims}`);
+  console.log(`Req.session.userId is set to ${req.session.userId}`);
   return res.json(user);
 });
 
