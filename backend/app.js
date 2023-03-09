@@ -2,8 +2,9 @@ import express from "express";
 import bodyParser from "body-parser";
 import morgan from "morgan";
 import session from "express-session";
-import { openMongoSession, closeMongoSession } from "./datasource.js";
+import cors from "cors";
 
+import { openMongoSession, closeMongoSession } from "./datasource.js";
 import { config } from "./config.js";
 
 import { usersRouter } from "./routers/users_router.js";
@@ -22,6 +23,15 @@ app.use(
     saveUninitialized: true,
   })
 );
+
+//cors
+app.use(express.static("static"));
+const corsOptions = {
+  origin: "http://localhost:4200",
+  credentials: true,
+};
+app.use(cors(corsOptions));
+
 // open MongoDB session
 try {
   await openMongoSession();
