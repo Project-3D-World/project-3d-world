@@ -18,7 +18,7 @@ app.use(morgan("dev")); // add request logger
 //create session
 app.use(
   session({
-    secret: "Please change this secret",
+    secret: config.sessionSecret,
     resave: false,
     saveUninitialized: true,
   })
@@ -27,7 +27,7 @@ app.use(
 //cors
 app.use(express.static("static"));
 const corsOptions = {
-  origin: "http://localhost:4200",
+  origin: config.frontendBaseUrl,
   credentials: true,
 };
 app.use(cors(corsOptions));
