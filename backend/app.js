@@ -3,8 +3,10 @@ import bodyParser from "body-parser";
 import morgan from "morgan";
 import session from "express-session";
 import { openMongoSession, closeMongoSession } from "./datasource.js";
-
 import { usersRouter } from "./routers/users_router.js";
+
+import cors from "cors";
+
 import { worldsRouter } from "./routers/worlds_router.js";
 
 const port = 3000; // default port
@@ -20,6 +22,15 @@ app.use(
     saveUninitialized: true,
   })
 );
+
+//cors
+app.use(express.static("static"));
+const corsOptions = {
+  origin: "http://localhost:4200",
+  credentials: true,
+};
+app.use(cors(corsOptions));
+
 // open MongoDB session
 try {
   await openMongoSession();
