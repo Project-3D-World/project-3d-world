@@ -1,7 +1,8 @@
 export const environment = {
   production: false,
   auth: {
-    domain: 'dev-ivb37m1e.us.auth0.com',
-    clientId: 'qmXMHqGtks8lRBcrFuhwlhLBaPtdjyvQ',
+    domain: 'auth0 domain',
+    clientId: 'auth0 clientId',
   },
+  apiEndpoint: 'endpoint',
 };
