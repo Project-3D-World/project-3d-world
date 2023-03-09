@@ -4,7 +4,7 @@
   (submit)="postMessage()"
   [formGroup]="nameForm"
 >
-  <div class="form-title">Post a message</div>
+  <div class="form-title">Choose a displayName</div>
   <input
     formControlName="name"
     type="text"
@@ -12,7 +12,7 @@
     class="form-element"
     placeholder="Enter your displayName"
   />
-  <button type="submit" class="btn">Post your message</button>
+  <button type="submit" class="btn">Link Account to DisplayName</button>
   <p>displayName: {{ nameForm.value.name }}</p>
   <p>Form Status: {{ nameForm.status }}</p>
   <p>Sign Up Status: {{ signUpStatus }}</p>
