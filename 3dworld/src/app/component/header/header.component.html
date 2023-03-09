@@ -1,5 +1,5 @@
 <header>
-  <a href="/" id="title">Auth0 Angular</a>
+  <a href="/" id="title">Buildverse</a>
   <div *ngIf="auth.isAuthenticated$ | async; else loggedOut">
     <button class="btn btn-warning" (click)="auth.logout()">Log out</button>
   </div>
@@ -9,7 +9,6 @@
       Log in
     </button>
   </ng-template>
-  <button class="btn btn-warning" (click)="auth.logout()">Log out</button>
 </header>
 
 <p id="error-box"></p>
