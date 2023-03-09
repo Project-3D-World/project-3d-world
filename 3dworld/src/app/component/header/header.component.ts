@@ -9,7 +9,11 @@ import { ApiService } from 'src/app/services/api.service';
   styleUrls: ['./header.component.scss'],
 })
 export class HeaderComponent {
-  constructor(public auth: AuthService, private location: Location,private api:ApiService) {}
+  constructor(
+    public auth: AuthService,
+    private location: Location,
+    private api: ApiService
+  ) {}
   ngOnInit(): void {}
 
   async loginWithRedirect(): Promise<void> {
