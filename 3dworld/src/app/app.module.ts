@@ -25,7 +25,6 @@ import { WorldObjectComponent } from './world-object/world-object.component';
     SignUpComponent,
 
     WorldObjectComponent,
-
   ],
   imports: [
     FormsModule,
