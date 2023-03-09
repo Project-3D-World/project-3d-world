@@ -1,13 +1,14 @@
 import { Router } from "express";
-import mongoose from "mongoose";
+import multer from "multer";
 
-import { getGfs } from "../datasource.js";
+import { GridFile } from "../models/gridfiles.js";
 import { World } from "../models/worlds.js";
-// import { User } from "../models/users.js";
+import { User } from "../models/users.js";
 
-const gfs = getGfs();
+// TODO: add user authentication
 
-// TODO: add user authentication middleware
+// Create a temp folder for storing uploaded files
+const upload = multer({dest: "../uploads"});
 
 export const worldsRouter = Router();
 
@@ -77,7 +78,8 @@ worldsRouter.post("/", async (req, res) => {
 worldsRouter.patch("/:worldId/chunks/:chunkId", async (req, res) => {
   /* an endpoint for a user to claim a chunk */
 
-  const { userId, worldId, chunkId } = req.params;
+  const { worldId, chunkId } = req.params;
+  const { userId } = req.body;
   const user = await User.findById(userId);
   if (!user) {
     res.status(404).json({ error: "User not found" });
@@ -98,10 +100,8 @@ worldsRouter.patch("/:worldId/chunks/:chunkId", async (req, res) => {
     return;
   }
 
-  const world_id = new mongoose.Types.ObjectId(worldId);
-  const chunk_id = new mongoose.Types.ObjectId(chunkId);
-  user.claims.push({ world: world_id, chunk: chunk_id });
-  chunk.claimedBy = new mongoose.Types.ObjectId(userId);
+  user.claims.push({ world: worldId, chunk: chunkId });
+  chunk.claimedBy = userId;
 
   await world.save();
   await user.save();
@@ -110,5 +110,7 @@ worldsRouter.patch("/:worldId/chunks/:chunkId", async (req, res) => {
   });
 });
 
-// add endpoint for user to upload a chunk file
-worldsRouter.put("/:worldId/chunks/:chunkId/file", async (req, res) => {});
+/* PUT /api/worlds/:worldId/chunks/:chunkId/file */
+worldsRouter.put("/:worldId/chunks/:chunkId/file", upload.single("chunkFile"),  async (req, res) => {
+  /* an endpoint for user to upload a chunk file */
+});

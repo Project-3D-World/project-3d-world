@@ -1,5 +1,4 @@
 import mongoose from "mongoose";
-import Grid from "gridfs-stream";
 
 import { config } from "./config.js";
 
@@ -30,8 +29,4 @@ export const closeMongoSession = async function () {
     await mongoose.disconnect();
     mongo_client = null;
   }
-};
-
-export const getGfs = function () {
-  return gfs;
 };
