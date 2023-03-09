@@ -124,13 +124,6 @@ worldsRouter.put(
       res.status(400).json({ error: "No file provided" });
       return;
     }
-    if (chunkFile.mimetype !== "model/gltf+json") {
-      res
-        .status(400)
-        .json({ error: "Invalid file type, file type should be .gtlf" });
-      fs.unlinkSync(chunkFile.path);
-      return;
-    }
 
     const user = await User.findById(userId);
     if (!user) {
