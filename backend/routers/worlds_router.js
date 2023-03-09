@@ -9,7 +9,7 @@ import { User } from "../models/users.js";
 // TODO: add user authentication
 
 // Create a temp folder for storing uploaded files
-const upload = multer({ dest: "../uploads" });
+const upload = multer({ dest: "./uploads" });
 
 export const worldsRouter = Router();
 
@@ -120,9 +120,22 @@ worldsRouter.put(
     const { worldId, chunkId } = req.params;
     const { userId } = req.body;
     const chunkFile = req.file;
+    if (!chunkFile) {
+      res.status(400).json({ error: "No file provided" });
+      return;
+    }
+    if (chunkFile.mimetype !== "model/gltf+json") {
+      res
+        .status(400)
+        .json({ error: "Invalid file type, file type should be .gtlf" });
+      fs.unlinkSync(chunkFile.path);
+      return;
+    }
+
     const user = await User.findById(userId);
     if (!user) {
       res.status(404).json({ error: "User not found" });
+      fs.unlinkSync(chunkFile.path);
       return;
     }
     const world = await World.findById(worldId);
