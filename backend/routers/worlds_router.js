@@ -1,13 +1,15 @@
 import { Router } from "express";
-import mongoose from "mongoose";
+import multer from "multer";
+import fs from "fs";
 
-import { getGfs } from "../datasource.js";
+import { GridFile } from "../models/gridfiles.js";
 import { World } from "../models/worlds.js";
-// import { User } from "../models/users.js";
+import { User } from "../models/users.js";
 
-const gfs = getGfs();
+// TODO: add user authentication
 
-// TODO: add user authentication middleware
+// Create a temp folder for storing uploaded files
+const upload = multer({ dest: "./uploads" });
 
 export const worldsRouter = Router();
 
@@ -77,7 +79,8 @@ worldsRouter.post("/", async (req, res) => {
 worldsRouter.patch("/:worldId/chunks/:chunkId", async (req, res) => {
   /* an endpoint for a user to claim a chunk */
 
-  const { userId, worldId, chunkId } = req.params;
+  const { worldId, chunkId } = req.params;
+  const { userId } = req.body;
   const user = await User.findById(userId);
   if (!user) {
     res.status(404).json({ error: "User not found" });
@@ -98,10 +101,8 @@ worldsRouter.patch("/:worldId/chunks/:chunkId", async (req, res) => {
     return;
   }
 
-  const world_id = new mongoose.Types.ObjectId(worldId);
-  const chunk_id = new mongoose.Types.ObjectId(chunkId);
-  user.claims.push({ world: world_id, chunk: chunk_id });
-  chunk.claimedBy = new mongoose.Types.ObjectId(userId);
+  user.claims.push({ world: worldId, chunk: chunkId });
+  chunk.claimedBy = userId;
 
   await world.save();
   await user.save();
@@ -110,5 +111,71 @@ worldsRouter.patch("/:worldId/chunks/:chunkId", async (req, res) => {
   });
 });
 
-// add endpoint for user to upload a chunk file
-worldsRouter.put("/:worldId/chunks/:chunkId/file", async (req, res) => {});
+/* PUT /api/worlds/:worldId/chunks/:chunkId/file */
+worldsRouter.put(
+  "/:worldId/chunks/:chunkId/file",
+  upload.single("chunkFile"),
+  async (req, res) => {
+    /* an endpoint for user to upload a chunk file */
+    const { worldId, chunkId } = req.params;
+    const { userId } = req.body;
+    const chunkFile = req.file;
+    if (!chunkFile) {
+      res.status(400).json({ error: "No file provided" });
+      return;
+    }
+
+    const user = await User.findById(userId);
+    if (!user) {
+      res.status(404).json({ error: "User not found" });
+      fs.unlinkSync(chunkFile.path);
+      return;
+    }
+    const world = await World.findById(worldId);
+    if (!world) {
+      res.status(404).json({ error: "World not found" });
+      fs.unlinkSync(chunkFile.path);
+      return;
+    }
+    const chunk = world.chunks.id(chunkId);
+    if (!chunk) {
+      res.status(404).json({ error: "Chunk not found" });
+      fs.unlinkSync(chunkFile.path);
+      return;
+    }
+    if (chunk.claimedBy.toString() !== userId) {
+      res
+        .status(403)
+        .json({ error: `This chunk is not claimed by the user ${userId}` });
+      fs.unlinkSync(chunkFile.path);
+      return;
+    }
+
+    // Upload the file to MongoDB and delete from /uploads
+    const fileStream = fs.createReadStream(chunkFile.path);
+    const gridFile = new GridFile({
+      filename: chunkFile.originalname,
+      contentType: chunkFile.mimetype,
+      metadata: {
+        world: worldId,
+        chunk: chunkId,
+      },
+    });
+    const uploadedChunk = await gridFile.upload(fileStream);
+    fs.unlinkSync(chunkFile.path);
+
+    // If there is already a file, delete it
+    if (chunk.file !== null) {
+      const oldFile = await GridFile.findById(chunk.chunkFile);
+      if (oldFile) {
+        await GridFile.deleteOne({ _id: oldFile._id });
+      }
+    }
+    chunk.chunkFile = uploadedChunk.id;
+    await world.save();
+    res.json({
+      message: "Chunk file uploaded",
+      chunk: chunk,
+    });
+  }
+);

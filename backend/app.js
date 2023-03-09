@@ -2,14 +2,15 @@ import express from "express";
 import bodyParser from "body-parser";
 import morgan from "morgan";
 import session from "express-session";
-import { openMongoSession, closeMongoSession } from "./datasource.js";
-import { usersRouter } from "./routers/users_router.js";
-
 import cors from "cors";
 
+import { openMongoSession, closeMongoSession } from "./datasource.js";
+import { config } from "./config.js";
+
+import { usersRouter } from "./routers/users_router.js";
 import { worldsRouter } from "./routers/worlds_router.js";
 
-const port = 3000; // default port
+const port = config.port;
 const app = express();
 
 app.use(bodyParser.json());
@@ -17,7 +18,7 @@ app.use(morgan("dev")); // add request logger
 //create session
 app.use(
   session({
-    secret: "Please change this secret",
+    secret: config.sessionSecret,
     resave: false,
     saveUninitialized: true,
   })
@@ -26,7 +27,7 @@ app.use(
 //cors
 app.use(express.static("static"));
 const corsOptions = {
-  origin: "http://localhost:4200",
+  origin: config.frontendBaseUrl,
   credentials: true,
 };
 app.use(cors(corsOptions));
