@@ -33,4 +33,8 @@ export class ApiService {
       return new Observable();
     }
   }
+
+  signOut(){
+    return this.http.get(this.endpoint+"/api/users/signout");
+  }
 }
