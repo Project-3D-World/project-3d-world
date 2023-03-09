@@ -4,10 +4,12 @@ import morgan from "morgan";
 import session from "express-session";
 import { openMongoSession, closeMongoSession } from "./datasource.js";
 
+import { config } from "./config.js";
+
 import { usersRouter } from "./routers/users_router.js";
 import { worldsRouter } from "./routers/worlds_router.js";
 
-const port = 3000; // default port
+const port = config.port;
 const app = express();
 
 app.use(bodyParser.json());
