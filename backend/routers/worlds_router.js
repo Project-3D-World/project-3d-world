@@ -87,40 +87,44 @@ worldsRouter.post("/", isAuthenticated, async (req, res) => {
 });
 
 /* PATCH /api/worlds/:worldId/chunks/:chunkId */
-worldsRouter.patch("/:worldId/chunks/:chunkId", isAuthenticated, async (req, res) => {
-  /* an endpoint for a user to claim a chunk */
+worldsRouter.patch(
+  "/:worldId/chunks/:chunkId",
+  isAuthenticated,
+  async (req, res) => {
+    /* an endpoint for a user to claim a chunk */
 
-  const { worldId, chunkId } = req.params;
-  const userId = req.session.userId;
-  const user = await User.findById(userId);
-  if (!user) {
-    res.status(404).json({ error: "User not found" });
-    return;
-  }
-  const world = await World.findById(worldId);
-  if (!world) {
-    res.status(404).json({ error: "World not found" });
-    return;
-  }
-  const chunk = world.chunks.id(chunkId);
-  if (!chunk) {
-    res.status(404).json({ error: "Chunk not found" });
-    return;
-  }
-  if (chunk.claimedBy !== null) {
-    res.status(400).json({ error: "Chunk already claimed" });
-    return;
-  }
+    const { worldId, chunkId } = req.params;
+    const userId = req.session.userId;
+    const user = await User.findById(userId);
+    if (!user) {
+      res.status(404).json({ error: "User not found" });
+      return;
+    }
+    const world = await World.findById(worldId);
+    if (!world) {
+      res.status(404).json({ error: "World not found" });
+      return;
+    }
+    const chunk = world.chunks.id(chunkId);
+    if (!chunk) {
+      res.status(404).json({ error: "Chunk not found" });
+      return;
+    }
+    if (chunk.claimedBy !== null) {
+      res.status(400).json({ error: "Chunk already claimed" });
+      return;
+    }
 
-  user.claims.push({ world: worldId, chunk: chunkId });
-  chunk.claimedBy = userId;
+    user.claims.push({ world: worldId, chunk: chunkId });
+    chunk.claimedBy = userId;
 
-  await world.save();
-  await user.save();
-  res.json({
-    message: "Chunk claimed",
-  });
-});
+    await world.save();
+    await user.save();
+    res.json({
+      message: "Chunk claimed",
+    });
+  }
+);
 
 /* PUT /api/worlds/:worldId/chunks/:chunkId/file */
 worldsRouter.put(
