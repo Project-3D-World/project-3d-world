@@ -51,8 +51,9 @@ const server = app.listen(port, () => {
 // close mongo session and server
 const cleanup = async () => {
   await closeMongoSession();
-  server.close(() => {
+  server.close((err) => {
     console.log("Server closed");
+    process.exit(err ? 1 : 0);
   });
 };
 process.on("SIGINT", cleanup);
