@@ -1,5 +1,6 @@
 import AdmZip from "adm-zip";
 import gltfValidator from "gltf-validator";
+import fs from "fs";
 
 // TODO: reformat the errors
 
@@ -38,4 +39,12 @@ export const validateGltfZip = async (zipFile) => {
       `GLTF validation failed with ${result.issues.numErrors} errors`
     );
   }
+};
+
+export const deleteFile = (path) => {
+  fs.unlink(path, (err) => {
+    if (err) {
+      console.error(err);
+    }
+  });
 };
