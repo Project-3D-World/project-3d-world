@@ -2,9 +2,12 @@ import { Router } from "express";
 import multer from "multer";
 import fs from "fs";
 
+import { isAuthenticated } from "../middleware/auth.js";
 import { GridFile } from "../models/gridfiles.js";
 import { World } from "../models/worlds.js";
 import { User } from "../models/users.js";
+
+import { validateGltfZip, deleteFile } from "./utils.js";
 
 // TODO: add user authentication
 
@@ -14,16 +17,26 @@ const upload = multer({ dest: "./uploads" });
 export const worldsRouter = Router();
 
 /* GET /api/worlds */
-worldsRouter.get("/", async (req, res) => {
+worldsRouter.get("/", isAuthenticated, async (req, res) => {
   const worlds = await World.find().lean();
   res.json({ worlds });
 });
 
+/* GET /api/worlds/:id */
+worldsRouter.get("/:id", isAuthenticated, async (req, res) => {
+  const world = await World.findById(req.params.id).lean();
+  if (!world) {
+    res.status(404).json({ error: "World not found" });
+    return;
+  }
+  res.json({ world });
+});
+
 /* GET /api/worlds/:id/map */
-worldsRouter.get("/:id/map", async (req, res) => {});
+worldsRouter.get("/:id/map", isAuthenticated, async (req, res) => {});
 
 /* POST /api/worlds */
-worldsRouter.post("/", async (req, res) => {
+worldsRouter.post("/", isAuthenticated, async (req, res) => {
   /* req.body should be:
   {
     name: string,
@@ -76,78 +89,90 @@ worldsRouter.post("/", async (req, res) => {
 });
 
 /* PATCH /api/worlds/:worldId/chunks/:chunkId */
-worldsRouter.patch("/:worldId/chunks/:chunkId", async (req, res) => {
-  /* an endpoint for a user to claim a chunk */
+worldsRouter.patch(
+  "/:worldId/chunks/:chunkId",
+  isAuthenticated,
+  async (req, res) => {
+    /* an endpoint for a user to claim a chunk */
 
-  const { worldId, chunkId } = req.params;
-  const { userId } = req.body;
-  const user = await User.findById(userId);
-  if (!user) {
-    res.status(404).json({ error: "User not found" });
-    return;
-  }
-  const world = await World.findById(worldId);
-  if (!world) {
-    res.status(404).json({ error: "World not found" });
-    return;
-  }
-  const chunk = world.chunks.id(chunkId);
-  if (!chunk) {
-    res.status(404).json({ error: "Chunk not found" });
-    return;
-  }
-  if (chunk.claimedBy !== null) {
-    res.status(400).json({ error: "Chunk already claimed" });
-    return;
-  }
+    const { worldId, chunkId } = req.params;
+    const userId = req.session.userId;
+    const user = await User.findById(userId);
+    if (!user) {
+      res.status(404).json({ error: "User not found" });
+      return;
+    }
+    const world = await World.findById(worldId);
+    if (!world) {
+      res.status(404).json({ error: "World not found" });
+      return;
+    }
+    const chunk = world.chunks.id(chunkId);
+    if (!chunk) {
+      res.status(404).json({ error: "Chunk not found" });
+      return;
+    }
+    if (chunk.claimedBy !== null) {
+      res.status(400).json({ error: "Chunk already claimed" });
+      return;
+    }
 
-  user.claims.push({ world: worldId, chunk: chunkId });
-  chunk.claimedBy = userId;
+    user.claims.push({ world: worldId, chunk: chunkId });
+    chunk.claimedBy = userId;
 
-  await world.save();
-  await user.save();
-  res.json({
-    message: "Chunk claimed",
-  });
-});
+    await world.save();
+    await user.save();
+    res.json({
+      message: "Chunk claimed",
+    });
+  }
+);
 
-/* PUT /api/worlds/:worldId/chunks/:chunkId/file */
-worldsRouter.put(
+/* POST /api/worlds/:worldId/chunks/:chunkId/file */
+worldsRouter.post(
   "/:worldId/chunks/:chunkId/file",
+  isAuthenticated,
   upload.single("chunkFile"),
   async (req, res) => {
     /* an endpoint for user to upload a chunk file */
     const { worldId, chunkId } = req.params;
-    const { userId } = req.body;
+    const userId = req.session.userId;
     const chunkFile = req.file;
     if (!chunkFile) {
       res.status(400).json({ error: "No file provided" });
+      return;
+    }
+    try {
+      await validateGltfZip(chunkFile.path);
+    } catch (err) {
+      deleteFile(chunkFile.path);
+      res.status(400).json({ error: err.message });
       return;
     }
 
     const user = await User.findById(userId);
     if (!user) {
       res.status(404).json({ error: "User not found" });
-      fs.unlinkSync(chunkFile.path);
+      deleteFile(chunkFile.path);
       return;
     }
     const world = await World.findById(worldId);
     if (!world) {
       res.status(404).json({ error: "World not found" });
-      fs.unlinkSync(chunkFile.path);
+      deleteFile(chunkFile.path);
       return;
     }
     const chunk = world.chunks.id(chunkId);
     if (!chunk) {
       res.status(404).json({ error: "Chunk not found" });
-      fs.unlinkSync(chunkFile.path);
+      deleteFile(chunkFile.path);
       return;
     }
     if (chunk.claimedBy.toString() !== userId) {
       res
         .status(403)
         .json({ error: `This chunk is not claimed by the user ${userId}` });
-      fs.unlinkSync(chunkFile.path);
+      deleteFile(chunkFile.path);
       return;
     }
 
@@ -162,7 +187,7 @@ worldsRouter.put(
       },
     });
     const uploadedChunk = await gridFile.upload(fileStream);
-    fs.unlinkSync(chunkFile.path);
+    deleteFile(chunkFile.path);
 
     // If there is already a file, delete it
     if (chunk.file !== null) {
