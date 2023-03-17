@@ -2,6 +2,8 @@ import { Router } from "express";
 import multer from "multer";
 import fs from "fs";
 
+import { getShareBackend } from "../datasource.js";
+
 import { isAuthenticated } from "../middleware/auth.js";
 import { GridFile } from "../models/gridfiles.js";
 import { World } from "../models/worlds.js";
@@ -9,10 +11,11 @@ import { User } from "../models/users.js";
 
 import { validateGltfZip, deleteFile } from "./utils.js";
 
-// TODO: add user authentication
-
 // Create a temp folder for storing uploaded files
 const upload = multer({ dest: "./uploads" });
+
+// Get the shareDB backend
+const shareBackend = getShareBackend();
 
 export const worldsRouter = Router();
 
