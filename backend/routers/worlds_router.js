@@ -32,8 +32,36 @@ worldsRouter.get("/:id", isAuthenticated, async (req, res) => {
   res.json({ world });
 });
 
-/* GET /api/worlds/:id/map */
-worldsRouter.get("/:id/map", isAuthenticated, async (req, res) => {});
+/* GET /api/worlds/:worldId/chunks/:chunkId/file */
+worldsRouter.get(
+  "/:worldId/chunks/:chunkId/file",
+  isAuthenticated,
+  async (req, res) => {
+    const { worldId, chunkId } = req.params;
+    const world = await World.findById(worldId);
+    if (!world) {
+      res.status(404).json({ error: "World not found" });
+      return;
+    }
+    const chunk = world.chunks.id(chunkId);
+    if (!chunk) {
+      res.status(404).json({ error: "Chunk not found" });
+      return;
+    }
+    if (chunk.fileId === null) {
+      res.status(404).json({ error: "Chunk is currently empty" });
+      return;
+    }
+    const chunkFile = await GridFile.findById(chunk.chunkFile);
+    if (!chunkFile) {
+      res.status(404).json({ error: "Chunk file not found" });
+      return;
+    }
+
+    res.header("Content-Type", chunkFile.contentType);
+    chunkFile.downloadStream(res);
+  }
+);
 
 /* POST /api/worlds */
 worldsRouter.post("/", isAuthenticated, async (req, res) => {
