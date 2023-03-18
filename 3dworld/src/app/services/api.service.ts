@@ -76,5 +76,4 @@ export class ApiService {
     return this.http.post(this.endpoint + '/api/worlds/' + worldId + '/chunks/' + chunkId + '/file', model);
   }
 
-
 }
