@@ -65,6 +65,7 @@ usersRouter.get("/signout", function (req, res, next) {
 
 usersRouter.get("/me", async (req, res) => {
   return res.json({
+    userId:req.session.userId,
     sub: req.session.sub,
     displayName: req.session.displayName,
   });
