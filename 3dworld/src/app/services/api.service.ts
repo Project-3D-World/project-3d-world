@@ -38,6 +38,7 @@ export class ApiService {
     return this.http.get(this.endpoint + '/api/users/signout');
   }
 
+
   //world apis
 
   //claim a chunk for a user
@@ -70,6 +71,10 @@ export class ApiService {
   //check how to send the file to backend
   uploadModel(worldId: string, chunkId: string, model: File) {
     return this.http.post(this.endpoint + '/api/worlds/' + worldId + '/chunks/' + chunkId + '/file', model);
+  }
+
+  getMe() {
+    return this.http.get(this.endpoint + '/api/users/me');
   }
 
 }
