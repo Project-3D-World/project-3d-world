@@ -38,6 +38,10 @@ export class ApiService {
     return this.http.get(this.endpoint + '/api/users/signout');
   }
 
+  getMe() {
+    return this.http.get(this.endpoint + '/api/users/me');
+  }
+
   //world apis
 
   //claim a chunk for a user
@@ -71,5 +75,6 @@ export class ApiService {
   uploadModel(worldId: string, chunkId: string, model: File) {
     return this.http.post(this.endpoint + '/api/worlds/' + worldId + '/chunks/' + chunkId + '/file', model);
   }
+
 
 }
