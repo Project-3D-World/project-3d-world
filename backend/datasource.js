@@ -8,7 +8,7 @@ const mongoURI = config.mongoURI;
 const mongoDbName = config.mongoDbName;
 
 let mongo_client = null;
-let shareBackend = null; 
+let shareBackend = null;
 
 export const openMongoSession = async function () {
   if (!mongo_client) {
@@ -40,4 +40,4 @@ export const closeMongoSession = async function () {
 
 export const getShareBackend = function () {
   return shareBackend;
-}
+};

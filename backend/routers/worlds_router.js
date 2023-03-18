@@ -1,6 +1,8 @@
 import { Router } from "express";
 import multer from "multer";
 import fs from "fs";
+import patch from "express-ws/lib/add-ws-method.js";
+import mongoose from "mongoose";
 
 import { getShareBackend } from "../datasource.js";
 
@@ -18,6 +20,7 @@ const upload = multer({ dest: "./uploads" });
 const shareBackend = getShareBackend();
 
 export const worldsRouter = Router();
+patch.default(worldsRouter);
 
 /* GET /api/worlds */
 worldsRouter.get("/", isAuthenticated, async (req, res) => {
@@ -235,3 +238,23 @@ worldsRouter.post(
     });
   }
 );
+
+/* WS /api/worlds/:worldId/live */
+worldsRouter.ws("/:worldId/live", async (ws, req) => {
+  if (!mongoose.Types.ObjectId.isValid(req.params.worldId)) {
+    ws.close(1008, "Invalid world ID");
+    return;
+  }
+  const world = await World.findById(req.params.worldId);
+  if (!world) {
+    ws.close(1008, "World not found");
+    return;
+  }
+
+  // TEST
+  ws.on("message", (msg) => {
+    ws.send(`You said: ${msg}`);
+  });
+
+  // TODO: add ws logic
+});
