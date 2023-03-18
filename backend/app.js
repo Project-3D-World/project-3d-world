@@ -13,9 +13,7 @@ import { worldsRouter } from "./routers/worlds_router.js";
 
 const port = config.port;
 const app = express();
-const wsInstance = expressWs(app, null, {
-  leaveRouterUntouched: true,
-});
+const wsInstance = expressWs(app);
 
 app.use(bodyParser.json());
 app.use(morgan("dev")); // add request logger
@@ -43,9 +41,6 @@ try {
   console.error(err);
 }
 
-// Apply ws to worldRouter
-wsInstance.applyTo(worldsRouter);
-
 // TODO: add other routers
 app.use("/api/users", usersRouter);
 app.use("/api/worlds", worldsRouter);
@@ -57,6 +52,9 @@ const server = app.listen(port, () => {
 
 // close mongo session and server
 const cleanup = async () => {
+  wsInstance.getWss().clients.forEach((client) => {
+    client.close();
+  });
   await closeMongoSession();
   server.close((err) => {
     console.log("Server closed");
