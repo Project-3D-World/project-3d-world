@@ -38,7 +38,7 @@ export class ApiService {
     return this.http.get(this.endpoint + '/api/users/signout');
   }
 
-  getMe(){
+  getMe() {
     return this.http.get(this.endpoint + '/api/users/me');
   }
 }
