@@ -37,4 +37,39 @@ export class ApiService {
   signOut() {
     return this.http.get(this.endpoint + '/api/users/signout');
   }
+
+  //world apis
+
+  //claim a chunk for a user
+  claimChunk(worldId: string, chunkId: string) {
+    return this.http.patch(this.endpoint + '/api/worlds/' + worldId + '/chunks/' + chunkId, {});
+  }
+
+  //get a world by id
+  getWorld(worldId: string) {
+    return this.http.get(this.endpoint + '/api/worlds/' + worldId);
+  }
+
+  //get all worlds
+  getAllWorlds() {
+    return this.http.get(this.endpoint + '/api/worlds');
+  }
+
+  //create a new world
+  createWorld(worldName: string, description: string, rules: string, chunksize: number, numberOfChunks: number) {
+    return this.http.post(this.endpoint + '/api/worlds', {
+      name: worldName,
+      chunkSize: { x: chunksize, y: chunksize, z: chunksize},
+      description: description ,
+      rules: rules,
+      chunks: [{ x: numberOfChunks, z: numberOfChunks}]
+    });
+  }
+
+  //upload a gltf model to a chunk
+  //check how to send the file to backend
+  uploadModel(worldId: string, chunkId: string, model: File) {
+    return this.http.post(this.endpoint + '/api/worlds/' + worldId + '/chunks/' + chunkId + '/file', model);
+  }
+
 }
