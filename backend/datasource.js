@@ -11,22 +11,17 @@ let mongo_client = null;
 let shareBackend = null;
 
 export const openMongoSession = async function () {
-  if (!mongo_client) {
+  if (mongo_client === null) {
     console.log("Connecting to MongoDB...");
     await mongoose.connect(mongoURI, {
       dbName: mongoDbName,
       useNewUrlParser: true,
       useUnifiedTopology: true,
     });
+    mongo_client = mongoose.connection.getClient();
     console.log("Connected to MongoDB");
-    mongoose.connection.once("open", () => {
-      mongo_client = mongoose.connection.client;
-      // Create ShareDB backend
-      if (!shareBackend) {
-        const db = new ShareDbMongo({ mongo: () => mongo_client });
-        shareBackend = new ShareDB({ db });
-      }
-    });
+    const db = new ShareDbMongo({ mongo: () => mongo_client });
+    shareBackend = new ShareDB({ db });
   }
 };
 
@@ -35,9 +30,13 @@ export const closeMongoSession = async function () {
     await shareBackend.close();
     await mongoose.disconnect();
     mongo_client = null;
+    shareBackend = null;
   }
 };
 
-export const getShareBackend = function () {
+export const getShareBackend = async function () {
+  if (mongo_client === null) {
+    await openMongoSession();
+  }
   return shareBackend;
 };
