@@ -45,7 +45,6 @@ export class SignUpComponent implements OnInit {
           this.signUpStatus = '200: you got signed in';
         },
         error: (err) => {
-          console.log(err);
           this.signUpStatus = `${err.status} ${err.error.error}`;
         },
       });
