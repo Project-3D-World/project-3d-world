@@ -10,19 +10,19 @@ export class ApiService {
   constructor(private http: HttpClient) {}
 
   signIn(profile: string) {
-    console.log(profile);
     const profileJson = JSON.parse(profile);
     if (profileJson?.sub) {
       return this.http.post(this.endpoint + '/api/users/signin', {
         sub: profileJson.sub,
       });
     } else {
-      return new Observable();
+      return new Observable((observer) => {
+        observer.error(new Error('Something went wrong!'));
+      });
     }
   }
 
   signUp(profile: string, displayName: string) {
-    console.log(profile, displayName);
     const profileJson = JSON.parse(profile);
     if (profileJson?.sub) {
       return this.http.post(this.endpoint + '/api/users/signup', {
@@ -30,7 +30,9 @@ export class ApiService {
         displayName: displayName,
       });
     } else {
-      return new Observable();
+      return new Observable((observer) => {
+        observer.error(new Error('Something went wrong!'));
+      });
     }
   }
 
@@ -75,6 +77,10 @@ export class ApiService {
 
   getMe() {
     return this.http.get(this.endpoint + '/api/users/me');
+  }
+
+  getWorlds() {
+    return this.http.get(this.endpoint + '/api/worlds');
   }
 
 }
