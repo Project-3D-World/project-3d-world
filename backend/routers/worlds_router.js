@@ -3,10 +3,11 @@ import multer from "multer";
 import fs from "fs";
 import patch from "express-ws/lib/add-ws-method.js";
 import mongoose from "mongoose";
+import WebSocketJSONStream from "@teamwork/websocket-json-stream";
 
 import { getShareBackend } from "../datasource.js";
 
-import { isAuthenticated } from "../middleware/auth.js";
+import { isAuthenticated, isWsAuthenticated } from "../middleware/auth.js";
 import { GridFile } from "../models/gridfiles.js";
 import { World } from "../models/worlds.js";
 import { User } from "../models/users.js";
@@ -17,7 +18,7 @@ import { validateGltfZip, deleteFile } from "./utils.js";
 const upload = multer({ dest: "./uploads" });
 
 // Get the shareDB backend
-const shareBackend = getShareBackend();
+const shareBackend = await getShareBackend();
 
 export const worldsRouter = Router();
 patch.default(worldsRouter);
@@ -156,6 +157,26 @@ worldsRouter.patch(
 
     await world.save();
     await user.save();
+
+    // Update the live world if it exists
+    const liveWorld = shareBackend.connect().get("live_worlds", worldId);
+    liveWorld.fetch((err) => {
+      if (err) {
+        return;
+      }
+      if (liveWorld.type !== null) {
+        const chunkIndex = liveWorld.data.chunks.findIndex(
+          (c) => c._id === chunk._id
+        );
+        liveWorld.submitOp([
+          {
+            p: ["chunks", chunkIndex, "claimedBy"],
+            oi: userId,
+          },
+        ]);
+      }
+    });
+
     res.json({
       message: "Chunk claimed",
     });
@@ -232,6 +253,28 @@ worldsRouter.post(
     }
     chunk.chunkFile = uploadedChunk.id;
     await world.save();
+
+    // Update the live world if it exists
+    const liveWorld = shareBackend.connect().get("live_worlds", worldId);
+    liveWorld.fetch((err) => {
+      if (err) {
+        return;
+      }
+      if (liveWorld.type !== null) {
+        const chunkIndex = liveWorld.data.chunks.findIndex(
+          (c) => c._id === chunk._id
+        );
+        if (chunkIndex !== -1) {
+          liveWorld.submitOp([
+            {
+              p: ["chunks", chunkIndex, "chunkFile"],
+              oi: uploadedChunk.id,
+            },
+          ]);
+        }
+      }
+    });
+
     res.json({
       message: "Chunk file uploaded",
       chunk: chunk,
@@ -240,7 +283,7 @@ worldsRouter.post(
 );
 
 /* WS /api/worlds/:worldId/live */
-worldsRouter.ws("/:worldId/live", async (ws, req) => {
+worldsRouter.ws("/:worldId/live", isWsAuthenticated, async (ws, req) => {
   if (!mongoose.Types.ObjectId.isValid(req.params.worldId)) {
     ws.close(1008, "Invalid world ID");
     return;
@@ -251,10 +294,35 @@ worldsRouter.ws("/:worldId/live", async (ws, req) => {
     return;
   }
 
-  // TEST
-  ws.on("message", (msg) => {
-    ws.send(`You said: ${msg}`);
+  const connection = shareBackend.connect();
+  const liveWorld = connection.get("live_worlds", req.params.worldId);
+  liveWorld.fetch((err) => {
+    if (err) {
+      ws.close(1011, "Error fetching live world");
+      return;
+    }
+    if (liveWorld.type === null) {
+      // TODO: check if this data is suffice
+      const data = {
+        chunks: world.chunks.forEach((chunk) => {
+          return {
+            location: chunk.location,
+            chunkFile: chunk.chunkFile,
+            claimedBy: chunk.claimedBy,
+          };
+        }),
+      };
+      liveWorld.create(data);
+    }
   });
-
-  // TODO: add ws logic
+  const stream = new WebSocketJSONStream(ws);
+  shareBackend.listen(stream);
+  // listen to live world changes and update mongoDB
+  liveWorld.on("op", (ops, source) => {
+    if (source) {
+      return;
+    }
+    // check to the changed path
+    console.log(ops);
+  });
 });
