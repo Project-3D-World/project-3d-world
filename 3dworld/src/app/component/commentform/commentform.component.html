@@ -1,0 +1,19 @@
+<form
+  class="complex-form"
+  id="create-comment-form"
+  (submit)="postComment()"
+  [formGroup]="commentForm"
+>
+  <div class="form-title">Post a Comment</div>
+  <textarea
+    formControlName="comment"
+    rows="4"
+    id="post-comment"
+    class="form-element"
+    placeholder="Enter your comment"
+    required
+  ></textarea>
+  <button type="submit" class="btn">Post your comment</button>
+  <p>Message: {{ commentForm.value.comment }}</p>
+  <p>Form Status: {{ commentForm.status }}</p>
+</form>
