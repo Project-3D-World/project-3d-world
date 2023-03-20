@@ -21,6 +21,9 @@ export class ApiService {
     }
   }
 
+
+
+
   signUp(profile: string, displayName: string) {
     console.log(profile, displayName);
     const profileJson = JSON.parse(profile);
@@ -51,22 +54,33 @@ export class ApiService {
 
   //get a world by id
   getWorld(worldId: string) {
-    return this.http.get(this.endpoint + '/api/worlds/' + worldId);
+    return this.http.get<JSON>(this.endpoint + '/api/worlds/' + worldId);
   }
 
   //get all worlds
   getAllWorlds() {
-    return this.http.get(this.endpoint + '/api/worlds');
+    return this.http.get<JSON>(this.endpoint + '/api/worlds');
   }
 
   //create a new world
   createWorld(worldName: string, description: string, rules: string, chunksize: number, numberOfChunks: number) {
+
+    let chunks = [];
+
+    for( let i = 0; i < numberOfChunks; i++)
+    {
+      for(let j = 0; j < numberOfChunks; j++)
+      {
+        chunks.push({x: i*chunksize, z: j*chunksize});
+      }
+    }
+
     return this.http.post(this.endpoint + '/api/worlds', {
       name: worldName,
       chunkSize: { x: chunksize, y: chunksize, z: chunksize},
       description: description ,
       rules: rules,
-      chunks: [{ x: numberOfChunks, z: numberOfChunks}]
+      chunks: chunks
     });
   }
 
