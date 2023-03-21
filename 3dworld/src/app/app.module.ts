@@ -16,7 +16,6 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { WorldObjectComponent } from './world-object/world-object.component';
 import { WorldsComponent } from './pages/worlds/worlds.component';
 import { WorlddivComponent } from './component/worlddiv/worlddiv.component';
-import { CommentformComponent } from './component/commentform/commentform.component';
 
 @NgModule({
   declarations: [
@@ -30,7 +29,6 @@ import { CommentformComponent } from './component/commentform/commentform.compon
     WorldObjectComponent,
     WorldsComponent,
     WorlddivComponent,
-    CommentformComponent,
   ],
   imports: [
     FormsModule,
