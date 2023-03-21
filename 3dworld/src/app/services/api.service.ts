@@ -21,6 +21,9 @@ export class ApiService {
     }
   }
 
+
+
+
   signUp(profile: string, displayName: string) {
     console.log(profile, displayName);
     const profileJson = JSON.parse(profile);
@@ -38,6 +41,10 @@ export class ApiService {
     return this.http.get(this.endpoint + '/api/users/signout');
   }
 
+  getMe() {
+    return this.http.get(this.endpoint + '/api/users/me');
+  }
+
   //world apis
 
   //claim a chunk for a user
@@ -47,17 +54,15 @@ export class ApiService {
 
   //get a world by id
   getWorld(worldId: string) {
-    return this.http.get(this.endpoint + '/api/worlds/' + worldId);
+    return this.http.get<JSON>(this.endpoint + '/api/worlds/' + worldId);
   }
 
   //get all worlds
   getAllWorlds() {
-    return this.http.get(this.endpoint + '/api/worlds');
+    return this.http.get<JSON>(this.endpoint + '/api/worlds');
   }
 
-  /*
   //create a new world
-
   createWorld(worldName: string, description: string, rules: string, chunksize: number, numberOfChunks: number) {
 
     let chunks = [];
@@ -69,13 +74,6 @@ export class ApiService {
         chunks.push({x: i*chunksize, z: j*chunksize});
       }
     }
-  createWorld(
-    worldName: string,
-    description: string,
-    rules: string,
-    chunksize: number,
-    numberOfChunks: number
-  ) {
 
     return this.http.post(this.endpoint + '/api/worlds', {
       name: worldName,
@@ -83,51 +81,13 @@ export class ApiService {
       description: description ,
       rules: rules,
       chunks: chunks
-
-      chunks: [{ x: numberOfChunks, z: numberOfChunks }],
-
     });
   }
-  */
 
   //upload a gltf model to a chunk
   //check how to send the file to backend
   uploadModel(worldId: string, chunkId: string, model: File) {
-    return this.http.post(
-      this.endpoint + '/api/worlds/' + worldId + '/chunks/' + chunkId + '/file',
-      model
-    );
+    return this.http.post(this.endpoint + '/api/worlds/' + worldId + '/chunks/' + chunkId + '/file', model);
   }
 
-  getMe() {
-    return this.http.get(this.endpoint + '/api/users/me');
-  }
-
-  getWorlds() {
-    return this.http.get(this.endpoint + '/api/worlds');
-  }
-
-  getCommentsForWorld(worldId: string, page: number, limit: number) {
-    return this.http.get(
-      this.endpoint +
-        `/api/comments/worldId=${worldId}&page=${page}&limit=${limit}`
-    );
-  }
-
-  postComment(
-    worldId: string,
-    x: number,
-    z: number,
-    author: string,
-    content: string
-  ) {
-    console.log(worldId, x, z, author, content);
-    return this.http.post(this.endpoint + `/api/comments/`, {
-      worldId: worldId,
-      author: author,
-      x: x,
-      z: z,
-      content: content,
-    });
-  }
 }
