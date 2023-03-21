@@ -304,7 +304,7 @@ worldsRouter.ws("/:worldId/live", isWsAuthenticated, async (ws, req) => {
     if (liveWorld.type === null) {
       // TODO: check if this data is suffice
       const data = {
-        chunks: world.chunks.forEach((chunk) => {
+        chunks: world.chunks.map((chunk) => {
           return {
             location: chunk.location,
             chunkFile: chunk.chunkFile,
@@ -312,7 +312,7 @@ worldsRouter.ws("/:worldId/live", isWsAuthenticated, async (ws, req) => {
           };
         }),
       };
-      liveWorld.create(data);
+      liveWorld.create(data, "json0");
     }
   });
   const stream = new WebSocketJSONStream(ws);
