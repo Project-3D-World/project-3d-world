@@ -31,8 +31,8 @@ export const openMongoSession = async function () {
 
 export const closeMongoSession = async function () {
   if (mongo_client) {
-    await shareBackend.close();
     await mongoose.disconnect();
+    await shareBackend.close();
     mongo_client = null;
     shareBackend = null;
   }
