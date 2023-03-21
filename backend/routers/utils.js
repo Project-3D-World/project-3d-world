@@ -1,6 +1,7 @@
 import AdmZip from "adm-zip";
 import gltfValidator from "gltf-validator";
 import fs from "fs";
+import mongoose from "mongoose";
 
 // TODO: reformat the errors
 
@@ -47,4 +48,13 @@ export const deleteFile = (path) => {
       console.error(err);
     }
   });
+};
+
+export const validateIds = (ids) => {
+  for (const id of ids) {
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return false;
+    }
+  }
+  return true;
 };
