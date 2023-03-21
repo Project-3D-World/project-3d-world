@@ -164,9 +164,11 @@ worldsRouter.patch(
       if (err) {
         return;
       }
-      if (liveWorld.type !== null) {
+      if (liveWorld.type) {
         const chunkIndex = liveWorld.data.chunks.findIndex(
-          (c) => c._id === chunk._id
+          (c) =>
+            c.location.x === chunk.location.x &&
+            c.location.z === chunk.location.z
         );
         liveWorld.submitOp([
           {
@@ -260,9 +262,11 @@ worldsRouter.post(
       if (err) {
         return;
       }
-      if (liveWorld.type !== null) {
+      if (liveWorld.type) {
         const chunkIndex = liveWorld.data.chunks.findIndex(
-          (c) => c._id === chunk._id
+          (c) =>
+            c.location.x === chunk.location.x &&
+            c.location.z === chunk.location.z
         );
         if (chunkIndex !== -1) {
           liveWorld.submitOp([
