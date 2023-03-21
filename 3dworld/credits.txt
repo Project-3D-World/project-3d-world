@@ -1,4 +1,0 @@
-Sources Used:
-ChatGPT
-Stackoverflow
-ThreeJS documentation
