@@ -11,7 +11,7 @@ export class WorldsComponent {
 
   constructor(private api: ApiService) {}
   ngOnInit() {
-    this.api.getWorlds().subscribe((response) => {
+    this.api.getAllWorlds().subscribe((response) => {
       this.worlds = Object.values(response)[0];
     });
   }
