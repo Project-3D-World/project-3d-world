@@ -44,6 +44,23 @@ export class ApiService {
     return this.http.get(this.endpoint + '/api/users/me');
   }
 
+  //postComment
+  postComment(
+    worldId: string,
+    x: number,
+    z: number,
+    author: string,
+    content: string
+  ) {
+    console.log(worldId, x, z, author, content);
+    return this.http.post(this.endpoint + `/api/comments/`, {
+      worldId: worldId,
+      author: author,
+      x: x,
+      z: z,
+      content: content,
+    });
+  }
   //world apis
 
   //claim a chunk for a user
