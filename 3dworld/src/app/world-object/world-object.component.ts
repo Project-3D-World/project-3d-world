@@ -20,7 +20,7 @@ export class WorldObjectComponent implements OnInit {
   }
 
   loadWorld(): void {
-    this.api.getWorld("64176688914a579ebfb79af5").subscribe((data) => {
+    this.api.getWorld("64163ea8dcde7c82cc71f65e").subscribe((data) => {
       console.log(data);
     });
   }
@@ -52,7 +52,7 @@ export class WorldObjectComponent implements OnInit {
     // if user clicks on a chunk that is owned by the user, open a form to submit a new gltf model
     this.loadWorld();
 
-    this.api.getWorld("64176688914a579ebfb79af5").subscribe((data) => {
+    this.api.getWorld("64163ea8dcde7c82cc71f65e").subscribe((data) => {
     
       let id = (<any>data).world._id;
       let chunks = (<any>data).world.chunks;
