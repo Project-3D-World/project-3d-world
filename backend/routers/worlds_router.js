@@ -1,20 +1,26 @@
 import { Router } from "express";
 import multer from "multer";
 import fs from "fs";
+import patch from "express-ws/lib/add-ws-method.js";
+import WebSocketJSONStream from "@teamwork/websocket-json-stream";
 
-import { isAuthenticated } from "../middleware/auth.js";
+import { getShareBackend } from "../datasource.js";
+
+import { isAuthenticated, isWsAuthenticated } from "../middleware/auth.js";
 import { GridFile } from "../models/gridfiles.js";
 import { World } from "../models/worlds.js";
 import { User } from "../models/users.js";
 
-import { validateGltfZip, deleteFile } from "./utils.js";
-
-// TODO: add user authentication
+import { validateGltfZip, deleteFile, validateIds } from "./utils.js";
 
 // Create a temp folder for storing uploaded files
 const upload = multer({ dest: "./uploads" });
 
+// Get the shareDB backend
+const shareBackend = await getShareBackend();
+
 export const worldsRouter = Router();
+patch.default(worldsRouter);
 
 /* GET /api/worlds */
 worldsRouter.get("/", isAuthenticated, async (req, res) => {
@@ -24,6 +30,11 @@ worldsRouter.get("/", isAuthenticated, async (req, res) => {
 
 /* GET /api/worlds/:id */
 worldsRouter.get("/:id", isAuthenticated, async (req, res) => {
+  if (!validateIds([id])) {
+    res.status(400).json({ error: "Invalid ID" });
+    deleteFile(chunkFile.path);
+    return;
+  }
   const world = await World.findById(req.params.id).lean();
   if (!world) {
     res.status(404).json({ error: "World not found" });
@@ -32,8 +43,42 @@ worldsRouter.get("/:id", isAuthenticated, async (req, res) => {
   res.json({ world });
 });
 
-/* GET /api/worlds/:id/map */
-worldsRouter.get("/:id/map", isAuthenticated, async (req, res) => {});
+/* GET /api/worlds/:worldId/chunks/:chunkId/file */
+worldsRouter.get(
+  "/:worldId/chunks/:chunkId/file",
+  isAuthenticated,
+  async (req, res) => {
+    const { worldId, chunkId } = req.params;
+    if (!validateIds([worldId, chunkId])) {
+      res.status(400).json({ error: "Invalid ID" });
+      deleteFile(chunkFile.path);
+      return;
+    }
+
+    const world = await World.findById(worldId);
+    if (!world) {
+      res.status(404).json({ error: "World not found" });
+      return;
+    }
+    const chunk = world.chunks.id(chunkId);
+    if (!chunk) {
+      res.status(404).json({ error: "Chunk not found" });
+      return;
+    }
+    if (chunk.fileId === null) {
+      res.status(404).json({ error: "Chunk is currently empty" });
+      return;
+    }
+    const chunkFile = await GridFile.findById(chunk.chunkFile);
+    if (!chunkFile) {
+      res.status(404).json({ error: "Chunk file not found" });
+      return;
+    }
+
+    res.header("Content-Type", chunkFile.contentType);
+    chunkFile.downloadStream(res);
+  }
+);
 
 /* POST /api/worlds */
 worldsRouter.post("/", isAuthenticated, async (req, res) => {
@@ -97,6 +142,12 @@ worldsRouter.patch(
 
     const { worldId, chunkId } = req.params;
     const userId = req.session.userId;
+    if (!validateIds([worldId, chunkId])) {
+      res.status(400).json({ error: "Invalid ID" });
+      deleteFile(chunkFile.path);
+      return;
+    }
+
     const user = await User.findById(userId);
     if (!user) {
       res.status(404).json({ error: "User not found" });
@@ -122,6 +173,28 @@ worldsRouter.patch(
 
     await world.save();
     await user.save();
+
+    // Update the live world if it exists
+    const liveWorld = shareBackend.connect().get("live_worlds", worldId);
+    liveWorld.fetch((err) => {
+      if (err) {
+        return;
+      }
+      if (liveWorld.type) {
+        const chunkIndex = liveWorld.data.chunks.findIndex(
+          (c) =>
+            c.location.x === chunk.location.x &&
+            c.location.z === chunk.location.z
+        );
+        liveWorld.submitOp([
+          {
+            p: ["chunks", chunkIndex, "claimedBy"],
+            oi: userId,
+          },
+        ]);
+      }
+    });
+
     res.json({
       message: "Chunk claimed",
     });
@@ -150,6 +223,12 @@ worldsRouter.post(
       return;
     }
 
+    if (!validateIds([worldId, chunkId])) {
+      res.status(400).json({ error: "Invalid ID" });
+      deleteFile(chunkFile.path);
+      return;
+    }
+
     const user = await User.findById(userId);
     if (!user) {
       res.status(404).json({ error: "User not found" });
@@ -168,7 +247,7 @@ worldsRouter.post(
       deleteFile(chunkFile.path);
       return;
     }
-    if (chunk.claimedBy.toString() !== userId) {
+    if (!chunk.claimedBy || chunk.claimedBy.toString() !== userId) {
       res
         .status(403)
         .json({ error: `This chunk is not claimed by the user ${userId}` });
@@ -198,9 +277,80 @@ worldsRouter.post(
     }
     chunk.chunkFile = uploadedChunk.id;
     await world.save();
+
+    // Update the live world if it exists
+    const liveWorld = shareBackend.connect().get("live_worlds", worldId);
+    liveWorld.fetch((err) => {
+      if (err) {
+        return;
+      }
+      if (liveWorld.type) {
+        const chunkIndex = liveWorld.data.chunks.findIndex(
+          (c) =>
+            c.location.x === chunk.location.x &&
+            c.location.z === chunk.location.z
+        );
+        if (chunkIndex !== -1) {
+          liveWorld.submitOp([
+            {
+              p: ["chunks", chunkIndex, "chunkFile"],
+              oi: uploadedChunk.id,
+            },
+          ]);
+        }
+      }
+    });
+
     res.json({
       message: "Chunk file uploaded",
       chunk: chunk,
     });
   }
 );
+
+/* WS /api/worlds/:worldId/live */
+worldsRouter.ws("/:worldId/live", isWsAuthenticated, async (ws, req) => {
+  if (!validateIds([req.params.worldId])) {
+    ws.close(1008, "Invalid world ID");
+    return;
+  }
+  const world = await World.findById(req.params.worldId);
+  if (!world) {
+    ws.close(1008, "World not found");
+    return;
+  }
+
+  const connection = shareBackend.connect();
+  const liveWorld = connection.get("live_worlds", req.params.worldId);
+  liveWorld.subscribe((err) => {
+    if (err) {
+      ws.close(1011, "Error fetching live world");
+      return;
+    }
+    if (liveWorld.type === null) {
+      // TODO: check if this data is suffice
+      const data = {
+        chunks: world.chunks.map((chunk) => {
+          return {
+            location: chunk.location,
+            chunkFile: chunk.chunkFile,
+            claimedBy: chunk.claimedBy,
+          };
+        }),
+      };
+      liveWorld.create(data, "json0");
+    }
+  });
+  const stream = new WebSocketJSONStream(ws);
+  shareBackend.listen(stream);
+  // listen to live world changes and update mongoDB
+  liveWorld.on("op", (ops, source) => {
+    if (source) {
+      return;
+    }
+    // check to the changed path
+    console.log(ops);
+
+    // TODO: update mongoDB when a chunk is liked/disliked
+  });
+});

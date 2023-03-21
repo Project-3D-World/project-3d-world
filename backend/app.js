@@ -1,4 +1,5 @@
 import express from "express";
+import expressWs from "express-ws";
 import bodyParser from "body-parser";
 import morgan from "morgan";
 import session from "express-session";
@@ -13,6 +14,7 @@ import { commentsRouter } from "./routers/comments_router.js";
 
 const port = config.port;
 const app = express();
+const wsInstance = expressWs(app);
 
 app.use(bodyParser.json());
 app.use(morgan("dev")); // add request logger
@@ -51,6 +53,9 @@ const server = app.listen(port, () => {
 
 // close mongo session and server
 const cleanup = async () => {
+  wsInstance.getWss().clients.forEach((client) => {
+    client.close();
+  });
   await closeMongoSession();
   server.close((err) => {
     console.log("Server closed");
