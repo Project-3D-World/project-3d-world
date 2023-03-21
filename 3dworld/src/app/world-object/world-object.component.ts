@@ -13,13 +13,14 @@ export class WorldObjectComponent implements OnInit {
   scene!: THREE.Scene;
   camera!: THREE.PerspectiveCamera;
   renderer!: THREE.WebGLRenderer;
+  worldId!: string;
 
   constructor(private api: ApiService) {
 
   }
 
   loadWorld(): void {
-    this.api.getAllWorlds().subscribe((data) => {
+    this.api.getWorld("64176688914a579ebfb79af5").subscribe((data) => {
       console.log(data);
     });
   }
@@ -36,6 +37,11 @@ export class WorldObjectComponent implements OnInit {
     });
   }
 
+  createWorld(): void {
+    this.api.createWorld("world", "world description", "world rules", 5, 4).subscribe((data) => {
+      console.log(data);
+    });
+  }
 
   ngOnInit() {
     //get a world id 
@@ -44,6 +50,19 @@ export class WorldObjectComponent implements OnInit {
     // if user clicks on a chunk, claim the chunk
     // if user clicks on a chunk that is already claimed, show the owner of the chunk
     // if user clicks on a chunk that is owned by the user, open a form to submit a new gltf model
+    this.loadWorld();
+
+    this.api.getWorld("64176688914a579ebfb79af5").subscribe((data) => {
+    
+      let id = (<any>data).world._id;
+      let chunks = (<any>data).world.chunks;
+      let sidelength = Math.sqrt(chunks.length);
+      let chunkSize = (<any>data).world.chunkSize.x;
+      console.log(id);
+      console.log(chunks);
+      console.log(sidelength);
+      console.log(chunkSize);
+
     const scene = new THREE.Scene();
     const camera = new THREE.PerspectiveCamera(
       75,
@@ -55,8 +74,6 @@ export class WorldObjectComponent implements OnInit {
     renderer.setSize(window.innerWidth, window.innerHeight);
     document.body.appendChild(renderer.domElement);
     const controls = new OrbitControls(camera, renderer.domElement);
-    const geometry = new THREE.BoxGeometry(2, 1, 2);
-    const material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
     const loader = new GLTFLoader();
     const api = this.api;
     const gridSize = 3;
@@ -67,12 +84,11 @@ export class WorldObjectComponent implements OnInit {
 
     const models:THREE.Group[] = [];
 
-    for (let x = 0; x < gridSize; x++) {
-      for (let z = 0; z < gridSize; z++) {
-        //const cube = new THREE.Mesh(geometry, material);
-        //cube.position.set(x * cubeSize, 0, z * cubeSize);
+    for (let x = 0; x < sidelength; x++) {
+      for (let z = 0; z < sidelength; z++) {
+        if((<any>data).world.chunks[x+z].chunkFile != null) {
         loader.load(
-          'assets/shiba/scene.gltf',
+          (<any>data).world.chunks[x+z].chunkFile,
           function (gltf) {
             gltf.scene.scale.set(5, 5, 5);
             gltf.scene.position.set(x * cubeSize, 0, z*cubeSize);
@@ -85,11 +101,22 @@ export class WorldObjectComponent implements OnInit {
           function (error) {
             console.error(error);
           }
-        );
-        //scene.add(cube);
-        //cubes.push(); // add each cube to the array
-      }
+        )
+        }
+        else
+        {
+          const geometry = new THREE.BoxGeometry(chunkSize, 1, chunkSize);
+          const material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
+          const cube = new THREE.Mesh(geometry, material);
+          cube.position.set(x * (chunkSize+1), 0, z * (chunkSize+1));
+          
+          let group = new THREE.Group();
+          group.add(cube);
+          scene.add(group);
+          models.push(group); // add each cube to the array
+        }
     }
+  }
 
     const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
     scene.add(ambientLight);
@@ -116,18 +143,27 @@ export class WorldObjectComponent implements OnInit {
       // (-1 to +1) for both components
       mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
       mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
-
       // update the picking ray with the camera and mouse position
       raycaster.setFromCamera(mouse, camera);
-
       // calculate objects intersecting the picking ray
       const intersects = raycaster.intersectObjects(models, true);
 
       for (let i = 0; i < intersects.length; i++) {
         // perform the desired action on the clicked cube(s)
         //claim the cube by sending an api request to the server
-        const model = intersects[i].object as THREE.Mesh;
+        const model = intersects[i].object;
         console.log(model);
+        console.log(model.getWorldPosition(new THREE.Vector3()));
+
+        // get world id
+        // get chunk id
+
+        // create the popup with world and chunk id if chunk is not claimed
+        /*var popup = document.createElement('div');
+        popup.className = 'popup';
+        popup.innerHTML = 'Claim this plot as your own?<br><button onclick="this.claimPlot()">Yes</button>';
+        document.body.appendChild(popup);
+        */
         break;
       }
     }
@@ -141,6 +177,7 @@ export class WorldObjectComponent implements OnInit {
     }
     
     requestAnimationFrame(animate);
-    
+    });
   }
+  
 }
