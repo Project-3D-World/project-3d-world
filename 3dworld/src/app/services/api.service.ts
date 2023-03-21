@@ -22,9 +22,6 @@ export class ApiService {
     }
   }
 
-
-
-
   signUp(profile: string, displayName: string) {
     const profileJson = JSON.parse(profile);
     if (profileJson?.sub) {
@@ -68,8 +65,6 @@ export class ApiService {
   }
 
   //create a new world
-  /*
-
   createWorld(worldName: string, description: string, rules: string, chunksize: number, numberOfChunks: number) {
 
     let chunks = [];
@@ -82,15 +77,6 @@ export class ApiService {
       }
     }
 
-
-  createWorld(
-    worldName: string,
-    description: string,
-    rules: string,
-    chunksize: number,
-    numberOfChunks: number
-  ) {
-
     return this.http.post(this.endpoint + '/api/worlds', {
       name: worldName,
       chunkSize: { x: chunksize, y: chunksize, z: chunksize },
@@ -98,12 +84,8 @@ export class ApiService {
       rules: rules,
 
       chunks: chunks
-
-      chunks: [{ x: numberOfChunks, z: numberOfChunks }],
-
     });
   }
-  */
 
   //upload a gltf model to a chunk
   //check how to send the file to backend
