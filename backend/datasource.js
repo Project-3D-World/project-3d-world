@@ -20,7 +20,11 @@ export const openMongoSession = async function () {
     });
     mongo_client = mongoose.connection.getClient();
     console.log("Connected to MongoDB");
-    const db = new ShareDbMongo({ mongo: () => mongo_client });
+    const db = new ShareDbMongo({
+      mongo: (callback) => {
+        callback(null, mongo_client);
+      },
+    });
     shareBackend = new ShareDB({ db });
   }
 };
