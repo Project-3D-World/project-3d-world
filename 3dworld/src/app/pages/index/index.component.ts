@@ -23,6 +23,7 @@ export class IndexComponent implements OnInit {
         (this.profileJson = JSON.stringify(profile, null, 2)),
         this.api.signIn(this.profileJson).subscribe({
           error: (err) => {
+            console.log(err);
             this.router.navigateByUrl('sign-up');
           },
         })
