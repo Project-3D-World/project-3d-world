@@ -30,7 +30,7 @@ worldsRouter.get("/", isAuthenticated, async (req, res) => {
 
 /* GET /api/worlds/:id */
 worldsRouter.get("/:id", isAuthenticated, async (req, res) => {
-  if (!validateIds([id])) {
+  if (!validateIds([req.params.id])) {
     res.status(400).json({ error: "Invalid ID" });
     deleteFile(chunkFile.path);
     return;
