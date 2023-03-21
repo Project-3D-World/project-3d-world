@@ -31,11 +31,11 @@ export class WorldObjectComponent implements OnInit {
     });
   }
 
-  /*uploadModel(worldId: string, chunkId: string, model: File): void {
+  uploadModel(worldId: string, chunkId: string, model: File): void {
     this.api.uploadModel(worldId, chunkId, model).subscribe((data) => {
       console.log(data);
     });
-  }*/
+  }
 
   createWorld(): void {
     this.api.createWorld("world", "world description", "world rules", 5, 4).subscribe((data) => {

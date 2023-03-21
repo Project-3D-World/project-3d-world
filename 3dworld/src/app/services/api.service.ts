@@ -10,14 +10,15 @@ export class ApiService {
   constructor(private http: HttpClient) {}
 
   signIn(profile: string) {
-    console.log(profile);
     const profileJson = JSON.parse(profile);
     if (profileJson?.sub) {
       return this.http.post(this.endpoint + '/api/users/signin', {
         sub: profileJson.sub,
       });
     } else {
-      return new Observable();
+      return new Observable((observer) => {
+        observer.error(new Error('Something went wrong!'));
+      });
     }
   }
 
@@ -25,7 +26,6 @@ export class ApiService {
 
 
   signUp(profile: string, displayName: string) {
-    console.log(profile, displayName);
     const profileJson = JSON.parse(profile);
     if (profileJson?.sub) {
       return this.http.post(this.endpoint + '/api/users/signup', {
@@ -33,7 +33,9 @@ export class ApiService {
         displayName: displayName,
       });
     } else {
-      return new Observable();
+      return new Observable((observer) => {
+        observer.error(new Error('Something went wrong!'));
+      });
     }
   }
 
@@ -49,7 +51,10 @@ export class ApiService {
 
   //claim a chunk for a user
   claimChunk(worldId: string, chunkId: string) {
-    return this.http.patch(this.endpoint + '/api/worlds/' + worldId + '/chunks/' + chunkId, {});
+    return this.http.patch(
+      this.endpoint + '/api/worlds/' + worldId + '/chunks/' + chunkId,
+      {}
+    );
   }
 
   //get a world by id
@@ -63,6 +68,8 @@ export class ApiService {
   }
 
   //create a new world
+  /*
+
   createWorld(worldName: string, description: string, rules: string, chunksize: number, numberOfChunks: number) {
 
     let chunks = [];
@@ -75,14 +82,28 @@ export class ApiService {
       }
     }
 
+
+  createWorld(
+    worldName: string,
+    description: string,
+    rules: string,
+    chunksize: number,
+    numberOfChunks: number
+  ) {
+
     return this.http.post(this.endpoint + '/api/worlds', {
       name: worldName,
-      chunkSize: { x: chunksize, y: chunksize, z: chunksize},
-      description: description ,
+      chunkSize: { x: chunksize, y: chunksize, z: chunksize },
+      description: description,
       rules: rules,
+
       chunks: chunks
+
+      chunks: [{ x: numberOfChunks, z: numberOfChunks }],
+
     });
   }
+  */
 
   //upload a gltf model to a chunk
   //check how to send the file to backend
