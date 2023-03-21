@@ -22,9 +22,6 @@ export class ApiService {
     }
   }
 
-
-
-
   signUp(profile: string, displayName: string) {
     const profileJson = JSON.parse(profile);
     if (profileJson?.sub) {
@@ -42,7 +39,7 @@ export class ApiService {
   signOut() {
     return this.http.get(this.endpoint + '/api/users/signout');
   }
-  
+
   //world apis
 
   //claim a chunk for a user
@@ -55,29 +52,15 @@ export class ApiService {
 
   //get a world by id
   getWorld(worldId: string) {
-    return this.http.get<JSON>(this.endpoint + '/api/worlds/' + worldId);
+    return this.http.get(this.endpoint + '/api/worlds/' + worldId);
   }
 
   //get all worlds
   getAllWorlds() {
-    return this.http.get<JSON>(this.endpoint + '/api/worlds');
+    return this.http.get(this.endpoint + '/api/worlds');
   }
 
   //create a new world
-
-  createWorld(worldName: string, description: string, rules: string, chunksize: number, numberOfChunks: number) {
-
-    let chunks = [];
-
-    for( let i = 0; i < numberOfChunks; i++)
-    {
-      for(let j = 0; j < numberOfChunks; j++)
-      {
-        chunks.push({x: i*chunksize, z: j*chunksize});
-      }
-    }
-
-
   createWorld(
     worldName: string,
     description: string,
@@ -85,15 +68,12 @@ export class ApiService {
     chunksize: number,
     numberOfChunks: number
   ) {
-
     return this.http.post(this.endpoint + '/api/worlds', {
       name: worldName,
       chunkSize: { x: chunksize, y: chunksize, z: chunksize },
       description: description,
       rules: rules,
-      chunks: chunks
       chunks: [{ x: numberOfChunks, z: numberOfChunks }],
-
     });
   }
 
@@ -106,9 +86,12 @@ export class ApiService {
     );
   }
 
-
   getMe() {
     return this.http.get(this.endpoint + '/api/users/me');
+  }
+
+  getWorlds() {
+    return this.http.get(this.endpoint + '/api/worlds');
   }
 
   getCommentsForWorld(worldId: string, page: number, limit: number) {
@@ -134,5 +117,4 @@ export class ApiService {
       content: content,
     });
   }
-
 }
