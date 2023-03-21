@@ -40,14 +40,12 @@ export class ApiService {
     return this.http.get(this.endpoint + '/api/users/signout');
   }
 
+
   //world apis
 
   //claim a chunk for a user
   claimChunk(worldId: string, chunkId: string) {
-    return this.http.patch(
-      this.endpoint + '/api/worlds/' + worldId + '/chunks/' + chunkId,
-      {}
-    );
+    return this.http.patch(this.endpoint + '/api/worlds/' + worldId + '/chunks/' + chunkId, {});
   }
 
   //get a world by id
@@ -61,29 +59,20 @@ export class ApiService {
   }
 
   //create a new world
-  createWorld(
-    worldName: string,
-    description: string,
-    rules: string,
-    chunksize: number,
-    numberOfChunks: number
-  ) {
+  createWorld(worldName: string, description: string, rules: string, chunksize: number, numberOfChunks: number) {
     return this.http.post(this.endpoint + '/api/worlds', {
       name: worldName,
-      chunkSize: { x: chunksize, y: chunksize, z: chunksize },
-      description: description,
+      chunkSize: { x: chunksize, y: chunksize, z: chunksize},
+      description: description ,
       rules: rules,
-      chunks: [{ x: numberOfChunks, z: numberOfChunks }],
+      chunks: [{ x: numberOfChunks, z: numberOfChunks}]
     });
   }
 
   //upload a gltf model to a chunk
   //check how to send the file to backend
   uploadModel(worldId: string, chunkId: string, model: File) {
-    return this.http.post(
-      this.endpoint + '/api/worlds/' + worldId + '/chunks/' + chunkId + '/file',
-      model
-    );
+    return this.http.post(this.endpoint + '/api/worlds/' + worldId + '/chunks/' + chunkId + '/file', model);
   }
 
   getMe() {
@@ -94,27 +83,4 @@ export class ApiService {
     return this.http.get(this.endpoint + '/api/worlds');
   }
 
-  getCommentsForWorld(worldId: string, page: number, limit: number) {
-    return this.http.get(
-      this.endpoint +
-        `/api/comments/worldId=${worldId}&page=${page}&limit=${limit}`
-    );
-  }
-
-  postComment(
-    worldId: string,
-    x: number,
-    z: number,
-    author: string,
-    content: string
-  ) {
-    console.log(worldId, x, z, author, content);
-    return this.http.post(this.endpoint + `/api/comments/`, {
-      worldId: worldId,
-      author: author,
-      x: x,
-      z: z,
-      content: content,
-    });
-  }
 }

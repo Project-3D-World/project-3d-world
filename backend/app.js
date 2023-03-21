@@ -9,7 +9,6 @@ import { config } from "./config.js";
 
 import { usersRouter } from "./routers/users_router.js";
 import { worldsRouter } from "./routers/worlds_router.js";
-import { commentsRouter } from "./routers/comments_router.js";
 
 const port = config.port;
 const app = express();
@@ -43,7 +42,7 @@ try {
 // TODO: add other routers
 app.use("/api/users", usersRouter);
 app.use("/api/worlds", worldsRouter);
-app.use( '/api/comments',commentsRouter)
+
 // start server
 const server = app.listen(port, () => {
   console.log(`Server started at http://localhost:${port}`);
