@@ -17,6 +17,7 @@ import { WorldObjectComponent } from './world-object/world-object.component';
 import { WorldsComponent } from './pages/worlds/worlds.component';
 import { WorlddivComponent } from './component/worlddiv/worlddiv.component';
 import { CommentformComponent } from './component/commentform/commentform.component';
+import { UploadFormComponent } from './component/upload-form/upload-form.component';
 
 @NgModule({
   declarations: [
@@ -31,6 +32,7 @@ import { CommentformComponent } from './component/commentform/commentform.compon
     WorldsComponent,
     WorlddivComponent,
     CommentformComponent,
+    UploadFormComponent,
   ],
   imports: [
     FormsModule,
