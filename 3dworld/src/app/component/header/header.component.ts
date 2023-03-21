@@ -12,8 +12,7 @@ export class HeaderComponent {
   constructor(
     public auth: AuthService,
     private location: Location,
-    private api: ApiService,
-    private router: Router
+    private api: ApiService
   ) {}
   ngOnInit(): void {}
 
@@ -23,10 +22,6 @@ export class HeaderComponent {
         redirect_uri: 'http://localhost:4200',
       },
     });
-  }
-
-  goToWorlds() {
-    this.router.navigateByUrl('worlds');
   }
   signOut() {
     this.auth.logout();
