@@ -41,7 +41,7 @@ export class SignUpComponent implements OnInit {
     if (this.profileJson.length !== 0) {
       this.api.signUp(this.profileJson, this.nameForm.value.name).subscribe({
         next: (x) => {
-          this.router.navigateByUrl('');
+          this.router.navigateByUrl('sign-in');
           this.signUpStatus = '200: you got signed in';
         },
         error: (err) => {
