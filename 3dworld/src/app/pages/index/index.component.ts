@@ -10,7 +10,7 @@ import { Route, Router } from '@angular/router';
   styleUrls: ['./index.component.scss'],
 })
 export class IndexComponent implements OnInit {
-  profileJson: string = '';
+  
   constructor(
     public auth: AuthService,
     private api: ApiService,
@@ -18,15 +18,8 @@ export class IndexComponent implements OnInit {
     private router: Router
   ) {}
   ngOnInit(): void {
-    this.auth.user$.subscribe(
-      (profile) => (
-        (this.profileJson = JSON.stringify(profile, null, 2)),
-        this.api.signIn(this.profileJson).subscribe({
-          error: (err) => {
-            this.router.navigateByUrl('sign-up');
-          },
-        })
-      )
-    );
+    this.api.getMe().subscribe((data)=>{
+      console.log(data);
+    })
   }
 }
