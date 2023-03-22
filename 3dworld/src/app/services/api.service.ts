@@ -14,7 +14,8 @@ export class ApiService {
     if (profileJson?.sub) {
       return this.http.post(this.endpoint + '/api/users/signin', {
         sub: profileJson.sub,
-      });
+      },
+      {withCredentials:true});
     } else {
       return new Observable((observer) => {
         observer.error(new Error('Something went wrong!'));
@@ -28,7 +29,8 @@ export class ApiService {
       return this.http.post(this.endpoint + '/api/users/signup', {
         sub: profileJson.sub,
         displayName: displayName,
-      });
+      },
+      {withCredentials:true});
     } else {
       return new Observable((observer) => {
         observer.error(new Error('Something went wrong!'));
@@ -41,7 +43,7 @@ export class ApiService {
   }
 
   getMe() {
-    return this.http.get(this.endpoint + '/api/users/me');
+    return this.http.get(this.endpoint + '/api/users/me',{withCredentials:true});
   }
 
   //postComment
