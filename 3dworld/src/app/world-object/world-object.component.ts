@@ -1,19 +1,19 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, Input, OnDestroy, OnInit} from '@angular/core';
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 import { ApiService } from '../services/api.service';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
-
 @Component({
   selector: 'app-world-object',
   templateUrl: './world-object.component.html',
   styleUrls: ['./world-object.component.scss'],
 })
-export class WorldObjectComponent implements OnInit {
+export class WorldObjectComponent implements OnInit, OnDestroy {
+
+  @Input() worldId!: string;
   scene!: THREE.Scene;
   camera!: THREE.PerspectiveCamera;
   renderer!: THREE.WebGLRenderer;
-  worldId!: string;
   raycaster!:THREE.Raycaster;
   mouse!:THREE.Vector2;
   models!: THREE.Group[];
@@ -70,6 +70,7 @@ export class WorldObjectComponent implements OnInit {
 
     for (let x = 0; x < sidelength; x++) {
       for (let z = 0; z < sidelength; z++) {
+        console.log((<any>data).world.chunks[x+z].chunkFile)
         if((<any>data).world.chunks[x+z].chunkFile != null) {
         this.loader.load(
           (<any>data).world.chunks[x+z].chunkFile,
@@ -126,17 +127,15 @@ export class WorldObjectComponent implements OnInit {
     this.mouse = new THREE.Vector2();
     this.models = [];
     this.ambientLight = new THREE.AmbientLight(0x404040);
-    // add event listeners to the cube
     this.scene.add(this.ambientLight);
     this.camera.position.y = 10;
     this.camera.position.z = 10;
     this.camera.position.x = 10;
     this.loadChunks();
-    
+
     const onClick = (event: MouseEvent) => {
       // calculate mouse position in normalized device coordinates
       // (-1 to +1) for both components
-      console.log("mouseClick");
       this.mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
       this.mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
       // update the picking ray with the camera and mouse position
@@ -165,6 +164,12 @@ export class WorldObjectComponent implements OnInit {
     }
 
     requestAnimationFrame(animate);
+  }
 
+  ngOnDestroy() {
+    window.removeEventListener('resize', this.onWindowResize, false);
+    this.renderer.domElement.removeEventListener('click', () => {}, false);
+    document.body.removeChild(this.renderer.domElement);
+    console.log("destroyed");
   }
 }
