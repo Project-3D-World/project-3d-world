@@ -6,6 +6,8 @@ import { SignUpComponent } from './pages/sign-up/sign-up.component';
 import { AuthGuard } from '@auth0/auth0-angular';
 import { Auth0Guard } from './guards/auth0.guard';
 import { WorldsComponent } from './pages/worlds/worlds.component';
+import { WorldViewComponent } from './pages/world-view/world-view.component';
+
 const routes: Routes = [
   {
     path: '',
@@ -23,6 +25,11 @@ const routes: Routes = [
   {
     path: 'worlds',
     component: WorldsComponent,
+    canActivate: [Auth0Guard],
+  },
+  {
+    path: 'world-view',
+    component: WorldViewComponent,
     canActivate: [Auth0Guard],
   },
 ];
