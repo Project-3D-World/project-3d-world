@@ -14,7 +14,8 @@ export class ApiService {
     if (profileJson?.sub) {
       return this.http.post(this.endpoint + '/api/users/signin', {
         sub: profileJson.sub,
-      });
+      },
+      {withCredentials:true});
     } else {
       return new Observable((observer) => {
         observer.error(new Error('Something went wrong!'));
@@ -28,7 +29,8 @@ export class ApiService {
       return this.http.post(this.endpoint + '/api/users/signup', {
         sub: profileJson.sub,
         displayName: displayName,
-      });
+      },
+      {withCredentials:true});
     } else {
       return new Observable((observer) => {
         observer.error(new Error('Something went wrong!'));
@@ -37,11 +39,11 @@ export class ApiService {
   }
 
   signOut() {
-    return this.http.get(this.endpoint + '/api/users/signout');
+    return this.http.get(this.endpoint + '/api/users/signout',{withCredentials:true});
   }
 
   getMe() {
-    return this.http.get(this.endpoint + '/api/users/me');
+    return this.http.get(this.endpoint + '/api/users/me',{withCredentials:true});
   }
 
   //postComment
@@ -59,7 +61,7 @@ export class ApiService {
       x: x,
       z: z,
       content: content,
-    });
+    },{withCredentials:true});
   }
   //world apis
 
@@ -67,18 +69,18 @@ export class ApiService {
   claimChunk(worldId: string, chunkId: string) {
     return this.http.patch(
       this.endpoint + '/api/worlds/' + worldId + '/chunks/' + chunkId,
-      {}
+      {},{withCredentials:true}
     );
   }
 
   //get a world by id
   getWorld(worldId: string) {
-    return this.http.get<JSON>(this.endpoint + '/api/worlds/' + worldId);
+    return this.http.get<JSON>(this.endpoint + '/api/worlds/' + worldId,{withCredentials:true});
   }
 
   //get all worlds
   getAllWorlds() {
-    return this.http.get<JSON>(this.endpoint + '/api/worlds');
+    return this.http.get<JSON>(this.endpoint + '/api/worlds',{withCredentials:true});
   }
 
   //create a new world
@@ -101,13 +103,13 @@ export class ApiService {
       rules: rules,
 
       chunks: chunks
-    });
+    },{withCredentials:true});
   }
 
   //upload a gltf model to a chunk
   //check how to send the file to backend
   uploadModel(worldId: string, chunkId: string, model: File) {
-    return this.http.post(this.endpoint + '/api/worlds/' + worldId + '/chunks/' + chunkId + '/file', model);
+    return this.http.post(this.endpoint + '/api/worlds/' + worldId + '/chunks/' + chunkId + '/file', model,{withCredentials:true});
   }
 
 }

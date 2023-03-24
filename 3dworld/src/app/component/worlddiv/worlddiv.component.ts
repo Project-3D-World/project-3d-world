@@ -10,5 +10,9 @@ export class WorlddivComponent implements OnInit {
   @Input() world!: any;
   ngOnInit(): void {}
 
-  visitWorld() {}
+  constructor(private route: Router) {}
+
+  visitWorld(worldId: string) {
+    this.route.navigate(['world-view'], { queryParams: { worldId: worldId} });
+  }
 }
