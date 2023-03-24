@@ -1,4 +1,5 @@
-import { Component, Input, OnDestroy, OnInit } from '@angular/core';
+import { AfterViewInit, Component, Input, OnDestroy } from '@angular/core';
+
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 import { ApiService } from '../services/api.service';
@@ -8,7 +9,7 @@ import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
   templateUrl: './world-object.component.html',
   styleUrls: ['./world-object.component.scss'],
 })
-export class WorldObjectComponent implements OnInit, OnDestroy {
+export class WorldObjectComponent implements AfterViewInit, OnDestroy {
   @Input() worldId!: string;
   scene!: THREE.Scene;
   camera!: THREE.PerspectiveCamera;
@@ -60,7 +61,7 @@ export class WorldObjectComponent implements OnInit, OnDestroy {
   }
 
   loadChunks() {
-    this.api.getWorld('641d0ab3682595dcb16f74c8').subscribe((data) => {
+    this.api.getWorld(this.worldId).subscribe((data) => {
       let id = (<any>data).world._id;
       let chunks = (<any>data).world.chunks;
       let sidelength = Math.sqrt(chunks.length);
@@ -105,8 +106,9 @@ export class WorldObjectComponent implements OnInit, OnDestroy {
     });
   }
 
-  ngOnInit() {
+  ngAfterViewInit() {
     //get a world id
+
     // load the world with its chunks
     // check if user clicks on a chunk
     // if user clicks on a chunk, claim the chunk

@@ -4,5 +4,7 @@
 <div class="col-12 world-content">Description: {{ world.description }}</div>
 <div class="col-12 world-content">Rules: {{ world.rules }}</div>
 <div class="col-12">
-  <button class="col-12 btn general-green" (click)="visitWorld()">Visit</button>
+  <button class="col-12 btn general-green" (click)="visitWorld(world._id)">
+    Visit
+  </button>
 </div>

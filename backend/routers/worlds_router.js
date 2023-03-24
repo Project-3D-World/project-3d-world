@@ -32,7 +32,6 @@ worldsRouter.get("/", isAuthenticated, async (req, res) => {
 worldsRouter.get("/:id", isAuthenticated, async (req, res) => {
   if (!validateIds([req.params.id])) {
     res.status(400).json({ error: "Invalid ID" });
-    deleteFile(chunkFile.path);
     return;
   }
   const world = await World.findById(req.params.id).lean();
@@ -51,7 +50,6 @@ worldsRouter.get(
     const { worldId, chunkId } = req.params;
     if (!validateIds([worldId, chunkId])) {
       res.status(400).json({ error: "Invalid ID" });
-      deleteFile(chunkFile.path);
       return;
     }
 
@@ -144,7 +142,6 @@ worldsRouter.patch(
     const userId = req.session.userId;
     if (!validateIds([worldId, chunkId])) {
       res.status(400).json({ error: "Invalid ID" });
-      deleteFile(chunkFile.path);
       return;
     }
 
@@ -319,38 +316,42 @@ worldsRouter.ws("/:worldId/live", isWsAuthenticated, async (ws, req) => {
     ws.close(1008, "World not found");
     return;
   }
-
   const connection = shareBackend.connect();
   const liveWorld = connection.get("live_worlds", req.params.worldId);
+
+  // Create live world if it doesn't exist
   liveWorld.subscribe((err) => {
     if (err) {
       ws.close(1011, "Error fetching live world");
       return;
     }
     if (liveWorld.type === null) {
-      // TODO: check if this data is suffice
       const data = {
-        chunks: world.chunks.map((chunk) => {
-          return {
-            location: chunk.location,
-            chunkFile: chunk.chunkFile,
-            claimedBy: chunk.claimedBy,
-          };
-        }),
+        chunks: world.chunks,
       };
       liveWorld.create(data, "json0");
     }
   });
+
   const stream = new WebSocketJSONStream(ws);
   shareBackend.listen(stream);
+
   // listen to live world changes and update mongoDB
   liveWorld.on("op", (ops, source) => {
     if (source) {
       return;
     }
-    // check to the changed path
-    console.log(ops);
-
-    // TODO: update mongoDB when a chunk is liked/disliked
+    const chunkIndex = ops[0].p[1];
+    if (ops[0].p[2] === "upvotes") {
+      const chunkId = liveWorld.data.chunks[chunkIndex]._id;
+      const chunk = world.chunks.id(chunkId);
+      chunk.upvotes += 1;
+      world.save();
+    } else if (ops[0].p[2] === "downvote") {
+      const chunkId = liveWorld.data.chunks[chunkIndex]._id;
+      const chunk = world.chunks.id(chunkId);
+      chunk.downvotes += 1;
+      world.save();
+    }
   });
 });

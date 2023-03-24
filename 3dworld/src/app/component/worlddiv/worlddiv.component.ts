@@ -12,9 +12,7 @@ export class WorlddivComponent implements OnInit {
 
   constructor(private route: Router) {}
 
-  visitWorld() {
-    this.route.navigate(['world-view'], {
-      queryParams: { worldId: this.world.id },
-    });
+  visitWorld(worldId: string) {
+    this.route.navigate(['world-view'], { queryParams: { worldId: worldId } });
   }
 }
