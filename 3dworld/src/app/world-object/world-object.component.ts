@@ -1,4 +1,4 @@
-import { Component, Input, OnDestroy, OnInit} from '@angular/core';
+import { Component, Input, OnDestroy, OnInit } from '@angular/core';
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 import { ApiService } from '../services/api.service';
@@ -9,21 +9,23 @@ import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
   styleUrls: ['./world-object.component.scss'],
 })
 export class WorldObjectComponent implements OnInit, OnDestroy {
-
   @Input() worldId!: string;
   scene!: THREE.Scene;
   camera!: THREE.PerspectiveCamera;
   renderer!: THREE.WebGLRenderer;
-  raycaster!:THREE.Raycaster;
-  mouse!:THREE.Vector2;
+  raycaster!: THREE.Raycaster;
+  mouse!: THREE.Vector2;
   models!: THREE.Group[];
   ambientLight!: THREE.AmbientLight;
   controls!: OrbitControls;
   loader!: GLTFLoader;
+  x!: number;
+  z!: number;
+  comments: any = [
+    { author: 'Youngjae', content: 'Hello', createdAt: 'this date' },
+  ];
 
-  constructor(private api: ApiService) {
-
-  }
+  constructor(private api: ApiService) {}
 
   loadWorld(): void {
     this.api.getWorld('64176688914a579ebfb79af5').subscribe((data) => {
@@ -31,7 +33,7 @@ export class WorldObjectComponent implements OnInit, OnDestroy {
     });
   }
 
-  claimPlot(worldId : string, chunkid: string): void {
+  claimPlot(worldId: string, chunkid: string): void {
     this.api.claimChunk(worldId, chunkid).subscribe((data) => {
       console.log(data);
     });
@@ -44,68 +46,67 @@ export class WorldObjectComponent implements OnInit, OnDestroy {
   }
 
   createWorld(): void {
-    this.api.createWorld("world", "world description", "world rules", 5, 4).subscribe((data) => {
-      console.log(data);
+    this.api
+      .createWorld('world', 'world description', 'world rules', 5, 4)
+      .subscribe((data) => {
+        console.log(data);
+      });
+  }
+
+  onWindowResize() {
+    this.camera.aspect = window.innerWidth / window.innerHeight;
+    this.camera.updateProjectionMatrix();
+    this.renderer.setSize(window.innerWidth, window.innerHeight);
+  }
+
+  loadChunks() {
+    this.api.getWorld('641d0ab3682595dcb16f74c8').subscribe((data) => {
+      let id = (<any>data).world._id;
+      let chunks = (<any>data).world.chunks;
+      let sidelength = Math.sqrt(chunks.length);
+      let chunkSize = (<any>data).world.chunkSize.x;
+      const cubeSize = 10;
+      console.log(id);
+      console.log(chunks);
+      console.log(sidelength);
+      console.log(chunkSize);
+
+      for (let x = 0; x < sidelength; x++) {
+        for (let z = 0; z < sidelength; z++) {
+          console.log((<any>data).world.chunks[x + z].chunkFile);
+          if ((<any>data).world.chunks[x + z].chunkFile != null) {
+            this.loader.load(
+              (<any>data).world.chunks[x + z].chunkFile,
+              (gltf) => {
+                gltf.scene.scale.set(5, 5, 5);
+                gltf.scene.position.set(x * cubeSize, 0, z * cubeSize);
+                this.models.push(gltf.scene);
+                this.scene.add(gltf.scene);
+              },
+              function (xhr) {
+                console.log((xhr.loaded / xhr.total) * 100 + '% loaded');
+              },
+              function (error) {
+                console.error(error);
+              }
+            );
+          } else {
+            const geometry = new THREE.BoxGeometry(chunkSize, 1, chunkSize);
+            const material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
+            const cube = new THREE.Mesh(geometry, material);
+            cube.position.set(x * (chunkSize + 1), 0, z * (chunkSize + 1));
+            let group = new THREE.Group();
+            group.add(cube);
+            this.scene.add(group);
+            this.models.push(group); // add each cube to the array
+          }
+        }
+      }
     });
   }
 
-  onWindowResize(){
-    this.camera.aspect = window.innerWidth / window.innerHeight;
-    this.camera.updateProjectionMatrix();
-    this.renderer.setSize( window.innerWidth, window.innerHeight );
-  }
-
-  loadChunks()
-  {
-    this.api.getWorld('64176688914a579ebfb79af5').subscribe((data) => {
-    let id = (<any>data).world._id;
-    let chunks = (<any>data).world.chunks;
-    let sidelength = Math.sqrt(chunks.length);
-    let chunkSize = (<any>data).world.chunkSize.x;
-    const cubeSize = 10;
-    console.log(id);
-    console.log(chunks);
-    console.log(sidelength);
-    console.log(chunkSize);
-
-    for (let x = 0; x < sidelength; x++) {
-      for (let z = 0; z < sidelength; z++) {
-        console.log((<any>data).world.chunks[x+z].chunkFile)
-        if((<any>data).world.chunks[x+z].chunkFile != null) {
-        this.loader.load(
-          (<any>data).world.chunks[x+z].chunkFile,
-           (gltf) => {
-            gltf.scene.scale.set(5, 5, 5);
-            gltf.scene.position.set(x * cubeSize, 0, z*cubeSize);
-            this.models.push(gltf.scene);
-            this.scene.add(gltf.scene);
-          },
-          function ( xhr ) {
-            console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' );
-          },
-          function (error) {
-            console.error(error);
-          }
-        )
-        }
-        else
-        {
-          const geometry = new THREE.BoxGeometry(chunkSize, 1, chunkSize);
-          const material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
-          const cube = new THREE.Mesh(geometry, material);
-          cube.position.set(x * (chunkSize+1), 0, z * (chunkSize+1));
-          let group = new THREE.Group();
-          group.add(cube);
-          this.scene.add(group);
-          this.models.push(group); // add each cube to the array
-        }
-    }
-    }
-  });
-  }
-
   ngOnInit() {
-    //get a world id 
+    //get a world id
     // load the world with its chunks
     // check if user clicks on a chunk
     // if user clicks on a chunk, claim the chunk
@@ -142,18 +143,22 @@ export class WorldObjectComponent implements OnInit, OnDestroy {
       this.raycaster.setFromCamera(this.mouse, this.camera);
       // calculate objects intersecting the picking ray
       const intersects = this.raycaster.intersectObjects(this.models, true);
-  
+
       for (let i = 0; i < intersects.length; i++) {
         // perform the desired action on the clicked cube(s)
         //claim the cube by sending an api request to the server
         const model = intersects[i].object;
         console.log(model);
         console.log(model.getWorldPosition(new THREE.Vector3()));
+        const position = model.getWorldPosition(new THREE.Vector3());
+        this.x = position.x;
+        this.z = position.z;
+        document.querySelector('.hidden')?.classList.remove('hidden');
         break;
       }
-    }
+    };
     this.renderer.domElement.addEventListener('click', onClick, false);
-    window.addEventListener( 'resize', this.onWindowResize, false );    
+    window.addEventListener('resize', this.onWindowResize, false);
 
     const animate = () => {
       this.controls.update();
@@ -161,7 +166,7 @@ export class WorldObjectComponent implements OnInit, OnDestroy {
       this.renderer.clear();
       this.renderer.render(this.scene, this.camera);
       requestAnimationFrame(animate);
-    }
+    };
 
     requestAnimationFrame(animate);
   }
@@ -170,6 +175,6 @@ export class WorldObjectComponent implements OnInit, OnDestroy {
     window.removeEventListener('resize', this.onWindowResize, false);
     this.renderer.domElement.removeEventListener('click', () => {}, false);
     document.body.removeChild(this.renderer.domElement);
-    console.log("destroyed");
+    console.log('destroyed');
   }
 }
