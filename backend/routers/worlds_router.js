@@ -32,7 +32,6 @@ worldsRouter.get("/", isAuthenticated, async (req, res) => {
 worldsRouter.get("/:id", isAuthenticated, async (req, res) => {
   if (!validateIds([req.params.id])) {
     res.status(400).json({ error: "Invalid ID" });
-    deleteFile(chunkFile.path);
     return;
   }
   const world = await World.findById(req.params.id).lean();
@@ -51,7 +50,6 @@ worldsRouter.get(
     const { worldId, chunkId } = req.params;
     if (!validateIds([worldId, chunkId])) {
       res.status(400).json({ error: "Invalid ID" });
-      deleteFile(chunkFile.path);
       return;
     }
 
@@ -144,7 +142,6 @@ worldsRouter.patch(
     const userId = req.session.userId;
     if (!validateIds([worldId, chunkId])) {
       res.status(400).json({ error: "Invalid ID" });
-      deleteFile(chunkFile.path);
       return;
     }
 
@@ -309,7 +306,7 @@ worldsRouter.post(
 );
 
 /* WS /api/worlds/:worldId/live */
-worldsRouter.ws("/:worldId/live", isWsAuthenticated, async (ws, req) => {
+worldsRouter.ws("/:worldId/live", async (ws, req) => {
   if (!validateIds([req.params.worldId])) {
     ws.close(1008, "Invalid world ID");
     return;
