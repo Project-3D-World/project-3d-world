@@ -306,7 +306,7 @@ worldsRouter.post(
 );
 
 /* WS /api/worlds/:worldId/live */
-worldsRouter.ws("/:worldId/live", async (ws, req) => {
+worldsRouter.ws("/:worldId/live", isWsAuthenticated, async (ws, req) => {
   if (!validateIds([req.params.worldId])) {
     ws.close(1008, "Invalid world ID");
     return;
