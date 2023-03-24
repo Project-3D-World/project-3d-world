@@ -1,4 +1,9 @@
 <p>world-object works!</p>
-<div #canvas id = "canvas" style="height: 600; width: 600"></div>
-<div class = "commentForm-container"></div>
-<div class = "commentView-container"></div>
+<div #canvas id="canvas" style="height: 600; width: 600"></div>
+<app-commentform
+  class="hidden"
+  [worldId]="worldId"
+  [chunkX]="x"
+  [chunkZ]="z"
+></app-commentform>
+<app-comment-view [comments]="comments"></app-comment-view>

@@ -15,5 +15,4 @@ export class WorldsComponent {
       this.worlds = Object.values(response)[0];
     });
   }
-
 }
