@@ -45,7 +45,7 @@ try {
 // TODO: add other routers
 app.use("/api/users", usersRouter);
 app.use("/api/worlds", worldsRouter);
-app.use( '/api/comments',commentsRouter)
+app.use("/api/comments", commentsRouter);
 // start server
 const server = app.listen(port, () => {
   console.log(`Server started at http://localhost:${port}`);
