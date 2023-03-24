@@ -82,18 +82,15 @@ export class ApiService {
   }
 
   //create a new world
-  createWorld(
-    worldName: string,
-    description: string,
-    rules: string,
-    chunksize: number,
-    numberOfChunks: number
-  ) {
+  createWorld(worldName: string, description: string, rules: string, chunksize: number, numberOfChunks: number) {
+
     let chunks = [];
 
-    for (let i = 0; i < numberOfChunks; i++) {
-      for (let j = 0; j < numberOfChunks; j++) {
-        chunks.push({ x: i * chunksize, z: j * chunksize });
+    for( let i = 0; i < numberOfChunks; i++)
+    {
+      for(let j = 0; j < numberOfChunks; j++)
+      {
+        chunks.push({x: i*chunksize, z: j*chunksize});
       }
     }
 
@@ -103,16 +100,14 @@ export class ApiService {
       description: description,
       rules: rules,
 
-      chunks: chunks,
+      chunks: chunks
     });
   }
 
   //upload a gltf model to a chunk
   //check how to send the file to backend
   uploadModel(worldId: string, chunkId: string, model: File) {
-    return this.http.post(
-      this.endpoint + '/api/worlds/' + worldId + '/chunks/' + chunkId + '/file',
-      model
-    );
+    return this.http.post(this.endpoint + '/api/worlds/' + worldId + '/chunks/' + chunkId + '/file', model);
   }
+
 }
