@@ -1,3 +1,33 @@
-<p>world-object works!</p>
-<div class = "commentForm-container"></div>
-<div class = "commentView-container"></div>
+<app-commentform
+  class="hidden"
+  [worldId]="worldId"
+  [chunkX]="x"
+  [chunkZ]="z"
+  (newComment)="newComment($event)"
+></app-commentform>
+
+<div class="item comment-containers-container hidden">
+  <app-comment-view
+    (deleted)="deleteComment($event)"
+    class="comment-view"
+    [comments]="comments.slice(0, 10)"
+    [userId]="userId"
+  ></app-comment-view>
+
+  <div class="row comment-button-container">
+    <button
+      *ngIf="commentPage > 0"
+      class="btn prev-btn"
+      (click)="getComments(commentPage - 1, commentLimit)"
+    >
+      Prev
+    </button>
+    <button
+      *ngIf="comments.length === 11"
+      class="btn next-btn"
+      (click)="getComments(commentPage + 1, commentLimit)"
+    >
+      Next
+    </button>
+  </div>
+</div>
