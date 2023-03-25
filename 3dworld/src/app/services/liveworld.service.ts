@@ -4,6 +4,10 @@ import { Injectable } from '@angular/core';
   providedIn: 'root'
 })
 export class LiveWorldService {
+  static Reaction = {
+    upvote: 'upvote',
+    downvote: 'downvote'
+  }
   private sharedb;
   private worldDoc: any;
   private socket: any;
@@ -39,14 +43,29 @@ export class LiveWorldService {
   disconnect() {
     if (this.socket) {
       this.socket.close();
+      this.worldDoc = null;
     }
   }
 
   getWorldData() {
+    if (!this.worldDoc) {
+      return null;
+    }
     return this.worldDoc.data;
   }
 
-  submitOp(op: any) {
+  addReaction(chunkId: string, reaction: any) {
+    if (reaction !== 'upvote' && reaction !== 'downvote') {
+      return;
+    }
+    const chunkIndex = this.worldDoc.data.chunks.findIndex((chunk: any) => chunk._id === chunkId);
+    if (chunkIndex === -1) {
+      return;
+    }
+    this.submitOp({ p: ['chunks', chunkIndex, reaction], oi: 1 });
+  }
+
+  private submitOp(op: any) {
     if (this.worldDoc) {
       this.worldDoc.submitOp(op);
     } else {
@@ -55,10 +74,11 @@ export class LiveWorldService {
   }
 
   onWorldChange(callback: any) {
+    if (!this.worldDoc) {
+      return;
+    }
     this.worldDoc.on('op', (op: any, source: any) => {
-      if (!source) {
-        callback(op);
-      }
+      callback(op);
     });
   }
 
