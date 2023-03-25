@@ -26,7 +26,6 @@ export class CommentformComponent {
   ngOnInit(): void {
     this.api.getMe().subscribe({
       next: (x: any) => {
-        console.log(x);
         this.authorId = x.userId;
         this.authorName = x.displayName;
       },
@@ -36,17 +35,8 @@ export class CommentformComponent {
   }
 
   postComment() {
-    console.log(this.chunkX, this.chunkZ);
     this.newComment.emit(this.commentForm.value.comment);
 
-    this.api
-      .postComment(
-        this.worldId,
-        this.chunkX,
-        this.chunkZ,
-        this.authorId,
-        this.commentForm.value.comment
-      )
-      .subscribe();
+    this.commentForm.reset();
   }
 }

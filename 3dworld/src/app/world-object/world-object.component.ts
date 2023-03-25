@@ -22,9 +22,11 @@ export class WorldObjectComponent implements AfterViewInit, OnDestroy {
   loader!: GLTFLoader;
   x!: number;
   z!: number;
-  comments: any = [
-    { author: 'Youngjae', content: 'Hello', createdAt: 'this date' },
-  ];
+  comments: any = [];
+  user: any;
+  commentPage: number = 0;
+  commentLimit: number = 10;
+  userId: string = '';
 
   constructor(private api: ApiService) {}
 
@@ -106,6 +108,33 @@ export class WorldObjectComponent implements AfterViewInit, OnDestroy {
     });
   }
 
+  deleteComment(event: string) {
+    this.api.deleteComment(event).subscribe();
+    this.getComments(0, this.commentLimit);
+  }
+  newComment(event: string) {
+    this.api
+      .postComment(this.worldId, this.x, this.z, this.user.userId, event)
+      .subscribe();
+    this.getComments(0, 10);
+    this.commentPage = 0;
+  }
+
+  getComments(page: number, limit: number) {
+    this.commentPage = page;
+    this.api.getComments(this.worldId, this.x, this.z, page, limit).subscribe({
+      next: (value) => {
+        this.comments = value;
+      },
+      error: (err) => {
+        console.error(err);
+      },
+      complete: () => {
+        console.log('attempted get comments');
+      },
+    });
+  }
+
   ngAfterViewInit() {
     //get a world id
 
@@ -114,6 +143,10 @@ export class WorldObjectComponent implements AfterViewInit, OnDestroy {
     // if user clicks on a chunk, claim the chunk
     // if user clicks on a chunk that is already claimed, show the owner of the chunk
     // if user clicks on a chunk that is owned by the user, open a form to submit a new gltf model
+    this.api.getMe().subscribe((data) => {
+      this.user = data;
+      this.userId = this.user.userId;
+    });
     this.scene = new THREE.Scene();
     this.camera = new THREE.PerspectiveCamera(
       75,
@@ -155,7 +188,11 @@ export class WorldObjectComponent implements AfterViewInit, OnDestroy {
         const position = model.getWorldPosition(new THREE.Vector3());
         this.x = position.x;
         this.z = position.z;
-        document.querySelector('.hidden')?.classList.remove('hidden');
+        this.getComments(0, 10);
+        document.querySelector('app-commentform')?.classList.remove('hidden');
+        document
+          .querySelector('.comment-containers-container')
+          ?.classList.remove('hidden');
         break;
       }
     };

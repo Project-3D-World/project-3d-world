@@ -7,7 +7,6 @@ export const commentsRouter = Router();
 
 //post
 commentsRouter.post("/", async (req, res) => {
-  console.log(req.body);
   const author = req.body.author;
   const x = req.body.x;
   const z = req.body.z;
@@ -48,19 +47,42 @@ commentsRouter.post("/", async (req, res) => {
 
 //get for world
 commentsRouter.get(
-  "/worldId=:worldId&page=:page&limit=:limit",
+  "/worldId=:worldId&x=:x&z=:z&page=:page&limit=:limit",
   async (req, res) => {
     console.log(req.params.worldId);
     const page = parseInt(req.params.page);
     const limit = parseInt(req.params.limit);
     const worldId = req.params.worldId;
+    const x = parseInt(req.params.x);
+    const z = parseInt(req.params.z);
     const world = await World.findById(worldId).lean();
     if (!world) {
       return res.status(404).json({ error: "World not found" });
     }
-    const comments = await Comments.find({ worldId: worldId })
+    const comments = await Comments.find({
+      worldId: worldId,
+      "chunk.x": x,
+      "chunk.z": z,
+    })
+      .sort({ createdAt: "desc" })
       .skip(page * limit)
       .limit(limit + 1);
     return res.json(comments);
   }
 );
+
+commentsRouter.delete("/:id", async (req, res) => {
+  const id = req.params.id;
+  const comment = await Comments.findById(id);
+  if (!comment) {
+    return res.status(404).json({ error: "Comment not found" });
+  }
+
+  try {
+    await Comments.findByIdAndDelete(id);
+  } catch {
+    return res.status(422).json({ error: "Comment deletion failed" });
+  }
+
+  return res.json(comment);
+});
