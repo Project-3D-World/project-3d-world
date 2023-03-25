@@ -19,6 +19,8 @@ import { WorlddivComponent } from './component/worlddiv/worlddiv.component';
 import { CommentformComponent } from './component/commentform/commentform.component';
 import { UploadFormComponent } from './component/upload-form/upload-form.component';
 import { WorldViewComponent } from './pages/world-view/world-view.component';
+import { CommentViewComponent } from './component/comment-view/comment-view.component';
+import { CommentDivComponent } from './component/comment-view/comment-div/comment-div.component';
 
 @NgModule({
   declarations: [
@@ -35,6 +37,8 @@ import { WorldViewComponent } from './pages/world-view/world-view.component';
     CommentformComponent,
     UploadFormComponent,
     WorldViewComponent,
+    CommentViewComponent,
+    CommentDivComponent,
   ],
   imports: [
     FormsModule,
