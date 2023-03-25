@@ -170,3 +170,8 @@ body {
 .general-green {
   background: green;
 }
+
+.hidden {
+  visibility: hidden !important;
+  height: 0px !important;
+}

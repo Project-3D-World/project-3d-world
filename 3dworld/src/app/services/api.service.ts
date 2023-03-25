@@ -12,10 +12,13 @@ export class ApiService {
   signIn(profile: string) {
     const profileJson = JSON.parse(profile);
     if (profileJson?.sub) {
-      return this.http.post(this.endpoint + '/api/users/signin', {
-        sub: profileJson.sub,
-      },
-      {withCredentials:true});
+      return this.http.post(
+        this.endpoint + '/api/users/signin',
+        {
+          sub: profileJson.sub,
+        },
+        { withCredentials: true }
+      );
     } else {
       return new Observable((observer) => {
         observer.error(new Error('Something went wrong!'));
@@ -26,11 +29,14 @@ export class ApiService {
   signUp(profile: string, displayName: string) {
     const profileJson = JSON.parse(profile);
     if (profileJson?.sub) {
-      return this.http.post(this.endpoint + '/api/users/signup', {
-        sub: profileJson.sub,
-        displayName: displayName,
-      },
-      {withCredentials:true});
+      return this.http.post(
+        this.endpoint + '/api/users/signup',
+        {
+          sub: profileJson.sub,
+          displayName: displayName,
+        },
+        { withCredentials: true }
+      );
     } else {
       return new Observable((observer) => {
         observer.error(new Error('Something went wrong!'));
@@ -39,11 +45,15 @@ export class ApiService {
   }
 
   signOut() {
-    return this.http.get(this.endpoint + '/api/users/signout',{withCredentials:true});
+    return this.http.get(this.endpoint + '/api/users/signout', {
+      withCredentials: true,
+    });
   }
 
   getMe() {
-    return this.http.get(this.endpoint + '/api/users/me',{withCredentials:true});
+    return this.http.get(this.endpoint + '/api/users/me', {
+      withCredentials: true,
+    });
   }
 
   //postComment
@@ -54,14 +64,37 @@ export class ApiService {
     author: string,
     content: string
   ) {
-    console.log(worldId, x, z, author, content);
-    return this.http.post(this.endpoint + `/api/comments/`, {
-      worldId: worldId,
-      author: author,
-      x: x,
-      z: z,
-      content: content,
-    },{withCredentials:true});
+    return this.http.post(
+      this.endpoint + `/api/comments/`,
+      {
+        worldId: worldId,
+        author: author,
+        x: x,
+        z: z,
+        content: content,
+      },
+      { withCredentials: true }
+    );
+  }
+
+  getComments(
+    worldId: string,
+    x: number,
+    z: number,
+    page: number,
+    limit: number
+  ) {
+    return this.http.get(
+      this.endpoint +
+        `/api/comments/worldId=${worldId}&x=${x}&z=${z}&page=${page}&limit=${limit}`,
+      { withCredentials: true }
+    );
+  }
+
+  deleteComment(id: string) {
+    return this.http.delete(this.endpoint + `/api/comments/${id}`, {
+      withCredentials: true,
+    });
   }
   //world apis
 
@@ -69,47 +102,62 @@ export class ApiService {
   claimChunk(worldId: string, chunkId: string) {
     return this.http.patch(
       this.endpoint + '/api/worlds/' + worldId + '/chunks/' + chunkId,
-      {},{withCredentials:true}
+      {},
+      { withCredentials: true }
     );
   }
 
   //get a world by id
   getWorld(worldId: string) {
-    return this.http.get<JSON>(this.endpoint + '/api/worlds/' + worldId,{withCredentials:true});
+    return this.http.get<JSON>(this.endpoint + '/api/worlds/' + worldId, {
+      withCredentials: true,
+    });
   }
 
   //get all worlds
   getAllWorlds() {
-    return this.http.get<JSON>(this.endpoint + '/api/worlds',{withCredentials:true});
+    return this.http.get<JSON>(this.endpoint + '/api/worlds', {
+      withCredentials: true,
+    });
   }
 
   //create a new world
-  createWorld(worldName: string, description: string, rules: string, chunksize: number, numberOfChunks: number) {
-
+  createWorld(
+    worldName: string,
+    description: string,
+    rules: string,
+    chunksize: number,
+    numberOfChunks: number
+  ) {
     let chunks = [];
 
-    for( let i = 0; i < numberOfChunks; i++)
-    {
-      for(let j = 0; j < numberOfChunks; j++)
-      {
-        chunks.push({x: i*chunksize, z: j*chunksize});
+    for (let i = 0; i < numberOfChunks; i++) {
+      for (let j = 0; j < numberOfChunks; j++) {
+        chunks.push({ x: i * chunksize, z: j * chunksize });
       }
     }
 
-    return this.http.post(this.endpoint + '/api/worlds', {
-      name: worldName,
-      chunkSize: { x: chunksize, y: chunksize, z: chunksize },
-      description: description,
-      rules: rules,
+    return this.http.post(
+      this.endpoint + '/api/worlds',
+      {
+        name: worldName,
+        chunkSize: { x: chunksize, y: chunksize, z: chunksize },
+        description: description,
+        rules: rules,
 
-      chunks: chunks
-    },{withCredentials:true});
+        chunks: chunks,
+      },
+      { withCredentials: true }
+    );
   }
 
   //upload a gltf model to a chunk
   //check how to send the file to backend
   uploadModel(worldId: string, chunkId: string, model: File) {
-    return this.http.post(this.endpoint + '/api/worlds/' + worldId + '/chunks/' + chunkId + '/file', model,{withCredentials:true});
+    return this.http.post(
+      this.endpoint + '/api/worlds/' + worldId + '/chunks/' + chunkId + '/file',
+      model,
+      { withCredentials: true }
+    );
   }
-
 }

@@ -10,7 +10,6 @@ import { Route, Router } from '@angular/router';
   styleUrls: ['./index.component.scss'],
 })
 export class IndexComponent implements OnInit {
-  
   constructor(
     public auth: AuthService,
     private api: ApiService,
@@ -18,8 +17,6 @@ export class IndexComponent implements OnInit {
     private router: Router
   ) {}
   ngOnInit(): void {
-    this.api.getMe().subscribe((data)=>{
-      console.log(data);
-    })
+    this.api.getMe().subscribe((data) => {});
   }
 }

@@ -8,19 +8,21 @@ import { ApiService } from 'src/app/services/api.service';
   templateUrl: './sign-in.component.html',
   styleUrls: ['./sign-in.component.scss'],
 })
-export class SignInComponent implements OnInit{
+export class SignInComponent implements OnInit {
   profileJson: string = '';
 
-  
-  constructor(private api:ApiService, public auth:AuthService, private router:Router){}
-
+  constructor(
+    private api: ApiService,
+    public auth: AuthService,
+    private router: Router
+  ) {}
 
   ngOnInit(): void {
     this.auth.user$.subscribe(
       (profile) => (
         (this.profileJson = JSON.stringify(profile, null, 2)),
         this.api.signIn(this.profileJson).subscribe({
-          next:(value)=>{
+          next: (value) => {
             this.router.navigateByUrl('');
           },
           error: (err) => {
