@@ -12,6 +12,8 @@ import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
 })
 export class WorldObjectComponent implements AfterViewInit{
   @Input() worldId!: string;
+  width!: number;
+  height!: number;
   scene!: THREE.Scene;
   camera!: THREE.PerspectiveCamera;
   renderer!: THREE.WebGLRenderer;
@@ -186,11 +188,13 @@ export class WorldObjectComponent implements AfterViewInit{
     requestAnimationFrame(this.animate.bind(this));
   };
 
+
   ngAfterViewInit() {
     //get a world id
     this.canvas = document.getElementById('canvas') as HTMLCanvasElement;
     this.canvas.width = window.innerWidth * 0.8;
     this.canvas.height = window.innerHeight * 0.6;
+
 
     this.api.getMe().subscribe((data) => {
       this.user = data;
@@ -200,11 +204,13 @@ export class WorldObjectComponent implements AfterViewInit{
     this.scene = new THREE.Scene();
     this.camera = new THREE.PerspectiveCamera(
       75,
+
       this.canvas.width / this.canvas.height,
       0.1,
       1000
     );
     this.renderer = new THREE.WebGLRenderer({canvas: document.getElementById('canvas') as HTMLCanvasElement});
+
     this.renderer.setSize(this.canvas.width, this.canvas.height);
     this.controls = new OrbitControls(this.camera, this.renderer.domElement);
     this.loader = new GLTFLoader();
