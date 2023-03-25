@@ -1,3 +1,4 @@
+
 import { AfterViewInit, Component, Input, OnDestroy } from '@angular/core';
 
 import * as THREE from 'three';
@@ -9,7 +10,7 @@ import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
   templateUrl: './world-object.component.html',
   styleUrls: ['./world-object.component.scss'],
 })
-export class WorldObjectComponent implements AfterViewInit, OnDestroy {
+export class WorldObjectComponent implements AfterViewInit{
   @Input() worldId!: string;
   scene!: THREE.Scene;
   camera!: THREE.PerspectiveCamera;
@@ -28,7 +29,9 @@ export class WorldObjectComponent implements AfterViewInit, OnDestroy {
   commentLimit: number = 10;
   userId: string = '';
 
+
   constructor(private api: ApiService) {}
+
 
   loadWorld(): void {
     this.api.getWorld('64176688914a579ebfb79af5').subscribe((data) => {
@@ -143,20 +146,28 @@ export class WorldObjectComponent implements AfterViewInit, OnDestroy {
     // if user clicks on a chunk, claim the chunk
     // if user clicks on a chunk that is already claimed, show the owner of the chunk
     // if user clicks on a chunk that is owned by the user, open a form to submit a new gltf model
+
+    const width = document.getElementById('canvas')?.clientWidth || 500;
+    const height = document.getElementById('canvas')?.clientHeight || 500;
+    const offsetLeft = document.getElementById('canvas')?.offsetLeft || 0;
+    const offsetTop = document.getElementById('canvas')?.offsetTop || 0;
+    console.log(width);
+    console.log(height);
+
     this.api.getMe().subscribe((data) => {
       this.user = data;
       this.userId = this.user.userId;
     });
+
     this.scene = new THREE.Scene();
     this.camera = new THREE.PerspectiveCamera(
       75,
-      window.innerWidth / window.innerHeight,
+      width / height,
       0.1,
       1000
     );
-    this.renderer = new THREE.WebGLRenderer();
-    this.renderer.setSize(window.innerWidth, window.innerHeight);
-    document.body.appendChild(this.renderer.domElement);
+    this.renderer = new THREE.WebGLRenderer({canvas: document.getElementById('canvas') as HTMLCanvasElement});
+    this.renderer.setSize(width, height);
     this.controls = new OrbitControls(this.camera, this.renderer.domElement);
     this.loader = new GLTFLoader();
     this.raycaster = new THREE.Raycaster();
@@ -172,8 +183,8 @@ export class WorldObjectComponent implements AfterViewInit, OnDestroy {
     const onClick = (event: MouseEvent) => {
       // calculate mouse position in normalized device coordinates
       // (-1 to +1) for both components
-      this.mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
-      this.mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+      this.mouse.x = ((event.clientX - offsetLeft) / width) * 2 - 1;
+      this.mouse.y = -((event.clientY - offsetTop) / height) * 2 + 1;
       // update the picking ray with the camera and mouse position
       this.raycaster.setFromCamera(this.mouse, this.camera);
       // calculate objects intersecting the picking ray
@@ -195,9 +206,13 @@ export class WorldObjectComponent implements AfterViewInit, OnDestroy {
           ?.classList.remove('hidden');
         break;
       }
+
+    }
+    document.getElementById('canvas')?.addEventListener('click', onClick, false);
+    window.addEventListener( 'resize', this.onWindowResize, false );    
+
     };
-    this.renderer.domElement.addEventListener('click', onClick, false);
-    window.addEventListener('resize', this.onWindowResize, false);
+
 
     const animate = () => {
       this.controls.update();
@@ -210,10 +225,4 @@ export class WorldObjectComponent implements AfterViewInit, OnDestroy {
     requestAnimationFrame(animate);
   }
 
-  ngOnDestroy() {
-    window.removeEventListener('resize', this.onWindowResize, false);
-    this.renderer.domElement.removeEventListener('click', () => {}, false);
-    document.body.removeChild(this.renderer.domElement);
-    console.log('destroyed');
-  }
 }
