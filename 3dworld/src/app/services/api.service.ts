@@ -64,7 +64,6 @@ export class ApiService {
     author: string,
     content: string
   ) {
-    console.log(worldId, x, z, author, content);
     return this.http.post(
       this.endpoint + `/api/comments/`,
       {
@@ -76,6 +75,26 @@ export class ApiService {
       },
       { withCredentials: true }
     );
+  }
+
+  getComments(
+    worldId: string,
+    x: number,
+    z: number,
+    page: number,
+    limit: number
+  ) {
+    return this.http.get(
+      this.endpoint +
+        `/api/comments/worldId=${worldId}&x=${x}&z=${z}&page=${page}&limit=${limit}`,
+      { withCredentials: true }
+    );
+  }
+
+  deleteComment(id: string) {
+    return this.http.delete(this.endpoint + `/api/comments/${id}`, {
+      withCredentials: true,
+    });
   }
   //world apis
 

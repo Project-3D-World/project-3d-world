@@ -1,4 +1,7 @@
-<p>comment-view works!</p>
 <div class="comments-container" *ngFor="let comment of comments">
-  <app-comment-div [comment]="comment"></app-comment-div>
+  <app-comment-div
+    [comment]="comment"
+    (deleted)="deleteComment($event)"
+    [userId]="userId"
+  ></app-comment-div>
 </div>

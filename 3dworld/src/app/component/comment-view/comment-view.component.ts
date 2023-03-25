@@ -1,4 +1,12 @@
-import { Component, Input, OnInit } from '@angular/core';
+import {
+  Component,
+  ElementRef,
+  EventEmitter,
+  Input,
+  OnInit,
+  Output,
+  ViewChild,
+} from '@angular/core';
 
 @Component({
   selector: 'app-comment-view',
@@ -6,5 +14,11 @@ import { Component, Input, OnInit } from '@angular/core';
   styleUrls: ['./comment-view.component.scss'],
 })
 export class CommentViewComponent {
-  @Input() comments: [] = [];
+  @Output() deleted = new EventEmitter<string>();
+  @Input() userId: string = '';
+  @Input() comments: any = [];
+
+  deleteComment(commentId: string) {
+    this.deleted.emit(commentId);
+  }
 }
