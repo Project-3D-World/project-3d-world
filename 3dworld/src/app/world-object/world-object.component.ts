@@ -12,6 +12,8 @@ import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
 })
 export class WorldObjectComponent implements AfterViewInit{
   @Input() worldId!: string;
+  width!: number;
+  height!: number;
   scene!: THREE.Scene;
   camera!: THREE.PerspectiveCamera;
   renderer!: THREE.WebGLRenderer;
@@ -147,12 +149,12 @@ export class WorldObjectComponent implements AfterViewInit{
     // if user clicks on a chunk that is already claimed, show the owner of the chunk
     // if user clicks on a chunk that is owned by the user, open a form to submit a new gltf model
 
-    const width = document.getElementById('canvas')?.clientWidth || 500;
-    const height = document.getElementById('canvas')?.clientHeight || 500;
+    this.width = document.getElementById('canvas')?.clientWidth || 500;
+    this.height = document.getElementById('canvas')?.clientHeight || 500;
     const offsetLeft = document.getElementById('canvas')?.offsetLeft || 0;
     const offsetTop = document.getElementById('canvas')?.offsetTop || 0;
-    console.log(width);
-    console.log(height);
+    console.log(this.width);
+    console.log(this.height);
 
     this.api.getMe().subscribe((data) => {
       this.user = data;
@@ -162,12 +164,12 @@ export class WorldObjectComponent implements AfterViewInit{
     this.scene = new THREE.Scene();
     this.camera = new THREE.PerspectiveCamera(
       75,
-      width / height,
+      this.width / this.height,
       0.1,
       1000
     );
     this.renderer = new THREE.WebGLRenderer({canvas: document.getElementById('canvas') as HTMLCanvasElement});
-    this.renderer.setSize(width, height);
+    this.renderer.setSize(this.width, this.height);
     this.controls = new OrbitControls(this.camera, this.renderer.domElement);
     this.loader = new GLTFLoader();
     this.raycaster = new THREE.Raycaster();
@@ -183,8 +185,8 @@ export class WorldObjectComponent implements AfterViewInit{
     const onClick = (event: MouseEvent) => {
       // calculate mouse position in normalized device coordinates
       // (-1 to +1) for both components
-      this.mouse.x = ((event.clientX - offsetLeft) / width) * 2 - 1;
-      this.mouse.y = -((event.clientY - offsetTop) / height) * 2 + 1;
+      this.mouse.x = ((event.clientX - offsetLeft) / this.width) * 2 - 1;
+      this.mouse.y = -((event.clientY - offsetTop) / this.height) * 2 + 1;
       // update the picking ray with the camera and mouse position
       this.raycaster.setFromCamera(this.mouse, this.camera);
       // calculate objects intersecting the picking ray
@@ -210,9 +212,6 @@ export class WorldObjectComponent implements AfterViewInit{
     }
     document.getElementById('canvas')?.addEventListener('click', onClick, false);
     window.addEventListener( 'resize', this.onWindowResize, false );    
-
-    };
-
 
     const animate = () => {
       this.controls.update();
