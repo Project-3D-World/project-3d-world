@@ -42,10 +42,19 @@ export class LiveWorldService {
       this.socket.close();
     }
     this.socket = new WebSocket(url);
-    const connection = new this.sharedb.Connection(this.socket);
-    this.worldDoc = connection.get('worlds', worldId);
 
     return new Promise<void>((resolve, reject) => {
+      // add listener event for when the server closes the connection due to an error
+      this.socket.addListener('close', (event: any) => {
+        if (event.code >= 4000) {
+          reject({
+            code: event.code,
+            reason: event.reason,
+          });
+        }
+      });
+      const connection = new this.sharedb.Connection(this.socket);
+      this.worldDoc = connection.get('worlds', worldId);
       this.worldDoc.subscribe((err: any) => {
         if (err) {
           reject(err);
