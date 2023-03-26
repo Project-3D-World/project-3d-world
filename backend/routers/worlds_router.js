@@ -308,12 +308,12 @@ worldsRouter.post(
 /* WS /api/worlds/:worldId/live */
 worldsRouter.ws("/:worldId/live", isWsAuthenticated, async (ws, req) => {
   if (!validateIds([req.params.worldId])) {
-    ws.close(1008, "Invalid world ID");
+    ws.close(4000, "Invalid world ID");
     return;
   }
   const world = await World.findById(req.params.worldId);
   if (!world) {
-    ws.close(1008, "World not found");
+    ws.close(4004, "World not found");
     return;
   }
   const connection = shareBackend.connect();
@@ -334,6 +334,11 @@ worldsRouter.ws("/:worldId/live", isWsAuthenticated, async (ws, req) => {
   });
 
   const stream = new WebSocketJSONStream(ws);
+  stream.on("error", (err) => {
+    if (err.name !== "Error [ERR_CLOSED]") {
+      console.error(err);
+    }
+  });
   shareBackend.listen(stream);
 
   // listen to live world changes and update mongoDB
