@@ -21,6 +21,7 @@ import { UploadFormComponent } from './component/upload-form/upload-form.compone
 import { WorldViewComponent } from './pages/world-view/world-view.component';
 import { CommentViewComponent } from './component/comment-view/comment-view.component';
 import { CommentDivComponent } from './component/comment-view/comment-div/comment-div.component';
+import { ChunkFormComponent } from './component/chunk-form/chunk-form.component';
 
 @NgModule({
   declarations: [
@@ -39,6 +40,7 @@ import { CommentDivComponent } from './component/comment-view/comment-div/commen
     WorldViewComponent,
     CommentViewComponent,
     CommentDivComponent,
+    ChunkFormComponent,
   ],
   imports: [
     FormsModule,
