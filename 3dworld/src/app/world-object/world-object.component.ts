@@ -12,8 +12,6 @@ import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
 })
 export class WorldObjectComponent implements AfterViewInit{
   @Input() worldId!: string;
-  width!: number;
-  height!: number;
   scene!: THREE.Scene;
   camera!: THREE.PerspectiveCamera;
   renderer!: THREE.WebGLRenderer;
