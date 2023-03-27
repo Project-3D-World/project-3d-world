@@ -49,7 +49,8 @@ export class WorldObjectComponent implements AfterViewInit {
     });
   }
 
-  uploadModel(event: File): void {
+  uploadModel(event: any): void {
+    console.log(event);
     this.api
       .uploadModel(this.worldId, this.chunkId, event)
       .subscribe((data) => {

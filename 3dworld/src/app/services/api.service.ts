@@ -1,4 +1,4 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { environment } from '../../environments/environment';
 import { Observable, Subscription } from 'rxjs';
@@ -154,12 +154,15 @@ export class ApiService {
   //upload a gltf model to a chunk
   //check how to send the file to backend
   uploadModel(worldId: string, chunkId: string, model: File) {
+    const headers = new HttpHeaders({
+      "Accept-Encoding" : "gzip, deflate, br",
+    });
     let formData = new FormData();
     formData.append('chunkFile', model);
     return this.http.post(
       this.endpoint + '/api/worlds/' + worldId + '/chunks/' + chunkId + '/file',
       formData,
-      { withCredentials: true }
+      { withCredentials: true, headers: headers }, 
     );
   }
 }

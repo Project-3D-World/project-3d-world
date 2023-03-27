@@ -17,6 +17,7 @@ export class UploadFormComponent {
   @Input() worldId: string = '';
   @Input() chunkX: number = 0;
   @Input() chunkZ: number = 0;
+  realFile!: File;
   uploadForm: FormGroup;
   constructor(private fb: FormBuilder, private api: ApiService) {
     this.uploadForm = this.fb.group({
@@ -24,15 +25,14 @@ export class UploadFormComponent {
     });
   }
 
-  newUpload() {
-    const selectedFile = this.uploadForm.get('GLTFfile')?.value;
-    if (selectedFile) {
-      const file = new File([selectedFile], selectedFile.name, {
-        type: selectedFile.type,
-      });
-      console.log(file);
-      this.file.emit(file);
+  newUpload(): void {
+      console.log(this.realFile);
+      this.file.emit(this.realFile);
       this.uploadForm.reset();
-    }
   }
+
+  fileChange(event: any): void {
+    this.realFile=event.target.files[0];
+  }
+
 }

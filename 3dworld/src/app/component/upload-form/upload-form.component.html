@@ -12,8 +12,9 @@
       formControlName="GLTFfile"
       id="gltf-zip-file"
       accept=".zip"
+      (change)="fileChange($event)"
       required
     />
   </div>
-  <button type="submit" class="btn">Upload</button>
+  <button type="submit" class="btn" >Upload</button>
 </form>
