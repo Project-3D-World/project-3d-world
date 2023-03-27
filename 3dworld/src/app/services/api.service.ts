@@ -154,9 +154,11 @@ export class ApiService {
   //upload a gltf model to a chunk
   //check how to send the file to backend
   uploadModel(worldId: string, chunkId: string, model: File) {
+    let formData = new FormData();
+    formData.append('chunkFile', model);
     return this.http.post(
       this.endpoint + '/api/worlds/' + worldId + '/chunks/' + chunkId + '/file',
-      model,
+      formData,
       { withCredentials: true }
     );
   }
