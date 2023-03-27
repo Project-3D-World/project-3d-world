@@ -1,1 +1,19 @@
-<p>upload-form works!</p>
+<form
+  class="complex-form"
+  id="upload-form"
+  (submit)="newUpload()"
+  [formGroup]="uploadForm"
+>
+  <div class="form-title">Upload a GLTF zip file</div>
+  <div class="form-group">
+    <label for="gltf-zip-file">Choose a file:</label>
+    <input
+      type="file"
+      formControlName="GLTFfile"
+      id="gltf-zip-file"
+      accept=".zip"
+      required
+    />
+  </div>
+  <button type="submit" class="btn">Upload</button>
+</form>

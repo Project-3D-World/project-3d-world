@@ -23,6 +23,7 @@ export class WorldObjectComponent implements AfterViewInit{
   loader!: GLTFLoader;
   x!: number;
   z!: number;
+  chunkId!: string;
   comments: any = [];
   user: any;
   commentPage: number = 0;
@@ -44,14 +45,14 @@ export class WorldObjectComponent implements AfterViewInit{
     });
   }
 
-  claimPlot(worldId: string, chunkid: string): void {
-    this.api.claimChunk(worldId, chunkid).subscribe((data) => {
+  claimPlot(): void {
+    this.api.claimChunk(this.worldId, this.chunkId).subscribe((data) => {
       console.log(data);
     });
   }
 
-  uploadModel(worldId: string, chunkId: string, model: File): void {
-    this.api.uploadModel(worldId, chunkId, model).subscribe((data) => {
+  uploadModel(event: File): void {
+    this.api.uploadModel(this.worldId, this.chunkId, event).subscribe((data) => {
       console.log(data);
     });
   }
@@ -80,21 +81,20 @@ export class WorldObjectComponent implements AfterViewInit{
       let chunks = (<any>data).world.chunks;
       let sidelength = Math.sqrt(chunks.length);
       let chunkSize = (<any>data).world.chunkSize.x;
-      const cubeSize = 10;
       console.log(id);
       console.log(chunks);
       console.log(sidelength);
       console.log(chunkSize);
 
-      for (let x = 0; x < sidelength; x++) {
-        for (let z = 0; z < sidelength; z++) {
-          console.log((<any>data).world.chunks[x + z].chunkFile);
-          if ((<any>data).world.chunks[x + z].chunkFile != null) {
+      for (let x = 0; x < sidelength*sidelength; x++) {
+          const coordX = ((<any>data).world.chunks[x].location.x);
+          const coordZ = ((<any>data).world.chunks[x].location.z);
+          if ((<any>data).world.chunks[x].chunkFile != null) {
             this.loader.load(
-              (<any>data).world.chunks[x + z].chunkFile,
+              (<any>data).world.chunks[x].chunkFile,
               (gltf) => {
                 gltf.scene.scale.set(5, 5, 5);
-                gltf.scene.position.set(x * cubeSize, 0, z * cubeSize);
+                gltf.scene.position.set(coordX, 0, coordZ);
                 this.models.push(gltf.scene);
                 this.scene.add(gltf.scene);
               },
@@ -106,16 +106,16 @@ export class WorldObjectComponent implements AfterViewInit{
               }
             );
           } else {
-            const geometry = new THREE.BoxGeometry(chunkSize, 1, chunkSize);
+            console.log((<any>data).world.chunks[x]._id)
+            const geometry = new THREE.BoxGeometry(chunkSize-1, 1, chunkSize-1);
             const material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
             const cube = new THREE.Mesh(geometry, material);
-            cube.position.set(x * (chunkSize + 1), 0, z * (chunkSize + 1));
+            cube.position.set(coordX, 0, coordZ);
             let group = new THREE.Group();
             group.add(cube);
             this.scene.add(group);
             this.models.push(group); // add each cube to the array
           }
-        }
       }
     });
   }
@@ -162,17 +162,28 @@ export class WorldObjectComponent implements AfterViewInit{
         // perform the desired action on the clicked cube(s)
         //claim the cube by sending an api request to the server
         const model = intersects[i].object;
+
         console.log(model);
         console.log(model.getWorldPosition(new THREE.Vector3()));
         const position = model.getWorldPosition(new THREE.Vector3());
-        // comment section
         this.x = position.x;
         this.z = position.z;
+
+        this.api.getWorld(this.worldId).subscribe((data) => {
+          const chunkSize = (<any>data).world.chunkSize.x;
+          const sidelength = Math.sqrt((<any>data).world.chunks.length);
+          const arrayPosition = (this.x/chunkSize)*sidelength + this.z/chunkSize;
+          this.chunkId = (<any>data).world.chunks[arrayPosition]._id;
+        });
+        // comment section
+
         this.getComments(0, 10);
         document.querySelector('app-commentform')?.classList.remove('hidden');
         document
           .querySelector('.comment-containers-container')
           ?.classList.remove('hidden');
+
+        document.querySelector('app-upload-form')?.classList.remove('hidden');
         break;
       }
   }
@@ -190,7 +201,7 @@ export class WorldObjectComponent implements AfterViewInit{
     //get a world id
     this.canvas = document.getElementById('canvas') as HTMLCanvasElement;
     this.canvas.width = window.innerWidth * 0.8;
-    this.canvas.height = window.innerHeight * 0.6;
+    this.canvas.height = window.innerHeight * 0.8;
 
     this.api.getMe().subscribe((data) => {
       this.user = data;

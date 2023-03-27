@@ -7,6 +7,19 @@
 <div class = "commentForm-container"></div>
 <div class = "commentView-container"></div>
 
+<!--claim plot section-->
+
+
+<!-- upload form section-->
+<app-upload-form
+  class="hidden"
+  [worldId]="worldId"
+  [chunkX]="x"
+  [chunkZ]="z"
+  (file)="uploadModel($event)"
+></app-upload-form>
+<!-- upvote/downvote section-->
+
 <app-commentform
   class="hidden"
   [worldId]="worldId"
