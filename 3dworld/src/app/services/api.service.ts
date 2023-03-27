@@ -157,8 +157,9 @@ export class ApiService {
     let formData = new FormData();
     formData.append('chunkFile', model);
     return this.http.post(
-      this.endpoint + '/api/worlds/' + worldId + '/chunks/' + chunkId + '/file',formData
-      ,{ withCredentials: true }
+      this.endpoint + '/api/worlds/' + worldId + '/chunks/' + chunkId + '/file',
+      formData,
+      { withCredentials: true }
     );
   }
 }
