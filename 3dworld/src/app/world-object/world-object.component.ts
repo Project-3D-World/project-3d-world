@@ -5,6 +5,7 @@ import * as JSZip from 'jszip';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 import { ApiService } from '../services/api.service';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
+import { Object3D } from 'three';
 @Component({
   selector: 'app-world-object',
   templateUrl: './world-object.component.html',
@@ -23,6 +24,8 @@ export class WorldObjectComponent implements AfterViewInit {
   loader!: GLTFLoader;
   x!: number;
   z!: number;
+  chunkSizeX!: number;
+  chunkSizeZ!: number;
   chunkId!: string;
   comments: any = [];
   user: any;
@@ -77,6 +80,58 @@ export class WorldObjectComponent implements AfterViewInit {
     this.renderer.setSize(this.canvas.width, this.canvas.height);
   }
 
+  loadSingleChunk(data: any, chunkSize: number, coordX: number, coordZ: number): void {
+    const zip = new JSZip();
+    const loadingManager = new THREE.LoadingManager();
+    const zipURL_to_URL: { [path: string]: string } = {};
+    let gltfFile: JSZip.JSZipObject;
+
+    zip.loadAsync(data).then((zip: JSZip) => {
+      gltfFile = zip.file(/\.gltf$/i)[0];
+      if (!gltfFile) {
+        throw new Error('GLTF file not found in zip');
+      }
+      // extract all the files in the zip as Blobs
+      const fileDataPromises: Promise<void>[] = [];
+      zip.forEach((relativePath, file) => {
+        fileDataPromises.push(
+          file.async('arraybuffer')
+          .then((data: ArrayBuffer) => {
+            const blob = new Blob([data]);
+            zipURL_to_URL[relativePath] = URL.createObjectURL(blob);
+          })
+        );
+      });
+      return Promise.all(fileDataPromises);
+    })
+    .then(() => {
+      loadingManager.setURLModifier((url: string) => {
+        if (url in zipURL_to_URL) {
+          return zipURL_to_URL[url];
+        }
+        return url;
+      });
+      this.loader = new GLTFLoader(loadingManager);
+      return gltfFile.async('arraybuffer'); // extract the GLTF file as a blob
+    })
+    .then((gltfBlob: ArrayBuffer) => {
+      console.log("GLTF BLOB", gltfBlob);
+      this.loader.parse(gltfBlob, '', (gltf) => {
+        console.log("GLTF LOADED SUCCESSFULLY", gltf);
+        this.resizeModel(gltf.scene, chunkSize);
+        const dimensions = this.getModelDimensions(gltf.scene);
+        const box = new THREE.Box3().setFromObject(gltf.scene);
+        const center = new THREE.Vector3();
+        box.getCenter(center);
+        center.negate();
+        gltf.scene.position.set(coordX, dimensions.y/2, coordZ);
+        gltf.scene.position.add(center);
+        this.models.push(gltf.scene);
+        this.scene.add(gltf.scene);
+      });
+    });
+  }
+
   private getModelDimensions(model: THREE.Group): THREE.Vector3 {
     const box = new THREE.Box3().setFromObject(model);
     const dimensions = new THREE.Vector3();
@@ -87,7 +142,7 @@ export class WorldObjectComponent implements AfterViewInit {
   private resizeModel(model: THREE.Group, chunkSize: any): void {
     const dimensions = this.getModelDimensions(model);
     const maxHorizontalDimension = Math.max(dimensions.x, dimensions.z);
-    const scale = (chunkSize - 1) * 0.9 / maxHorizontalDimension ;
+    const scale = (chunkSize) * 0.9 / maxHorizontalDimension ;
     model.scale.setScalar(scale);
   }
 
@@ -97,12 +152,14 @@ export class WorldObjectComponent implements AfterViewInit {
       let chunks = (<any>data).world.chunks;
       let sidelength = Math.sqrt(chunks.length);
       let chunkSize = (<any>data).world.chunkSize.x;
+      this.chunkSizeX = (<any>data).world.chunkSize.x;
+      this.chunkSizeZ = (<any>data).world.chunkSize.z;
       console.log(id);
       console.log(chunks);
       console.log(sidelength);
       console.log(chunkSize);
 
-      for (let x = 0; x < sidelength * sidelength; x++) {
+      for (let x = 0; x < chunks.length; x++) {
         const coordX = (<any>data).world.chunks[x].location.x;
         const coordZ = (<any>data).world.chunks[x].location.z;
         if ((<any>data).world.chunks[x].chunkFile != null) {
@@ -123,82 +180,16 @@ export class WorldObjectComponent implements AfterViewInit {
             }
           );
           */
+         
 
         this.getChunkFile((<any>data).world.chunks[x]._id).then((data) => {
-          const zip = new JSZip();
-          const loadingManager = new THREE.LoadingManager();
-          const zipURL_to_URL: { [path: string]: string } = {};
-          let gltfFile: JSZip.JSZipObject;
-
-          zip.loadAsync(data).then((zip: JSZip) => {
-            gltfFile = zip.file(/\.gltf$/i)[0];
-            if (!gltfFile) {
-              throw new Error('GLTF file not found in zip');
-            }
-            // extract all the files in the zip as Blobs
-            const fileDataPromises: Promise<void>[] = [];
-            zip.forEach((relativePath, file) => {
-              fileDataPromises.push(
-                file.async('arraybuffer')
-                .then((data: ArrayBuffer) => {
-                  const blob = new Blob([data]);
-                  zipURL_to_URL[relativePath] = URL.createObjectURL(blob);
-                })
-              );
-            });
-            return Promise.all(fileDataPromises);
-          })
-          .then(() => {
-            loadingManager.setURLModifier((url: string) => {
-              if (url in zipURL_to_URL) {
-                return zipURL_to_URL[url];
-              }
-              return url;
-            });
-            this.loader = new GLTFLoader(loadingManager);
-            return gltfFile.async('arraybuffer'); // extract the GLTF file as a blob
-          })
-          .then((gltfBlob: ArrayBuffer) => {
-            console.log("GLTF BLOB", gltfBlob);
-            this.loader.parse(gltfBlob, '', (gltf) => {
-              console.log("GLTF LOADED SUCCESSFULLY", gltf);
-              gltf.scene.scale.set(5, 5, 5);
-              gltf.scene.position.set(coordX, 0, coordZ);
-              this.models.push(gltf.scene);
-              this.scene.add(gltf.scene);
-            });
-
-            /*this.loader.load(url,
-              gltf => {
-                console.log("GLTF LOADED SUCCESSFULLY", gltf)
-                gltf.scene.scale.set(5, 5, 5);
-                gltf.scene.position.set(coordX, 0, coordZ);
-                this.models.push(gltf.scene);
-                this.scene.add(gltf.scene);
-              },
-              function (xhr) {
-                console.log((xhr.loaded / xhr.total) * 100 + '% loaded');
-              },
-              function (error) {
-                console.error(error);
-              }
-            );*/
-          });
+          this.loadSingleChunk(data, chunkSize, coordX, coordZ);
         });
-         
-         /*this.loader.loadAsync((<any>data).world.chunks[x].chunkFile.toString()).then((gltf) => {
-          gltf.scene.scale.set(5, 5, 5);
-          gltf.scene.position.set(coordX, 0, coordZ);
-          this.models.push(gltf.scene);
-          this.scene.add(gltf.scene);
-        });
-        */
-
         } else {
           console.log((<any>data).world.chunks[x]._id);
           const geometry = new THREE.BoxGeometry(
             chunkSize - 1,
-            1,
+            0,
             chunkSize - 1
           );
           const material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
@@ -261,8 +252,12 @@ export class WorldObjectComponent implements AfterViewInit {
       console.log(model);
       console.log(model.getWorldPosition(new THREE.Vector3()));
       const position = model.getWorldPosition(new THREE.Vector3());
-      this.x = position.x;
-      this.z = position.z;
+      const numberX = Math.floor(position.x/this.chunkSizeX);
+      const numberZ = Math.floor(position.z/this.chunkSizeZ); 
+
+      this.x = numberX*this.chunkSizeX;
+      this.z = numberZ*this.chunkSizeZ;
+      console.log(this.x, this.z);
       let claimed = false;
 
       this.api.getWorld(this.worldId).subscribe((data) => {
