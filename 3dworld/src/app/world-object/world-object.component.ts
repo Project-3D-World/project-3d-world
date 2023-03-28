@@ -111,46 +111,43 @@ export class WorldObjectComponent implements AfterViewInit {
           */
 
         this.getChunkFile((<any>data).world.chunks[x]._id).then((data) => {
-          console.log(data);
-          const blob = data;
-          console.log(blob);
-
           const zip = new JSZip();
           const loadingManager = new THREE.LoadingManager();
-          zip.loadAsync(blob).then((zip) => {
-            const gltfFile = zip.file(/\.gltf$/i)[0];
+          const zipURL_to_URL: { [path: string]: string } = {};
+          let gltfFile: JSZip.JSZipObject;
+
+          zip.loadAsync(data).then((zip: JSZip) => {
+            gltfFile = zip.file(/\.gltf$/i)[0];
             if (!gltfFile) {
               throw new Error('GLTF file not found in zip');
             }
-            /*
-            loadingManager.setURLModifier(async (url: string) => {
-              const file = zip.file(url);
-              if (file) {
-                const fileData = await file.async('arraybuffer');
-                return URL.createObjectURL(new Blob([fileData]));
+            // extract all the files in the zip as Blobs
+            const fileDataPromises: Promise<void>[] = [];
+            zip.forEach((relativePath, file) => {
+              fileDataPromises.push(
+                file.async('arraybuffer')
+                .then((data: ArrayBuffer) => {
+                  const blob = new Blob([data]);
+                  zipURL_to_URL[relativePath] = URL.createObjectURL(blob);
+                })
+              );
+            });
+            return Promise.all(fileDataPromises);
+          })
+          .then(() => {
+            loadingManager.setURLModifier((url: string) => {
+              if (url in zipURL_to_URL) {
+                return zipURL_to_URL[url];
               }
               return url;
             });
-            */
-            loadingManager.setURLModifier((url: string) => {
-              return new Promise<string>(async resolve => {
-                const file = zip.file(url);
-                if (file) {
-                  const fileData = await file.async('arraybuffer');
-                  resolve(URL.createObjectURL(new Blob([fileData])));
-                } else {
-                  resolve(url);
-                }
-              });
-            });
-
             this.loader = new GLTFLoader(loadingManager);
-
             return gltfFile.async('arraybuffer'); // extract the GLTF file as a blob
-          }).then((gltfBlob) => {
-            console.log("GLTF BLOB", gltfBlob)
+          })
+          .then((gltfBlob: ArrayBuffer) => {
+            console.log("GLTF BLOB", gltfBlob);
             this.loader.parse(gltfBlob, '', (gltf) => {
-              console.log("GLTF LOADED SUCCESSFULLY", gltf)
+              console.log("GLTF LOADED SUCCESSFULLY", gltf);
               gltf.scene.scale.set(5, 5, 5);
               gltf.scene.position.set(coordX, 0, coordZ);
               this.models.push(gltf.scene);
