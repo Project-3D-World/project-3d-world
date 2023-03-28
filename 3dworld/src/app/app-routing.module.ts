@@ -7,6 +7,7 @@ import { AuthGuard } from '@auth0/auth0-angular';
 import { Auth0Guard } from './guards/auth0.guard';
 import { WorldsComponent } from './pages/worlds/worlds.component';
 import { WorldViewComponent } from './pages/world-view/world-view.component';
+import { ProfileComponent } from './pages/profile/profile.component';
 
 const routes: Routes = [
   {
@@ -32,6 +33,11 @@ const routes: Routes = [
     component: WorldViewComponent,
     canActivate: [Auth0Guard],
   },
+  {
+    path:'profile',
+    component:ProfileComponent,
+    canActivate:[Auth0Guard],
+  }
 ];
 
 @NgModule({
