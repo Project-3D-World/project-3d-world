@@ -7,7 +7,13 @@
 <div class="commentView-container"></div>
 
 <!--claim plot section-->
-
+<app-chunk-form
+  class="hidden"
+  [worldId]="worldId"
+  [chunkX]="x"
+  [chunkZ]="z"
+  (answer)="claimPlot($event)"
+></app-chunk-form>
 <!-- upload form section-->
 <app-upload-form
   class="hidden"

@@ -107,6 +107,13 @@ export class ApiService {
     );
   }
 
+  getChunkFile(worldId: string, chunkId: string) {
+    return this.http.get(
+      this.endpoint + '/api/worlds/' + worldId + '/chunks/' + chunkId + '/file',
+      { withCredentials: true, responseType: 'blob' }
+    );
+  }
+
   //get a world by id
   getWorld(worldId: string) {
     return this.http.get<JSON>(this.endpoint + '/api/worlds/' + worldId, {

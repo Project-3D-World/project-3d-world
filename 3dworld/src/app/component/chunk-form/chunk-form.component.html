@@ -1,0 +1,7 @@
+<form [formGroup]="form" (ngSubmit)="onSubmit()">
+    <label>
+      <input type="checkbox" formControlName="answer" (change)="claimPlot($event)">
+      Claim chunk as your own?
+    </label>
+    <button type="submit" class="btn" >Submit</button>
+  </form>
