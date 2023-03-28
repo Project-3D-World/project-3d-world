@@ -19,7 +19,7 @@ export class UploadFormComponent {
   @Input() chunkZ: number = 0;
   realFile!: File;
   uploadForm: FormGroup;
-  constructor(private fb: FormBuilder, private api: ApiService) {
+  constructor(private fb: FormBuilder) {
     this.uploadForm = this.fb.group({
       GLTFfile: [null, Validators.required],
     });

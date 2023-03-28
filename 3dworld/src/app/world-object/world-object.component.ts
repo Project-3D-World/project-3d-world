@@ -1,6 +1,7 @@
 import { AfterViewInit, Component, Input, OnDestroy } from '@angular/core';
 
 import * as THREE from 'three';
+import * as JSZip from 'jszip';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 import { ApiService } from '../services/api.service';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
@@ -37,16 +38,18 @@ export class WorldObjectComponent implements AfterViewInit {
 
   constructor(private api: ApiService) {}
 
-  loadWorld(): void {
-    this.api.getWorld('64176688914a579ebfb79af5').subscribe((data) => {
-      console.log(data);
-    });
-  }
-
-  claimPlot(): void {
+  claimPlot(userInput: boolean): void {
+    if(userInput){
     this.api.claimChunk(this.worldId, this.chunkId).subscribe((data) => {
       console.log(data);
     });
+    }
+  }
+
+  async getChunkFile(chunkId: string): Promise<any> {
+    const data = await this.api.getChunkFile(this.worldId, chunkId).toPromise();
+    console.log(data);
+    return data;
   }
 
   uploadModel(event: any): void {
@@ -89,8 +92,9 @@ export class WorldObjectComponent implements AfterViewInit {
         const coordX = (<any>data).world.chunks[x].location.x;
         const coordZ = (<any>data).world.chunks[x].location.z;
         if ((<any>data).world.chunks[x].chunkFile != null) {
+          /*
           this.loader.load(
-            (<any>data).world.chunks[x].chunkFile,
+            (<any>data).world.chunks[x].chunkFile.toString(),
             (gltf) => {
               gltf.scene.scale.set(5, 5, 5);
               gltf.scene.position.set(coordX, 0, coordZ);
@@ -104,6 +108,79 @@ export class WorldObjectComponent implements AfterViewInit {
               console.error(error);
             }
           );
+          */
+
+        this.getChunkFile((<any>data).world.chunks[x]._id).then((data) => {
+          console.log(data);
+          const blob = data;
+          console.log(blob);
+
+          const zip = new JSZip();
+          const loadingManager = new THREE.LoadingManager();
+          zip.loadAsync(blob).then((zip) => {
+            const gltfFile = zip.file(/\.gltf$/i)[0];
+            if (!gltfFile) {
+              throw new Error('GLTF file not found in zip');
+            }
+            /*
+            loadingManager.setURLModifier(async (url: string) => {
+              const file = zip.file(url);
+              if (file) {
+                const fileData = await file.async('arraybuffer');
+                return URL.createObjectURL(new Blob([fileData]));
+              }
+              return url;
+            });
+            */
+            loadingManager.setURLModifier((url: string) => {
+              return new Promise<string>(async resolve => {
+                const file = zip.file(url);
+                if (file) {
+                  const fileData = await file.async('arraybuffer');
+                  resolve(URL.createObjectURL(new Blob([fileData])));
+                } else {
+                  resolve(url);
+                }
+              });
+            });
+
+            return gltfFile.async('arraybuffer'); // extract the GLTF file as a blob
+          }).then((gltfBlob) => {
+            console.log("GLTF BLOB", gltfBlob)
+            this.loader.parse(gltfBlob, '', (gltf) => {
+              console.log("GLTF LOADED SUCCESSFULLY", gltf)
+              gltf.scene.scale.set(5, 5, 5);
+              gltf.scene.position.set(coordX, 0, coordZ);
+              this.models.push(gltf.scene);
+              this.scene.add(gltf.scene);
+            });
+
+            /*this.loader.load(url,
+              gltf => {
+                console.log("GLTF LOADED SUCCESSFULLY", gltf)
+                gltf.scene.scale.set(5, 5, 5);
+                gltf.scene.position.set(coordX, 0, coordZ);
+                this.models.push(gltf.scene);
+                this.scene.add(gltf.scene);
+              },
+              function (xhr) {
+                console.log((xhr.loaded / xhr.total) * 100 + '% loaded');
+              },
+              function (error) {
+                console.error(error);
+              }
+            );*/
+          });
+        });
+         
+         /*this.loader.loadAsync((<any>data).world.chunks[x].chunkFile.toString()).then((gltf) => {
+          gltf.scene.scale.set(5, 5, 5);
+          gltf.scene.position.set(coordX, 0, coordZ);
+          this.models.push(gltf.scene);
+          this.scene.add(gltf.scene);
+        });
+        */
+
         } else {
           console.log((<any>data).world.chunks[x]._id);
           const geometry = new THREE.BoxGeometry(
@@ -173,6 +250,7 @@ export class WorldObjectComponent implements AfterViewInit {
       const position = model.getWorldPosition(new THREE.Vector3());
       this.x = position.x;
       this.z = position.z;
+      let claimed = false;
 
       this.api.getWorld(this.worldId).subscribe((data) => {
         const chunkSize = (<any>data).world.chunkSize.x;
@@ -180,6 +258,18 @@ export class WorldObjectComponent implements AfterViewInit {
         const arrayPosition =
           (this.x / chunkSize) * sidelength + this.z / chunkSize;
         this.chunkId = (<any>data).world.chunks[arrayPosition]._id;
+        if((<any>data).world.chunks[arrayPosition].claimedBy != null){
+          claimed = true;
+        }
+        //claim section
+        if(!claimed)
+        {
+          document.querySelector('app-chunk-form')?.classList.remove('hidden');
+        }
+        else
+        {
+          document.querySelector('app-chunk-form')?.classList.add('hidden');
+        }
       });
       // comment section
 
@@ -188,8 +278,10 @@ export class WorldObjectComponent implements AfterViewInit {
       document
         .querySelector('.comment-containers-container')
         ?.classList.remove('hidden');
-
+      //upload section
       document.querySelector('app-upload-form')?.classList.remove('hidden');
+
+
       break;
     }
   }
