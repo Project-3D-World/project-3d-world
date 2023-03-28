@@ -77,6 +77,20 @@ export class WorldObjectComponent implements AfterViewInit {
     this.renderer.setSize(this.canvas.width, this.canvas.height);
   }
 
+  private getModelDimensions(model: THREE.Group): THREE.Vector3 {
+    const box = new THREE.Box3().setFromObject(model);
+    const dimensions = new THREE.Vector3();
+    box.getSize(dimensions);
+    return dimensions;
+  }
+
+  private resizeModel(model: THREE.Group, chunkSize: any): void {
+    const dimensions = this.getModelDimensions(model);
+    const maxHorizontalDimension = Math.max(dimensions.x, dimensions.z);
+    const scale = (chunkSize - 1) * 0.9 / maxHorizontalDimension ;
+    model.scale.setScalar(scale);
+  }
+
   loadChunks() {
     this.api.getWorld(this.worldId).subscribe((data) => {
       let id = (<any>data).world._id;
