@@ -144,6 +144,8 @@ export class WorldObjectComponent implements AfterViewInit {
               });
             });
 
+            this.loader = new GLTFLoader(loadingManager);
+
             return gltfFile.async('arraybuffer'); // extract the GLTF file as a blob
           }).then((gltfBlob) => {
             console.log("GLTF BLOB", gltfBlob)
