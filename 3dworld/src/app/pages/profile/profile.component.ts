@@ -20,9 +20,16 @@ export class ProfileComponent {
     this.auth.user$.subscribe((success) => {
       this.user = success;
     });
-    this.api.getMyClaims(0, 10).subscribe((data) => {
+    this.api.getMyClaims(0, this.limit).subscribe((data) => {
       console.log(data);
       this.claims = data;
+    });
+  }
+
+  getClaims(page: number, limit: number) {
+    this.api.getMyClaims(page, limit).subscribe((data) => {
+      this.claims = data;
+      this.page = page;
     });
   }
 }
