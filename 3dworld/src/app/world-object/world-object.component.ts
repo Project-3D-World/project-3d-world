@@ -20,6 +20,8 @@ export class WorldObjectComponent implements AfterViewInit {
   raycaster!: THREE.Raycaster;
   mouse!: THREE.Vector2;
   models!: THREE.Group[];
+  loadedChunks!: Map<number, number>;
+  loadedCount!: number;
   ambientLight!: THREE.AmbientLight;
   controls!: OrbitControls;
   loader!: GLTFLoader;
@@ -65,15 +67,28 @@ export class WorldObjectComponent implements AfterViewInit {
   }
 
   onWindowResize() {
-    console.log(this.camera);
-    this.canvas.width = window.innerWidth * 0.8;
-    this.canvas.height = window.innerHeight * 0.8;
+    this.resizeCanvasToDisplaySize(this.canvas);
     this.camera.aspect = this.canvas.width / this.canvas.height;
     this.camera.updateProjectionMatrix();
     this.renderer.setSize(this.canvas.width, this.canvas.height);
   }
 
-  loadSingleChunk(data: any, chunkSize: number, coordX: number, coordZ: number): void {
+  resizeCanvasToDisplaySize(canvas: HTMLCanvasElement) {
+    // look up the size the canvas is being displayed
+    const width = canvas.clientWidth;
+    const height = canvas.clientHeight;
+ 
+    // If it's resolution does not match change it
+    if (canvas.width !== width || canvas.height !== height) {
+      canvas.width = width;
+      canvas.height = height;
+      return true;
+    }
+ 
+    return false;
+ }
+  
+  loadSingleChunk(data: any, coordX: number, coordZ: number, init = true): void {
     const zip = new JSZip();
     const loadingManager = new THREE.LoadingManager();
     const zipURL_to_URL: { [path: string]: string } = {};
@@ -109,7 +124,7 @@ export class WorldObjectComponent implements AfterViewInit {
     })
     .then((gltfBlob: ArrayBuffer) => {
       this.loader.parse(gltfBlob, '', (gltf) => {
-        this.resizeModel(gltf.scene, chunkSize);
+        this.resizeModel(gltf.scene, this.chunkSizeX);
         const dimensions = this.getModelDimensions(gltf.scene);
         const box = new THREE.Box3().setFromObject(gltf.scene, true);
         const center = new THREE.Vector3();
@@ -122,8 +137,19 @@ export class WorldObjectComponent implements AfterViewInit {
         const directionlLight = new THREE.DirectionalLight(0xffffff, 1);
         gltf.scene.add(directionlLight);
         gltf.scene.add(heimsphere);
-        this.models.push(gltf.scene);
-        this.scene.add(gltf.scene);
+        if (init) {
+          this.models.push(gltf.scene);
+          this.scene.add(gltf.scene);
+          this.loadedChunks.set(coordX + coordZ*this.chunkSizeX, this.loadedCount++);
+        } else {
+          const key = coordX + coordZ*this.chunkSizeX;
+          if (this.loadedChunks.get(key)) {
+            this.scene.remove(this.models[this.loadedChunks.get(key)!]);
+            this.models[this.loadedChunks.get(key)!] = gltf.scene;
+            this.scene.add(gltf.scene);
+          }
+        }
+        
       });
     });
   }
@@ -145,16 +171,14 @@ export class WorldObjectComponent implements AfterViewInit {
   loadChunks(worldData: any): void {
       let id = worldData.world._id;
       let chunks = worldData.world.chunks;
-      this.chunkSizeX = worldData.world.chunkSize.x;
-      this.chunkSizeZ = worldData.world.chunkSize.z;
 
       for (let x = 0; x < chunks.length; x++) {
         const coordX = worldData.world.chunks[x].location.x;
         const coordZ = worldData.world.chunks[x].location.z;
         if (worldData.world.chunks[x].chunkFile != null) {
-        this.getChunkFile(worldData.world.chunks[x]._id).then((data) => {
-          this.loadSingleChunk(data, this.chunkSizeX, coordX, coordZ);
-        });
+          this.getChunkFile(worldData.world.chunks[x]._id).then((data) => {
+            this.loadSingleChunk(data, coordX, coordZ);
+          });
         } 
         else {
           const geometry = new THREE.BoxGeometry(
@@ -169,6 +193,7 @@ export class WorldObjectComponent implements AfterViewInit {
           group.add(cube);
           this.scene.add(group);
           this.models.push(group); // add each cube to the array
+          this.loadedChunks.set(coordX + coordZ*this.chunkSizeX, this.loadedCount++);
         }
       }
   }
@@ -220,13 +245,13 @@ export class WorldObjectComponent implements AfterViewInit {
 
       const position = model.getWorldPosition(new THREE.Vector3());
       const numberX = Math.round(position.x/this.chunkSizeX);
-      const numberZ = Math.round(position.z/this.chunkSizeZ); 
+      const numberZ = Math.round(position.z/this.chunkSizeX); 
 
       this.x = numberX*this.chunkSizeX;
-      this.z = numberZ*this.chunkSizeZ;
+      this.z = numberZ*this.chunkSizeX;
 
       const sidelength = Math.sqrt(this.worldData.world.chunks.length);
-      const arrayPosition = (this.x/this.chunkSizeX) * sidelength + this.z/this.chunkSizeZ;
+      const arrayPosition = (this.x/this.chunkSizeX) * sidelength + this.z/this.chunkSizeX;
       this.chunkId = this.worldData.world.chunks[arrayPosition]._id;
       if(this.worldData.world.chunks[arrayPosition].claimedBy == null)
       {
@@ -273,8 +298,7 @@ export class WorldObjectComponent implements AfterViewInit {
 
   ngAfterViewInit() {
     this.canvas = document.getElementById('canvas') as HTMLCanvasElement;
-    this.canvas.width = window.innerWidth * 0.8;
-    this.canvas.height = window.innerHeight * 0.8;
+    this.resizeCanvasToDisplaySize(this.canvas);
 
     this.scene = new THREE.Scene();
     this.camera = new THREE.PerspectiveCamera(
@@ -294,6 +318,8 @@ export class WorldObjectComponent implements AfterViewInit {
     this.raycaster = new THREE.Raycaster();
     this.mouse = new THREE.Vector2();
     this.models = [];
+    this.loadedChunks = new Map();
+    this.loadedCount = 0;
     this.ambientLight = new THREE.AmbientLight(0x404040);
     this.scene.add(this.ambientLight);
     this.camera.position.y = 10;
@@ -303,17 +329,33 @@ export class WorldObjectComponent implements AfterViewInit {
     document
       .getElementById('canvas')
       ?.addEventListener('click', this.onClick.bind(this), false);
-    window.addEventListener('resize', this.onWindowResize, false);
+    window.addEventListener('resize', this.onWindowResize.bind(this), false);
     requestAnimationFrame(this.animate.bind(this));
     
     this.onInitReplay.subscribe((data) => {
       this.worldData = data[0];
+      this.chunkSizeX = this.worldData.world.chunkSize.x;
       this.user = data[1];
       this.userId = this.user.userId;
 
+      const liveWorldData = this.liveWorld.getWorldData();
+      if (liveWorldData) {
+        this.worldData.world.chunks = liveWorldData.chunks;
+      }
       this.loadChunks(this.worldData);
 
-      // TODO: instantiate live world
+      this.liveWorld.onWorldChange( (ops: any) => {
+        const newWorldData = this.liveWorld.getWorldData();
+        this.worldData.world.chunks = newWorldData.chunks;
+        const chunkIndex = ops[0].p[1];
+        if (ops[0].p[2] === 'chunkFile') {
+          const coordX = this.worldData.world.chunks[chunkIndex].location.x;
+          const coordZ = this.worldData.world.chunks[chunkIndex].location.z;
+          this.getChunkFile(this.worldData.world.chunks[chunkIndex]._id).then((data) => {
+            this.loadSingleChunk(data, coordX, coordZ, false);
+          });
+        }
+      });
     });
   }
 }
