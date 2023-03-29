@@ -56,6 +56,15 @@ export class ApiService {
     });
   }
 
+  getMyClaims(page: number, limit: number) {
+    return this.http.get(
+      this.endpoint + `/api/users/myClaims/page=${page}&limit=${limit}`,
+      {
+        withCredentials: true,
+      }
+    );
+  }
+
   //postComment
   postComment(
     worldId: string,
@@ -155,14 +164,14 @@ export class ApiService {
   //check how to send the file to backend
   uploadModel(worldId: string, chunkId: string, model: File) {
     const headers = new HttpHeaders({
-      "Accept-Encoding" : "gzip, deflate, br",
+      'Accept-Encoding': 'gzip, deflate, br',
     });
     let formData = new FormData();
     formData.append('chunkFile', model);
     return this.http.post(
       this.endpoint + '/api/worlds/' + worldId + '/chunks/' + chunkId + '/file',
       formData,
-      { withCredentials: true, headers: headers }, 
+      { withCredentials: true, headers: headers }
     );
   }
 }

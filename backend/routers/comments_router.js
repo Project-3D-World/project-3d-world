@@ -2,11 +2,12 @@ import { Router } from "express";
 import { Comments } from "../models/comments.js";
 import { User } from "../models/users.js";
 import { World } from "../models/worlds.js";
+import { isAuthenticated } from "../middleware/auth.js";
 import mongoose from "mongoose";
 export const commentsRouter = Router();
 
 //post
-commentsRouter.post("/", async (req, res) => {
+commentsRouter.post("/", isAuthenticated, async (req, res) => {
   const author = req.body.author;
   const x = req.body.x;
   const z = req.body.z;
@@ -48,6 +49,7 @@ commentsRouter.post("/", async (req, res) => {
 //get for world
 commentsRouter.get(
   "/worldId=:worldId&x=:x&z=:z&page=:page&limit=:limit",
+  isAuthenticated,
   async (req, res) => {
     console.log(req.params.worldId);
     const page = parseInt(req.params.page);
@@ -71,13 +73,16 @@ commentsRouter.get(
   }
 );
 
-commentsRouter.delete("/:id", async (req, res) => {
+commentsRouter.delete("/:id", isAuthenticated, async (req, res) => {
   const id = req.params.id;
+
   const comment = await Comments.findById(id);
   if (!comment) {
     return res.status(404).json({ error: "Comment not found" });
   }
-
+  if (comment.author.toString() !== req.session.userId) {
+    return res.status(401).json({ error: "Unauthorized to delete comment" });
+  }
   try {
     await Comments.findByIdAndDelete(id);
   } catch {

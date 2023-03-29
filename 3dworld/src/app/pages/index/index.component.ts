@@ -17,6 +17,30 @@ export class IndexComponent implements OnInit {
     private router: Router
   ) {}
   ngOnInit(): void {
-    this.api.getMe().subscribe((data) => {});
+    this.api.getMe().subscribe({
+      next: (data) => {
+        this.auth.isAuthenticated$.subscribe((data) => {
+          if (data === false) {
+            this.api.signOut().subscribe();
+          }
+        });
+      },
+      error: (err) => {
+        if (err.status === 401) {
+          this.auth.isAuthenticated$.subscribe((data) => {
+            if (data === true) {
+              this.auth.user$.subscribe((data) => {
+                this.api.signIn(JSON.stringify(data, null, 2)).subscribe({
+                  next: (value) => {},
+                  error: (value) => {
+                    this.auth.logout().subscribe();
+                  },
+                });
+              });
+            }
+          });
+        }
+      },
+    });
   }
 }
