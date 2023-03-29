@@ -56,7 +56,7 @@ export class LiveWorldService {
         }
       });
       const connection = new this.sharedb.Connection(this.socket);
-      this.worldDoc = connection.get('worlds', worldId);
+      this.worldDoc = connection.get('live_worlds', worldId);
       this.worldDoc.subscribe((err: any) => {
         if (err) {
           reject(err);
