@@ -3,9 +3,25 @@
   <img [src]="user.picture" />
 </div>
 <h1>You have claims in these worlds:</h1>
-<div class="worlds-container" *ngFor="let claim of claims">
+<div class="worlds-container" *ngFor="let claim of claims.slice(0, limit)">
   <app-worlddiv
     class="row world general align-items-center"
     [world]="claim.world"
   ></app-worlddiv>
+</div>
+<div class="row comment-button-container">
+  <button
+    *ngIf="page > 0"
+    class="btn prev-btn"
+    (click)="getClaims(page - 1, limit)"
+  >
+    Prev
+  </button>
+  <button
+    *ngIf="claims.length === limit + 1"
+    class="btn next-btn"
+    (click)="getClaims(page + 1, limit)"
+  >
+    Next
+  </button>
 </div>
