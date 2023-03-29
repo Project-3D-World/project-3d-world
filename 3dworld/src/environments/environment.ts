@@ -5,4 +5,5 @@ export const environment = {
     clientId: 'auth0 clientId',
   },
   apiEndpoint: 'endpoint',
+  liveWorldEndpoint: 'websocket endpoint',
 };

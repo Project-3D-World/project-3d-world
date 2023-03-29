@@ -4,8 +4,9 @@ import * as THREE from 'three';
 import * as JSZip from 'jszip';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 import { ApiService } from '../services/api.service';
+import { LiveWorldService } from '../services/liveworld.service';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
-import { lastValueFrom } from 'rxjs';
+import { lastValueFrom, forkJoin, ReplaySubject, tap, takeUntil, take } from 'rxjs';
 @Component({
   selector: 'app-world-object',
   templateUrl: './world-object.component.html',
@@ -35,14 +36,16 @@ export class WorldObjectComponent implements AfterViewInit {
   userId: string = '';
   canvas!: HTMLCanvasElement;
 
-  constructor(private api: ApiService) {}
+  private onInitReplay = new ReplaySubject<any>(1);
+
+  constructor(private api: ApiService, private liveWorld: LiveWorldService) {}
 
   claimPlot(userInput: boolean): void {
     if(userInput){
-      this.api.claimChunk(this.worldId, this.chunkId);
-      const chunkIndex = this.worldData.chunks.findIndex((chunk: any) => chunk._id === this.chunkId);
-      this.worldData.chunk[chunkIndex].claimed = true;
-      this.worldData.chunk[chunkIndex].claimedBy = this.userId;
+      this.api.claimChunk(this.worldId, this.chunkId).subscribe();
+      const chunkIndex = this.worldData.world.chunks.findIndex((chunk: any) => chunk._id === this.chunkId);
+      this.worldData.world.chunks[chunkIndex].claimed = true;
+      this.worldData.world.chunks[chunkIndex].claimedBy = this.userId;
     }
   }
 
@@ -62,6 +65,7 @@ export class WorldObjectComponent implements AfterViewInit {
   }
 
   onWindowResize() {
+    console.log(this.camera);
     this.canvas.width = window.innerWidth * 0.8;
     this.canvas.height = window.innerHeight * 0.8;
     this.camera.aspect = this.canvas.width / this.canvas.height;
@@ -253,16 +257,24 @@ export class WorldObjectComponent implements AfterViewInit {
     requestAnimationFrame(this.animate.bind(this));
   }
 
+  ngOnInit(): void {
+    forkJoin([
+      this.api.getWorld(this.worldId),
+      this.api.getMe(),
+      this.liveWorld.connect(this.worldId),
+    ])
+    .pipe(
+      tap(data => {
+        this.onInitReplay.next(data);
+      }),
+      take(1)
+    ).subscribe();
+  }
+
   ngAfterViewInit() {
-    //get a world id
     this.canvas = document.getElementById('canvas') as HTMLCanvasElement;
     this.canvas.width = window.innerWidth * 0.8;
     this.canvas.height = window.innerHeight * 0.8;
-
-    this.api.getMe().subscribe((data) => {
-      this.user = data;
-      this.userId = this.user.userId;
-    });
 
     this.scene = new THREE.Scene();
     this.camera = new THREE.PerspectiveCamera(
@@ -287,15 +299,21 @@ export class WorldObjectComponent implements AfterViewInit {
     this.camera.position.y = 10;
     this.camera.position.z = 10;
     this.camera.position.x = 10;
-    this.api.getWorld(this.worldId).subscribe((data) => {
-      this.worldData = data;
-      this.loadChunks(this.worldData);
-    });
-    
+
     document
       .getElementById('canvas')
       ?.addEventListener('click', this.onClick.bind(this), false);
     window.addEventListener('resize', this.onWindowResize, false);
     requestAnimationFrame(this.animate.bind(this));
+    
+    this.onInitReplay.subscribe((data) => {
+      this.worldData = data[0];
+      this.user = data[1];
+      this.userId = this.user.userId;
+
+      this.loadChunks(this.worldData);
+
+      // TODO: instantiate live world
+    });
   }
 }

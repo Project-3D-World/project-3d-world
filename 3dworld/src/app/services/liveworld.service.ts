@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+import { environment } from '../../environments/environment';
 
 /**
  * Example world data:
@@ -33,11 +34,12 @@ export class LiveWorldService {
     this.sharedb = require('sharedb/lib/client');
   }
 
-  async connect(url: string, worldId: string) {
+  async connect(worldId: string) {
     /**
      * Connect to the live world at url and id. Returns a promise that resolves
      * when the connection is established.
      */
+    const url = environment.liveWorldEndpoint + '/api/worlds/' + worldId + '/live';
     if (this.socket) {
       this.socket.close();
     }
@@ -45,7 +47,7 @@ export class LiveWorldService {
 
     return new Promise<void>((resolve, reject) => {
       // add listener event for when the server closes the connection due to an error
-      this.socket.addListener('close', (event: any) => {
+      this.socket.addEventListener('close', (event: any) => {
         if (event.code >= 4000) {
           reject({
             code: event.code,
