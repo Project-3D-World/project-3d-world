@@ -5,8 +5,10 @@ import { SignInComponent } from './pages/sign-in/sign-in.component';
 import { SignUpComponent } from './pages/sign-up/sign-up.component';
 import { AuthGuard } from '@auth0/auth0-angular';
 import { Auth0Guard } from './guards/auth0.guard';
+import { SessionGuard } from './guards/session.guard';
 import { WorldsComponent } from './pages/worlds/worlds.component';
 import { WorldViewComponent } from './pages/world-view/world-view.component';
+import { ProfileComponent } from './pages/profile/profile.component';
 
 const routes: Routes = [
   {
@@ -25,12 +27,17 @@ const routes: Routes = [
   {
     path: 'worlds',
     component: WorldsComponent,
-    canActivate: [Auth0Guard],
+    canActivate: [Auth0Guard, SessionGuard],
   },
   {
     path: 'world-view',
     component: WorldViewComponent,
-    canActivate: [Auth0Guard],
+    canActivate: [Auth0Guard, SessionGuard],
+  },
+  {
+    path: 'profile',
+    component: ProfileComponent,
+    canActivate: [Auth0Guard, SessionGuard],
   },
 ];
 

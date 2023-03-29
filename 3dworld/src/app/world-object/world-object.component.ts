@@ -124,15 +124,17 @@ export class WorldObjectComponent implements AfterViewInit {
   }
 
   deleteComment(event: string) {
-    this.api.deleteComment(event).subscribe();
-    this.getComments(0, this.commentLimit);
+    this.api.deleteComment(event).subscribe((data) => {
+      this.getComments(0, this.commentLimit);
+    });
   }
   newComment(event: string) {
     this.api
       .postComment(this.worldId, this.x, this.z, this.user.userId, event)
-      .subscribe();
-    this.getComments(0, 10);
-    this.commentPage = 0;
+      .subscribe((data) => {
+        this.getComments(0, 10);
+        this.commentPage = 0;
+      });
   }
 
   getComments(page: number, limit: number) {

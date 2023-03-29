@@ -1,0 +1,11 @@
+<div>
+  <h2>Welcome "{{ user.name }}"</h2>
+  <img [src]="user.picture" />
+</div>
+<h1>You have claims in these worlds:</h1>
+<div class="worlds-container" *ngFor="let claim of claims">
+  <app-worlddiv
+    class="row world general align-items-center"
+    [world]="claim.world"
+  ></app-worlddiv>
+</div>
