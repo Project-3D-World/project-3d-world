@@ -39,9 +39,10 @@ export class WorldObjectComponent implements AfterViewInit {
 
   claimPlot(userInput: boolean): void {
     if(userInput){
-      this.api.claimChunk(this.worldId, this.chunkId).subscribe((data) => {
-        console.log(data);
-      });
+      this.api.claimChunk(this.worldId, this.chunkId);
+      const chunkIndex = this.worldData.chunks.findIndex((chunk: any) => chunk._id === this.chunkId);
+      this.worldData.chunk[chunkIndex].claimed = true;
+      this.worldData.chunk[chunkIndex].claimedBy = this.userId;
     }
   }
 
