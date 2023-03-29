@@ -5,7 +5,7 @@ import * as JSZip from 'jszip';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 import { ApiService } from '../services/api.service';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
-import { Object3D } from 'three';
+import { Object3D, PointLight } from 'three';
 @Component({
   selector: 'app-world-object',
   templateUrl: './world-object.component.html',
@@ -27,16 +27,12 @@ export class WorldObjectComponent implements AfterViewInit {
   chunkSizeX!: number;
   chunkSizeZ!: number;
   chunkId!: string;
+  worldData!: any;
   comments: any = [];
   user: any;
   commentPage: number = 0;
   commentLimit: number = 10;
   userId: string = '';
-
-  offsetLeft!: number;
-  offsetTop!: number;
-  width!: number;
-  height!: number;
   canvas!: HTMLCanvasElement;
 
   constructor(private api: ApiService) {}
@@ -120,12 +116,18 @@ export class WorldObjectComponent implements AfterViewInit {
         console.log("GLTF LOADED SUCCESSFULLY", gltf);
         this.resizeModel(gltf.scene, chunkSize);
         const dimensions = this.getModelDimensions(gltf.scene);
-        const box = new THREE.Box3().setFromObject(gltf.scene);
+        const box = new THREE.Box3().setFromObject(gltf.scene, true);
         const center = new THREE.Vector3();
         box.getCenter(center);
         center.negate();
         gltf.scene.position.set(coordX, dimensions.y/2, coordZ);
         gltf.scene.position.add(center);
+        console.log("center", center);
+        // Create a directional light and add it to the scene.
+        const heimsphere = new THREE.HemisphereLight(0xffffff, 0x000000, 1);
+        const directionlLight = new THREE.DirectionalLight(0xffffff, 1);
+        gltf.scene.add(directionlLight);
+        gltf.scene.add(heimsphere);
         this.models.push(gltf.scene);
         this.scene.add(gltf.scene);
       });
@@ -146,26 +148,25 @@ export class WorldObjectComponent implements AfterViewInit {
     model.scale.setScalar(scale);
   }
 
-  loadChunks() {
-    this.api.getWorld(this.worldId).subscribe((data) => {
-      let id = (<any>data).world._id;
-      let chunks = (<any>data).world.chunks;
+  loadChunks(worldData: any): void {
+      let id = worldData.world._id;
+      let chunks = worldData.world.chunks;
       let sidelength = Math.sqrt(chunks.length);
-      let chunkSize = (<any>data).world.chunkSize.x;
-      this.chunkSizeX = (<any>data).world.chunkSize.x;
-      this.chunkSizeZ = (<any>data).world.chunkSize.z;
+      let chunkSize = worldData.world.chunkSize.x;
+      this.chunkSizeX = worldData.world.chunkSize.x;
+      this.chunkSizeZ = worldData.world.chunkSize.z;
       console.log(id);
       console.log(chunks);
       console.log(sidelength);
       console.log(chunkSize);
 
       for (let x = 0; x < chunks.length; x++) {
-        const coordX = (<any>data).world.chunks[x].location.x;
-        const coordZ = (<any>data).world.chunks[x].location.z;
-        if ((<any>data).world.chunks[x].chunkFile != null) {
+        const coordX = worldData.world.chunks[x].location.x;
+        const coordZ = worldData.world.chunks[x].location.z;
+        if (worldData.world.chunks[x].chunkFile != null) {
           /*
           this.loader.load(
-            (<any>data).world.chunks[x].chunkFile.toString(),
+            (worldData).world.chunks[x].chunkFile.toString(),
             (gltf) => {
               gltf.scene.scale.set(5, 5, 5);
               gltf.scene.position.set(coordX, 0, coordZ);
@@ -180,13 +181,12 @@ export class WorldObjectComponent implements AfterViewInit {
             }
           );
           */
-         
-
-        this.getChunkFile((<any>data).world.chunks[x]._id).then((data) => {
+        this.getChunkFile(worldData.world.chunks[x]._id).then((data) => {
           this.loadSingleChunk(data, chunkSize, coordX, coordZ);
         });
-        } else {
-          console.log((<any>data).world.chunks[x]._id);
+        } 
+        else {
+          console.log(worldData.world.chunks[x]._id);
           const geometry = new THREE.BoxGeometry(
             chunkSize - 1,
             0,
@@ -201,7 +201,6 @@ export class WorldObjectComponent implements AfterViewInit {
           this.models.push(group); // add each cube to the array
         }
       }
-    });
   }
 
   deleteComment(event: string) {
@@ -252,6 +251,8 @@ export class WorldObjectComponent implements AfterViewInit {
       console.log(model);
       console.log(model.getWorldPosition(new THREE.Vector3()));
       const position = model.getWorldPosition(new THREE.Vector3());
+      position.x = Math.abs(position.x);
+      position.z = Math.abs(position.z);
       const numberX = Math.floor(position.x/this.chunkSizeX);
       const numberZ = Math.floor(position.z/this.chunkSizeZ); 
 
@@ -260,13 +261,12 @@ export class WorldObjectComponent implements AfterViewInit {
       console.log(this.x, this.z);
       let claimed = false;
 
-      this.api.getWorld(this.worldId).subscribe((data) => {
-        const chunkSize = (<any>data).world.chunkSize.x;
-        const sidelength = Math.sqrt((<any>data).world.chunks.length);
+        const chunkSize = this.worldData.world.chunkSize.x;
+        const sidelength = Math.sqrt(this.worldData.world.chunks.length);
         const arrayPosition =
           (this.x / chunkSize) * sidelength + this.z / chunkSize;
-        this.chunkId = (<any>data).world.chunks[arrayPosition]._id;
-        if((<any>data).world.chunks[arrayPosition].claimedBy != null){
+        this.chunkId = this.worldData.world.chunks[arrayPosition]._id;
+        if(this.worldData.world.chunks[arrayPosition].claimedBy != null){
           claimed = true;
         }
         //claim section
@@ -278,9 +278,7 @@ export class WorldObjectComponent implements AfterViewInit {
         {
           document.querySelector('app-chunk-form')?.classList.add('hidden');
         }
-      });
       // comment section
-
       this.getComments(0, 10);
       document.querySelector('app-commentform')?.classList.remove('hidden');
       document
@@ -288,7 +286,6 @@ export class WorldObjectComponent implements AfterViewInit {
         ?.classList.remove('hidden');
       //upload section
       document.querySelector('app-upload-form')?.classList.remove('hidden');
-
 
       break;
     }
@@ -337,7 +334,11 @@ export class WorldObjectComponent implements AfterViewInit {
     this.camera.position.y = 10;
     this.camera.position.z = 10;
     this.camera.position.x = 10;
-    this.loadChunks();
+    this.api.getWorld(this.worldId).subscribe((data) => {
+      this.worldData = data;
+      this.loadChunks(this.worldData);
+    });
+    
     document
       .getElementById('canvas')
       ?.addEventListener('click', this.onClick.bind(this), false);
