@@ -132,7 +132,7 @@ export class WorldObjectComponent implements AfterViewInit {
     this.api
       .postComment(this.worldId, this.x, this.z, this.user.userId, event)
       .subscribe((data) => {
-        this.getComments(0, 10);
+        this.getComments(0, this.commentLimit);
         this.commentPage = 0;
       });
   }
@@ -185,7 +185,7 @@ export class WorldObjectComponent implements AfterViewInit {
       });
       // comment section
 
-      this.getComments(0, 10);
+      this.getComments(0, this.commentLimit);
       document.querySelector('app-commentform')?.classList.remove('hidden');
       document
         .querySelector('.comment-containers-container')
