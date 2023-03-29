@@ -75,8 +75,8 @@ export class WorldObjectComponent implements AfterViewInit {
 
   resizeCanvasToDisplaySize(canvas: HTMLCanvasElement) {
     // look up the size the canvas is being displayed
-    const width = canvas.clientWidth;
-    const height = canvas.clientHeight;
+    const width = document.getElementById('canvas-container')!.clientWidth;
+    const height = document.getElementById('canvas-container')!.clientHeight;
  
     // If it's resolution does not match change it
     if (canvas.width !== width || canvas.height !== height) {
@@ -303,7 +303,6 @@ export class WorldObjectComponent implements AfterViewInit {
     this.scene = new THREE.Scene();
     this.camera = new THREE.PerspectiveCamera(
       75,
-
       this.canvas.width / this.canvas.height,
       0.1,
       1000
