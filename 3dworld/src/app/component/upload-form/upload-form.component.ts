@@ -26,13 +26,12 @@ export class UploadFormComponent {
   }
 
   newUpload(): void {
-      console.log(this.realFile);
-      this.file.emit(this.realFile);
-      this.uploadForm.reset();
+    console.log(this.realFile);
+    this.file.emit(this.realFile);
+    this.uploadForm.reset();
   }
 
   fileChange(event: any): void {
-    this.realFile=event.target.files[0];
+    this.realFile = event.target.files[0];
   }
-
 }

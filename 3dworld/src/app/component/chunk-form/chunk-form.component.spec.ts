@@ -8,9 +8,8 @@ describe('ChunkFormComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ ChunkFormComponent ]
-    })
-    .compileComponents();
+      declarations: [ChunkFormComponent],
+    }).compileComponents();
 
     fixture = TestBed.createComponent(ChunkFormComponent);
     component = fixture.componentInstance;
