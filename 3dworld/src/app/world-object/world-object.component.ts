@@ -1,11 +1,10 @@
-import { AfterViewInit, Component, Input, OnDestroy } from '@angular/core';
+import { AfterViewInit, Component, Input,} from '@angular/core';
 
 import * as THREE from 'three';
 import * as JSZip from 'jszip';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 import { ApiService } from '../services/api.service';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
-import { Object3D, PointLight } from 'three';
 @Component({
   selector: 'app-world-object',
   templateUrl: './world-object.component.html',
@@ -39,9 +38,9 @@ export class WorldObjectComponent implements AfterViewInit {
 
   claimPlot(userInput: boolean): void {
     if(userInput){
-    this.api.claimChunk(this.worldId, this.chunkId).subscribe((data) => {
-      console.log(data);
-    });
+      this.api.claimChunk(this.worldId, this.chunkId).subscribe((data) => {
+        console.log(data);
+      });
     }
   }
 
@@ -121,6 +120,8 @@ export class WorldObjectComponent implements AfterViewInit {
         box.getCenter(center);
         center.negate();
         gltf.scene.position.set(coordX, dimensions.y/2, coordZ);
+        console.log(coordX, dimensions.y/2, coordZ);
+        console.log(center.x,center.y,center.z);
         gltf.scene.position.add(center);
         console.log("center", center);
         // Create a directional light and add it to the scene.
@@ -144,7 +145,8 @@ export class WorldObjectComponent implements AfterViewInit {
   private resizeModel(model: THREE.Group, chunkSize: any): void {
     const dimensions = this.getModelDimensions(model);
     const maxHorizontalDimension = Math.max(dimensions.x, dimensions.z);
-    const scale = (chunkSize) * 0.9 / maxHorizontalDimension ;
+    const scale = (chunkSize-1) * 0.9 / maxHorizontalDimension ;
+    console.log(scale);
     model.scale.setScalar(scale);
   }
 
@@ -246,19 +248,14 @@ export class WorldObjectComponent implements AfterViewInit {
     for (let i = 0; i < intersects.length; i++) {
       // perform the desired action on the clicked cube(s)
       //claim the cube by sending an api request to the server
-      const model = intersects[i].object;
+      let model = intersects[i].object;
 
-      console.log(model);
-      console.log(model.getWorldPosition(new THREE.Vector3()));
       const position = model.getWorldPosition(new THREE.Vector3());
-      position.x = Math.abs(position.x);
-      position.z = Math.abs(position.z);
-      const numberX = Math.floor(position.x/this.chunkSizeX);
-      const numberZ = Math.floor(position.z/this.chunkSizeZ); 
+      const numberX = Math.round(position.x/this.chunkSizeX);
+      const numberZ = Math.round(position.z/this.chunkSizeZ); 
 
       this.x = numberX*this.chunkSizeX;
       this.z = numberZ*this.chunkSizeZ;
-      console.log(this.x, this.z);
       let claimed = false;
 
         const chunkSize = this.worldData.world.chunkSize.x;
