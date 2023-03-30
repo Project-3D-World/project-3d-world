@@ -264,18 +264,27 @@ export class WorldObjectComponent implements AfterViewInit {
         document.querySelector('app-chunk-form')?.classList.add('hidden');
       }
       // comment section
-      if(this.worldData.world.chunks[arrayPosition].chunkFile !== null)
+      if(this.worldData.world.chunks[arrayPosition].chunkFile != null)
       {
         this.getComments(0, 10);
         document.querySelector('app-commentform')?.classList.remove('hidden');
         document.querySelector('.comment-containers-container')?.classList.remove('hidden');
       }
+      else{
+        document.querySelector('app-commentform')?.classList.add('hidden');
+        document.querySelector('.comment-containers-container')?.classList.add('hidden');
+      }
 
       //upload section
       if(this.worldData.world.chunks[arrayPosition].claimedBy === this.user.userId)
+      {
         document.querySelector('app-upload-form')?.classList.remove('hidden');
+      }
       else
+      {
         document.querySelector('app-upload-form')?.classList.add('hidden');
+      }
+        
       break;
     }
   }
