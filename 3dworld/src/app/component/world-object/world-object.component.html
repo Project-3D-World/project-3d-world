@@ -1,13 +1,16 @@
-<p>world-object works!</p>
-<div>
-  <canvas id="canvas"></canvas>
+
+<div id="canvas-container" style="width:100vw; height:80vw">
+  <canvas id="canvas" class="canvas"></canvas>
 </div>
 
-<div class="commentForm-container"></div>
-<div class="commentView-container"></div>
-
 <!--claim plot section-->
-
+<app-chunk-form
+  class="hidden"
+  [worldId]="worldId"
+  [chunkX]="x"
+  [chunkZ]="z"
+  (answer)="claimPlot($event)"
+></app-chunk-form>
 <!-- upload form section-->
 <app-upload-form
   class="hidden"

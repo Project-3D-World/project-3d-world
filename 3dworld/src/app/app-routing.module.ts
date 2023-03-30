@@ -8,6 +8,7 @@ import { Auth0Guard } from './guards/auth0.guard';
 import { SessionGuard } from './guards/session.guard';
 import { WorldsComponent } from './pages/worlds/worlds.component';
 import { WorldViewComponent } from './pages/world-view/world-view.component';
+import { WorldObjectComponent } from './component/world-object/world-object.component';
 import { ProfileComponent } from './pages/profile/profile.component';
 
 const routes: Routes = [
@@ -38,6 +39,11 @@ const routes: Routes = [
     path: 'profile',
     component: ProfileComponent,
     canActivate: [Auth0Guard, SessionGuard],
+  },
+  {
+    path: 'world-object',
+    component: WorldObjectComponent,
+    canActivate: [Auth0Guard],
   },
 ];
 
