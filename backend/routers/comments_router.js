@@ -66,6 +66,7 @@ commentsRouter.get(
       "chunk.x": x,
       "chunk.z": z,
     })
+      .populate("author")
       .sort({ createdAt: "desc" })
       .skip(page * limit)
       .limit(limit + 1);
