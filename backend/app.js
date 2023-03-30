@@ -1,11 +1,13 @@
 import express from "express";
 import expressWs from "express-ws";
+import { createServer } from "http"
 import bodyParser from "body-parser";
 import morgan from "morgan";
 import session from "express-session";
 import cors from "cors";
 import cron from "node-cron";
 import { openMongoSession, closeMongoSession } from "./datasource.js";
+import { initSocketIOFromServer } from "./socketio/notifications.js";
 import { config } from "./config.js";
 import sgMail from "@sendgrid/mail";
 
@@ -94,7 +96,9 @@ sgMail
     });
 });
 // start server
-const server = app.listen(port, () => {
+const server = createServer(app);
+initSocketIOFromServer(server);
+server.listen(port, () => {
   console.log(`Server started at http://localhost:${port}`);
 });
 
