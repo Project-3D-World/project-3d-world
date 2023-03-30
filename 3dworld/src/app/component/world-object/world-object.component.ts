@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, Input } from '@angular/core';
+import { AfterViewInit, Component, Input, OnDestroy,} from '@angular/core';
 
 import * as THREE from 'three';
 import * as JSZip from 'jszip';
@@ -19,7 +19,7 @@ import {
   templateUrl: './world-object.component.html',
   styleUrls: ['./world-object.component.scss'],
 })
-export class WorldObjectComponent implements AfterViewInit {
+export class WorldObjectComponent implements AfterViewInit, OnDestroy {
   @Input() worldId!: string;
   scene!: THREE.Scene;
   camera!: THREE.PerspectiveCamera;
@@ -44,6 +44,8 @@ export class WorldObjectComponent implements AfterViewInit {
   commentLimit: number = 10;
   userId: string = '';
   canvas!: HTMLCanvasElement;
+  upvotes: number = 0;
+  downvotes: number = 0;
 
   private onInitReplay = new ReplaySubject<any>(1);
 
@@ -51,6 +53,7 @@ export class WorldObjectComponent implements AfterViewInit {
 
   claimPlot(userInput: boolean): void {
     if (userInput) {
+      document.querySelector('app-chunk-form')!.classList.add('hidden');
       this.api.claimChunk(this.worldId, this.chunkId).subscribe();
       const chunkIndex = this.worldData.world.chunks.findIndex(
         (chunk: any) => chunk._id === this.chunkId
@@ -58,6 +61,10 @@ export class WorldObjectComponent implements AfterViewInit {
       this.worldData.world.chunks[chunkIndex].claimed = true;
       this.worldData.world.chunks[chunkIndex].claimedBy = this.userId;
     }
+  }
+
+  vote(vote: Event): void {
+    console.log("voted");
   }
 
   getChunkFile(chunkId: string): Promise<any> {
@@ -69,7 +76,13 @@ export class WorldObjectComponent implements AfterViewInit {
     );
   }
 
+  createWorld(): void {
+    this.api.createWorld("newWorld", "newerWorld", "no rules", 5, 4).subscribe((data) => {
+    });
+  }
+
   uploadModel(event: any): void {
+    document.querySelector('app-upload-form')!.classList.add('hidden');
     this.api
       .uploadModel(this.worldId, this.chunkId, event)
       .subscribe((data) => {
@@ -160,15 +173,16 @@ export class WorldObjectComponent implements AfterViewInit {
           const directionlLight = new THREE.DirectionalLight(0xffffff, 1);
           gltf.scene.add(directionlLight);
           gltf.scene.add(heimsphere);
+          const length = this.worldData.world.chunks.length;
           if (init) {
             this.models.push(gltf.scene);
             this.scene.add(gltf.scene);
             this.loadedChunks.set(
-              coordX + coordZ * this.chunkSizeX,
+              coordX + coordZ * length,
               this.loadedCount++
             );
           } else {
-            const key = coordX + coordZ * this.chunkSizeX;
+            const key = coordX + coordZ * length;
             if (this.loadedChunks.get(key)) {
               this.scene.remove(this.models[this.loadedChunks.get(key)!]);
               this.models[this.loadedChunks.get(key)!] = gltf.scene;
@@ -217,8 +231,9 @@ export class WorldObjectComponent implements AfterViewInit {
         group.add(cube);
         this.scene.add(group);
         this.models.push(group); // add each cube to the array
+        const length = this.worldData.world.chunks.length;
         this.loadedChunks.set(
-          coordX + coordZ * this.chunkSizeX,
+          coordX + coordZ * length,
           this.loadedCount++
         );
       }
@@ -270,17 +285,15 @@ export class WorldObjectComponent implements AfterViewInit {
       // perform the desired action on the clicked cube(s)
       //claim the cube by sending an api request to the server
       let model = intersects[i].object;
-
       const position = model.getWorldPosition(new THREE.Vector3());
       const numberX = Math.round(position.x / this.chunkSizeX);
       const numberZ = Math.round(position.z / this.chunkSizeX);
-
       this.x = numberX * this.chunkSizeX;
       this.z = numberZ * this.chunkSizeX;
-
-      const sidelength = Math.sqrt(this.worldData.world.chunks.length);
-      const arrayPosition =
-        (this.x / this.chunkSizeX) * sidelength + this.z / this.chunkSizeX;
+      const length = this.worldData.world.chunks.length;
+      const arrayPosition = this.worldData.world.chunks.findIndex((chunk: any) => {
+        return chunk.location.x === this.x && chunk.location.z === this.z;
+      });
       this.chunkId = this.worldData.world.chunks[arrayPosition]._id;
       //claim section
       if (this.worldData.world.chunks[arrayPosition].claimedBy === null) {
@@ -310,6 +323,13 @@ export class WorldObjectComponent implements AfterViewInit {
         document.querySelector('app-upload-form')?.classList.remove('hidden');
       } else {
         document.querySelector('app-upload-form')?.classList.add('hidden');
+      }
+
+      //vote section
+      if (this.worldData.world.chunks[arrayPosition].chunkFile != null) {
+        this.upvotes = this.worldData.world.chunks[arrayPosition].upvotes;
+        this.downvotes = this.worldData.world.chunks[arrayPosition].downvotes;
+        document.querySelector('app-vote')?.classList.remove('hidden');
       }
 
       break;
@@ -402,5 +422,11 @@ export class WorldObjectComponent implements AfterViewInit {
         }
       });
     });
+  }
+
+  ngOnDestroy(): void {
+    //disconnect from the live world
+    console.log("disconnecting from live world");
+    this.liveWorld.disconnect();
   }
 }

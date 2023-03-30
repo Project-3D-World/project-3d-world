@@ -12,6 +12,7 @@ import { environment } from 'src/environments/environment';
 import { HTTP_INTERCEPTORS, HttpClientModule } from '@angular/common/http';
 import { SignUpComponent } from './pages/sign-up/sign-up.component';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { SocketIoConfig, SocketIoModule } from 'ngx-socket-io';
 
 import { WorldObjectComponent } from './component/world-object/world-object.component';
 import { WorldsComponent } from './pages/worlds/worlds.component';
@@ -23,7 +24,7 @@ import { CommentViewComponent } from './component/comment-view/comment-view.comp
 import { CommentDivComponent } from './component/comment-view/comment-div/comment-div.component';
 import { ChunkFormComponent } from './component/chunk-form/chunk-form.component';
 import { ProfileComponent } from './pages/profile/profile.component';
-import { SocketIoConfig, SocketIoModule } from 'ngx-socket-io';
+import { VoteComponent } from './component/vote/vote.component';
 
 const socketIoCfg: SocketIoConfig = { 
   url: environment.apiEndpoint, 
@@ -51,6 +52,7 @@ const socketIoCfg: SocketIoConfig = {
     CommentDivComponent,
     ChunkFormComponent,
     ProfileComponent,
+    VoteComponent,
   ],
   imports: [
     FormsModule,
