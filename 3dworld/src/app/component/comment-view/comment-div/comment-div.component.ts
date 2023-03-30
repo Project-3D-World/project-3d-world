@@ -7,7 +7,7 @@ import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 })
 export class CommentDivComponent implements OnInit {
   ngOnInit(): void {
-    this.mine = this.comment.author == this.userId;
+    this.mine = this.comment.author._id == this.userId;
   }
   mine: boolean = false;
   @Output() deleted = new EventEmitter<string>();
