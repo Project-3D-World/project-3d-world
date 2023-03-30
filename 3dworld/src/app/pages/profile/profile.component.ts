@@ -11,7 +11,8 @@ export class ProfileComponent {
   page: number = 0;
   limit: number = 10;
   user: any;
-  claims: any;
+  me: any = {};
+  claims: any = [];
   constructor(public auth: AuthService, private api: ApiService) {
     this.user = {};
   }
@@ -19,9 +20,11 @@ export class ProfileComponent {
   ngOnInit() {
     this.auth.user$.subscribe((success) => {
       this.user = success;
+      this.api.getMe().subscribe((data) => {
+        this.me = data;
+      });
     });
     this.api.getMyClaims(0, this.limit).subscribe((data) => {
-      console.log(data);
       this.claims = data;
     });
   }

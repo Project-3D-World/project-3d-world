@@ -9,4 +9,5 @@ export const config = {
   frontendBaseUrl: process.env.FRONTEND_BASE_URL,
   port: process.env.PORT,
   sessionSecret: process.env.SESSION_SECRET,
+  sendGrid_Api_key: process.env.SENDGRID_API_KEY,
 };

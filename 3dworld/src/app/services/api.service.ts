@@ -34,6 +34,7 @@ export class ApiService {
         {
           sub: profileJson.sub,
           displayName: displayName,
+          email: profileJson.email,
         },
         { withCredentials: true }
       );
