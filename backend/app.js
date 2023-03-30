@@ -21,17 +21,16 @@ const wsInstance = expressWs(app);
 
 app.use(bodyParser.json());
 app.use(morgan("dev")); // add request logger
+
 //create session
-app.use(
-  session({
-    secret: config.sessionSecret,
-    resave: false,
-    saveUninitialized: true,
-  })
-);
+const sessionMiddleware = session({
+  secret: config.sessionSecret,
+  resave: false,
+  saveUninitialized: true,
+});
+app.use(sessionMiddleware);
 
 //cors
-app.use(express.static("static"));
 const corsOptions = {
   origin: config.frontendBaseUrl,
   credentials: true,
@@ -97,7 +96,7 @@ sgMail
 });
 // start server
 const server = createServer(app);
-initSocketIOFromServer(server);
+initSocketIOFromServer(server, sessionMiddleware, corsOptions);
 server.listen(port, () => {
   console.log(`Server started at http://localhost:${port}`);
 });
