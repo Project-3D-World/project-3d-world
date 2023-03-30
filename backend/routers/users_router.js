@@ -1,5 +1,6 @@
 import { Router } from "express";
 import { User } from "../models/users.js";
+import { isAuthenticated } from "../middleware/auth.js";
 // TODO: Create a mongoose model for users and import it here
 
 export const usersRouter = Router();
@@ -52,10 +53,10 @@ usersRouter.post("/signin", async (req, res) => {
   console.log(`Req.session.sub is set to ${req.session.sub}`);
   console.log(`Req.session.displayName is set to ${req.session.displayName}`);
   console.log(`Req.session.userId is set to ${req.session.userId}`);
-  return res.json(user);
+  return res.json({ userId: user._id, sub: user.sub });
 });
 
-usersRouter.get("/signout", function (req, res, next) {
+usersRouter.get("/signout", isAuthenticated, function (req, res, next) {
   console.log("started");
   req.session.destroy();
   console.log("Session ended");
@@ -63,7 +64,7 @@ usersRouter.get("/signout", function (req, res, next) {
   res.json({ message: "Signed out" });
 });
 
-usersRouter.get("/me", async (req, res) => {
+usersRouter.get("/me", isAuthenticated, async (req, res) => {
   return res.json({
     userId: req.session.userId,
     sub: req.session.sub,
@@ -75,6 +76,28 @@ usersRouter.get("/", async (req, res) => {
   const users = await User.find();
   return res.json(users);
 });
+
+//getting claims
+usersRouter.get(
+  "/myClaims/page=:page&limit=:limit",
+  isAuthenticated,
+  async (req, res) => {
+    const page = parseInt(req.params.page);
+    const limit = parseInt(req.params.limit);
+    const user = await User.findById(req.session.userId).populate(
+      "claims.world"
+    );
+    const claims = [
+      ...new Map(user.claims.map((m) => [m.world._id, m])).values(),
+    ];
+    const claimsPostSlice = claims.slice(
+      page * limit,
+      page * limit + limit + 1
+    );
+    return res.json(claimsPostSlice);
+  }
+);
+
 //getting one
 usersRouter.get("/:id", async (req, res) => {});
 

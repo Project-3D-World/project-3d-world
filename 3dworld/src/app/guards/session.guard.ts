@@ -5,6 +5,7 @@ import {
   RouterStateSnapshot,
   UrlTree,
 } from '@angular/router';
+import { AuthService } from '@auth0/auth0-angular';
 import { Observable } from 'rxjs';
 import { ApiService } from '../services/api.service';
 
@@ -12,7 +13,7 @@ import { ApiService } from '../services/api.service';
   providedIn: 'root',
 })
 export class SessionGuard implements CanActivate {
-  constructor(private api: ApiService) {}
+  constructor(private api: ApiService, public auth: AuthService) {}
   canActivate(
     route: ActivatedRouteSnapshot,
     state: RouterStateSnapshot
@@ -21,6 +22,17 @@ export class SessionGuard implements CanActivate {
     | Promise<boolean | UrlTree>
     | boolean
     | UrlTree {
-    return true;
+    return new Promise((res) => {
+      this.api.getMe().subscribe({
+        next: (value) => {
+          res(true);
+        },
+        error: (err) => {
+          this.auth.logout().subscribe((data) => {
+            res(false);
+          });
+        },
+      });
+    });
   }
 }

@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
 
 const claimsSchema = new mongoose.Schema({
-  world: mongoose.SchemaTypes.ObjectId,
+  world: { type: mongoose.SchemaTypes.ObjectId, ref: "World" },
   chunk: mongoose.SchemaTypes.ObjectId,
 });
 const userSchema = new mongoose.Schema({

@@ -4,7 +4,7 @@ import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms'
 @Component({
   selector: 'app-chunk-form',
   templateUrl: './chunk-form.component.html',
-  styleUrls: ['./chunk-form.component.scss']
+  styleUrls: ['./chunk-form.component.scss'],
 })
 export class ChunkFormComponent {
   @Output() answer = new EventEmitter<boolean>();
