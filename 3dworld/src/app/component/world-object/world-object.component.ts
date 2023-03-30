@@ -54,13 +54,13 @@ export class WorldObjectComponent implements AfterViewInit {
       (chunk: any) => chunk._id === this.chunkId
     );
     if (userInput && !this.worldData.world.chunks[chunkIndex].claimed) {
+      this.worldData.world.chunks[chunkIndex].claimed = true;
+      this.worldData.world.chunks[chunkIndex].claimedBy = this.userId;
       this.api.claimChunk(this.worldId, this.chunkId).subscribe(
         (data) => {
           document.querySelector('app-chunk-form')!.classList.add('hidden');
         }
       );
-      this.worldData.world.chunks[chunkIndex].claimed = true;
-      this.worldData.world.chunks[chunkIndex].claimedBy = this.userId;
     }
   }
 
