@@ -347,15 +347,10 @@ worldsRouter.ws("/:worldId/live", isWsAuthenticated, async (ws, req) => {
       return;
     }
     const chunkIndex = ops[0].p[1];
-    if (ops[0].p[2] === "upvotes") {
+    if (ops[0].p[2] === "upvotes" || ops[0].p[2] === "downvotes") {
       const chunkId = liveWorld.data.chunks[chunkIndex]._id;
       const chunk = world.chunks.id(chunkId);
-      chunk.upvotes += 1;
-      world.save();
-    } else if (ops[0].p[2] === "downvote") {
-      const chunkId = liveWorld.data.chunks[chunkIndex]._id;
-      const chunk = world.chunks.id(chunkId);
-      chunk.downvotes += 1;
+      chunk[ops[0].p[2]] += (ops[0].na ? ops[0].na : 0);
       world.save();
     }
   });
