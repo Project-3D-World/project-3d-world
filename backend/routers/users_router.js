@@ -1,6 +1,8 @@
 import { Router } from "express";
 import { User } from "../models/users.js";
 import { isAuthenticated } from "../middleware/auth.js";
+import { Db } from "mongodb";
+import { World } from "../models/worlds.js";
 // TODO: Create a mongoose model for users and import it here
 
 export const usersRouter = Router();
@@ -21,6 +23,7 @@ usersRouter.post("/signup", async (req, res) => {
   const user = new User({
     sub: req.body.sub,
     displayName: req.body.displayName,
+    email: req.body.email,
     claims: [],
   });
 
@@ -97,6 +100,12 @@ usersRouter.get(
     return res.json(claimsPostSlice);
   }
 );
+
+//getSumofUpvotesandDownvotes
+usersRouter.get("/allusers/upvotesanddownvotes", async (req, res) => {
+  const items = await User.find().select("email upvotes downvotes");
+  return res.json(items);
+});
 
 //getting one
 usersRouter.get("/:id", async (req, res) => {});

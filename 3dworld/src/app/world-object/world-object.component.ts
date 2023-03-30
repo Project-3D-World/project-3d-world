@@ -206,6 +206,7 @@ export class WorldObjectComponent implements AfterViewInit {
   }
 
   ngAfterViewInit() {
+    this.createWorld();
     //get a world id
     this.canvas = document.getElementById('canvas') as HTMLCanvasElement;
     this.canvas.width = window.innerWidth * 0.8;
