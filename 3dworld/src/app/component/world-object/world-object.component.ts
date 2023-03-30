@@ -3,8 +3,8 @@ import { AfterViewInit, Component, Input,} from '@angular/core';
 import * as THREE from 'three';
 import * as JSZip from 'jszip';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
-import { ApiService } from '../services/api.service';
-import { LiveWorldService } from '../services/liveworld.service';
+import { ApiService } from '../../services/api.service';
+import { LiveWorldService } from '../../services/liveworld.service';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
 import { lastValueFrom, forkJoin, ReplaySubject, tap, takeUntil, take } from 'rxjs';
 @Component({
@@ -74,9 +74,9 @@ export class WorldObjectComponent implements AfterViewInit {
   }
 
   resizeCanvasToDisplaySize(canvas: HTMLCanvasElement) {
-    // look up the size the canvas is being displayed
-    const width = document.getElementById('canvas-container')!.clientWidth;
-    const height = document.getElementById('canvas-container')!.clientHeight;
+    // to be in sync with the body max size, ensure height and width are not greater than 800px
+    const width = Math.min(800,document.getElementById('canvas-container')!.clientWidth);
+    const height = Math.min(800,document.getElementById('canvas-container')!.clientHeight);
  
     // If it's resolution does not match change it
     if (canvas.width !== width || canvas.height !== height) {
@@ -253,7 +253,8 @@ export class WorldObjectComponent implements AfterViewInit {
       const sidelength = Math.sqrt(this.worldData.world.chunks.length);
       const arrayPosition = (this.x/this.chunkSizeX) * sidelength + this.z/this.chunkSizeX;
       this.chunkId = this.worldData.world.chunks[arrayPosition]._id;
-      if(this.worldData.world.chunks[arrayPosition].claimedBy == null)
+      //claim section
+      if(this.worldData.world.chunks[arrayPosition].claimedBy === null)
       {
         document.querySelector('app-chunk-form')?.classList.remove('hidden');
       }
@@ -262,13 +263,18 @@ export class WorldObjectComponent implements AfterViewInit {
         document.querySelector('app-chunk-form')?.classList.add('hidden');
       }
       // comment section
-      this.getComments(0, 10);
-      document.querySelector('app-commentform')?.classList.remove('hidden');
-      document
-        .querySelector('.comment-containers-container')
-        ?.classList.remove('hidden');
+      if(this.worldData.world.chunks[arrayPosition].chunkFile !== null)
+      {
+        this.getComments(0, 10);
+        document.querySelector('app-commentform')?.classList.remove('hidden');
+        document.querySelector('.comment-containers-container')?.classList.remove('hidden');
+      }
+
       //upload section
-      document.querySelector('app-upload-form')?.classList.remove('hidden');
+      if(this.worldData.world.chunks[arrayPosition].claimedBy === this.user.userId)
+        document.querySelector('app-upload-form')?.classList.remove('hidden');
+      else
+        document.querySelector('app-upload-form')?.classList.add('hidden');
       break;
     }
   }
