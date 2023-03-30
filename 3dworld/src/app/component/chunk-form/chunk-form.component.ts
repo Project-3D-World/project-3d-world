@@ -1,5 +1,10 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
-import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
+import {
+  FormBuilder,
+  FormControl,
+  FormGroup,
+  Validators,
+} from '@angular/forms';
 
 @Component({
   selector: 'app-chunk-form',
@@ -13,7 +18,7 @@ export class ChunkFormComponent {
   @Input() chunkZ: number = 0;
   userInput = false;
   form = new FormGroup({
-    answer: new FormControl(false)
+    answer: new FormControl(false),
   });
 
   onSubmit() {
@@ -29,5 +34,4 @@ export class ChunkFormComponent {
   claimPlot(event: any): void {
     this.userInput = event.target.checked;
   }
-
 }
