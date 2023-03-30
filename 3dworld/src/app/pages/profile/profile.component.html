@@ -1,6 +1,6 @@
 <div>
   <h2 *ngIf="me.displayName">Welcome "{{ me.displayName }}"</h2>
-  <img [src]="user.picture" />
+  <img src="{{user.picture}}">
 </div>
 <h1>You have claims in these worlds:</h1>
 <div class="worlds-container" *ngFor="let claim of claims.slice(0, limit)">
