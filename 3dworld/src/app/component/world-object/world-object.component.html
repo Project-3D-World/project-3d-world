@@ -33,7 +33,7 @@
   <app-comment-view
     (deleted)="deleteComment($event)"
     class="comment-view"
-    [comments]="comments.slice(0, 10)"
+    [comments]="comments.slice(0, commentLimit)"
     [userId]="userId"
   ></app-comment-view>
 
@@ -46,7 +46,7 @@
       Prev
     </button>
     <button
-      *ngIf="comments.length === 11"
+      *ngIf="comments.length === commentLimit + 1"
       class="btn next-btn"
       (click)="getComments(commentPage + 1, commentLimit)"
     >

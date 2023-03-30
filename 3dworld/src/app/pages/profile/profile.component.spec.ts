@@ -1,17 +1,17 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { ChunkFormComponent } from './chunk-form.component';
+import { ProfileComponent } from './profile.component';
 
-describe('ChunkFormComponent', () => {
-  let component: ChunkFormComponent;
-  let fixture: ComponentFixture<ChunkFormComponent>;
+describe('ProfileComponent', () => {
+  let component: ProfileComponent;
+  let fixture: ComponentFixture<ProfileComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ChunkFormComponent],
+      declarations: [ProfileComponent],
     }).compileComponents();
 
-    fixture = TestBed.createComponent(ChunkFormComponent);
+    fixture = TestBed.createComponent(ProfileComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

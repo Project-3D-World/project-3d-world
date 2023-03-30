@@ -7,12 +7,13 @@ import {
 } from '@angular/router';
 import { AuthService } from '@auth0/auth0-angular';
 import { Observable } from 'rxjs';
+import { ApiService } from '../services/api.service';
 
 @Injectable({
   providedIn: 'root',
 })
 export class Auth0Guard implements CanActivate {
-  constructor(public auth: AuthService) {}
+  constructor(public auth: AuthService, private api: ApiService) {}
   canActivate(
     route: ActivatedRouteSnapshot,
     state: RouterStateSnapshot
@@ -21,6 +22,22 @@ export class Auth0Guard implements CanActivate {
     | Promise<boolean | UrlTree>
     | boolean
     | UrlTree {
-    return this.auth.isAuthenticated$;
+    return new Promise((res) => {
+      this.auth.isAuthenticated$.subscribe((data) => {
+        if (data === true) {
+          res(true);
+        } else {
+          this.api.getMe().subscribe({
+            next: (data) => {
+              res(false);
+            },
+            error: (err) => {
+              res(false);
+            },
+          });
+        }
+      });
+    });
+    //return this.auth.isAuthenticated$;
   }
 }

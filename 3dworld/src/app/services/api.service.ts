@@ -56,6 +56,15 @@ export class ApiService {
     });
   }
 
+  getMyClaims(page: number, limit: number) {
+    return this.http.get(
+      this.endpoint + `/api/users/myClaims/page=${page}&limit=${limit}`,
+      {
+        withCredentials: true,
+      }
+    );
+  }
+
   //postComment
   postComment(
     worldId: string,
