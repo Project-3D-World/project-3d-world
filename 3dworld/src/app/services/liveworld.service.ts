@@ -102,7 +102,20 @@ export class LiveWorldService {
     if (chunkIndex === -1) {
       return;
     }
-    this.submitOp({ p: ['chunks', chunkIndex, reaction], oi: 1 });
+    this.submitOp({ p: ['chunks', chunkIndex, reaction], na: 1 });
+  }
+
+  removeReaction(chunkId: string, reaction: any) {
+    if (reaction !== 'upvote' && reaction !== 'downvote') {
+      return;
+    }
+    const chunkIndex = this.worldDoc.data.chunks.findIndex(
+      (chunk: any) => chunk._id === chunkId
+    );
+    if (chunkIndex === -1) {
+      return;
+    }
+    this.submitOp({ p: ['chunks', chunkIndex, reaction], na: -1 });
   }
 
   private submitOp(op: any) {
