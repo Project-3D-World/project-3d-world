@@ -1,9 +1,11 @@
+const backendBaseUrl = 'url to the backend with no protocol';
+
 export const environment = {
   production: false,
   auth: {
     domain: 'auth0 domain',
     clientId: 'auth0 clientId',
   },
-  apiEndpoint: 'endpoint',
-  liveWorldEndpoint: 'websocket endpoint',
+  apiEndpoint: 'http://' + backendBaseUrl,
+  wsEndpoint: 'ws://' + backendBaseUrl,
 };
