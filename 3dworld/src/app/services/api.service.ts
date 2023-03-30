@@ -161,7 +161,6 @@ export class ApiService {
         chunkSize: { x: chunksize, y: chunksize, z: chunksize },
         description: description,
         rules: rules,
-
         chunks: chunks,
       },
       { withCredentials: true }
