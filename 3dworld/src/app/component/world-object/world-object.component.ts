@@ -52,14 +52,17 @@ export class WorldObjectComponent implements AfterViewInit, OnDestroy {
   constructor(private api: ApiService, private liveWorld: LiveWorldService) {}
 
   claimPlot(userInput: boolean): void {
-    if (userInput) {
-      document.querySelector('app-chunk-form')!.classList.add('hidden');
-      this.api.claimChunk(this.worldId, this.chunkId).subscribe();
-      const chunkIndex = this.worldData.world.chunks.findIndex(
-        (chunk: any) => chunk._id === this.chunkId
-      );
+    const chunkIndex = this.worldData.world.chunks.findIndex(
+      (chunk: any) => chunk._id === this.chunkId
+    );
+    if (userInput && !this.worldData.world.chunks[chunkIndex].claimed) {
       this.worldData.world.chunks[chunkIndex].claimed = true;
       this.worldData.world.chunks[chunkIndex].claimedBy = this.userId;
+      this.api.claimChunk(this.worldId, this.chunkId).subscribe(
+        (data) => {
+          document.querySelector('app-chunk-form')!.classList.add('hidden');
+        }
+      );
     }
   }
 
@@ -86,6 +89,7 @@ export class WorldObjectComponent implements AfterViewInit, OnDestroy {
     this.api
       .uploadModel(this.worldId, this.chunkId, event)
       .subscribe((data) => {
+        document.querySelector('app-upload-form')!.classList.add('hidden');
         console.log(data);
       });
   }
