@@ -116,6 +116,13 @@ export class ApiService {
     );
   }
 
+  getChunkFile(worldId: string, chunkId: string) {
+    return this.http.get(
+      this.endpoint + '/api/worlds/' + worldId + '/chunks/' + chunkId + '/file',
+      { withCredentials: true, responseType: 'blob' }
+    );
+  }
+
   //get a world by id
   getWorld(worldId: string) {
     return this.http.get<JSON>(this.endpoint + '/api/worlds/' + worldId, {
@@ -163,15 +170,12 @@ export class ApiService {
   //upload a gltf model to a chunk
   //check how to send the file to backend
   uploadModel(worldId: string, chunkId: string, model: File) {
-    const headers = new HttpHeaders({
-      'Accept-Encoding': 'gzip, deflate, br',
-    });
     let formData = new FormData();
     formData.append('chunkFile', model);
     return this.http.post(
       this.endpoint + '/api/worlds/' + worldId + '/chunks/' + chunkId + '/file',
       formData,
-      { withCredentials: true, headers: headers }
+      { withCredentials: true }, 
     );
   }
 }

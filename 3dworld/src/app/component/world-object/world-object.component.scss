@@ -1,0 +1,25 @@
+.item {
+  border-radius: 10px;
+  font-size: 20px;
+  color: #3c3d3f;
+  border: 2px solid brown;
+  padding: 10px 20px 10px 20px;
+  margin: 10px;
+}
+.content {
+  font-size: 24px;
+}
+.canvas {
+  width: 100%;
+  height: 100%;
+  background-color: blue;
+  border: 2px solid #3c3d3f;
+  border-radius: 10px;
+  padding: 10px;
+  margin: 10px;
+}
+
+.hidden {
+  visibility: hidden !important;
+  height: 0px !important;
+}

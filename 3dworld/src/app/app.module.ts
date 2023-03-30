@@ -13,7 +13,7 @@ import { HTTP_INTERCEPTORS, HttpClientModule } from '@angular/common/http';
 import { SignUpComponent } from './pages/sign-up/sign-up.component';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
-import { WorldObjectComponent } from './world-object/world-object.component';
+import { WorldObjectComponent } from './component/world-object/world-object.component';
 import { WorldsComponent } from './pages/worlds/worlds.component';
 import { WorlddivComponent } from './component/worlddiv/worlddiv.component';
 import { CommentformComponent } from './component/commentform/commentform.component';
@@ -30,9 +30,7 @@ import { ProfileComponent } from './pages/profile/profile.component';
     HeaderComponent,
     IndexComponent,
     SignInComponent,
-
     SignUpComponent,
-
     WorldObjectComponent,
     WorldsComponent,
     WorlddivComponent,
