@@ -123,7 +123,7 @@ worldsRouter.post("/", isAuthenticated, async (req, res) => {
   try {
     await world.save();
   } catch (err) {
-    if (err.name === "ValidationError") {
+    if (err.message === "Chunks overlap") {
       res.status(400).json({ error: err.message });
       return;
     }

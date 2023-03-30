@@ -46,6 +46,13 @@ try {
 app.use("/api/users", usersRouter);
 app.use("/api/worlds", worldsRouter);
 app.use("/api/comments", commentsRouter);
+
+// catch 500 errors
+app.use((err, req, res, next) => {
+  console.error(err.stack);
+  res.status(500).json({ error: "Internal server error" });
+});
+
 // start server
 const server = app.listen(port, () => {
   console.log(`Server started at http://localhost:${port}`);
