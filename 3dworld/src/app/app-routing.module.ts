@@ -7,6 +7,7 @@ import { AuthGuard } from '@auth0/auth0-angular';
 import { Auth0Guard } from './guards/auth0.guard';
 import { WorldsComponent } from './pages/worlds/worlds.component';
 import { WorldViewComponent } from './pages/world-view/world-view.component';
+import { WorldObjectComponent } from './component/world-object/world-object.component';
 
 const routes: Routes = [
   {
@@ -30,6 +31,11 @@ const routes: Routes = [
   {
     path: 'world-view',
     component: WorldViewComponent,
+    canActivate: [Auth0Guard],
+  },
+  {
+    path: 'world-object',
+    component: WorldObjectComponent,
     canActivate: [Auth0Guard],
   },
 ];
