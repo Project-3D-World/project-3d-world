@@ -39,7 +39,7 @@ export class LiveWorldService {
      * Connect to the live world at url and id. Returns a promise that resolves
      * when the connection is established.
      */
-    const url = environment.liveWorldEndpoint + '/api/worlds/' + worldId + '/live';
+    const url = environment.wsEndpoint + '/api/worlds/' + worldId + '/live';
     if (this.socket) {
       this.socket.close();
     }
