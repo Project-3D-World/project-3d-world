@@ -102,7 +102,7 @@ export class WorldObjectComponent implements AfterViewInit, OnDestroy {
       800,
       document.getElementById('canvas-container')!.clientWidth
     );
-    let height = 10/16 * width;
+    let height = (10 / 16) * width;
 
     // If it's resolution does not match change it
     if (canvas.width !== width || canvas.height !== height) {
