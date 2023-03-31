@@ -42,16 +42,13 @@ const initializeUser = async (socket) => {
   const status = await redisClient.hgetall(`userId:${socket.user.userId}`);
 
   redisClient.hmset(`userId:${socket.user.userId}`, {
-    unotifiedUpvotes: 0,
-    unotifiedDownvotes: 0,
-    unotifiedComments: 0,
+    online: true,
+    unotifiedReviews: 0
   });
 
   if (status) {
     socket.emit("summaryNotification", {
-      upvotes: +status.unotifiedUpvotes,
-      downvotes: +status.unotifiedDownvotes,
-      comments: +status.unotifiedComments,
+      reviews: status.unotifiedReviews,
     });
   }
 };
@@ -66,13 +63,13 @@ const onNotify = async (socket, notification) => {
   if (receiverStatus === "false") {
     redisClient.hincrby(
       `userId:${receiverId}`,
-      `unotified${notification.type}`,
+      `unotifiedReviews`,
       1
     );
   } else {
     socket.to(receiverId).emit("notification", {
       sender: socket.user.displayName,
-      type: notification.type,
+      rating: notification.rating,
       worldId: notification.worldId,
       worldName: notification.worldName,
     });
