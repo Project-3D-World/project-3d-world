@@ -6,21 +6,23 @@ import { isSocketAuthenticated } from "../middleware/auth.js";
 let io;
 const redisClient = new Redis(); // connect to default localhost:6379
 
+const wrap = middleware => (socket, next) => middleware(socket.request, {}, next);
+
 export const initSocketIOFromServer = (
   server,
   sessionMiddleware,
   corsOptions
 ) => {
   io = new Server(server, {
-    path: "/notifications/",
     cors: corsOptions,
   });
-  io.engine.use(sessionMiddleware);
-  io.use(isSocketAuthenticated);
+  const notifNamespace = io.of("/notifications");
+  notifNamespace.use(wrap(sessionMiddleware));
+  notifNamespace.use(isSocketAuthenticated);
 
   console.log("SocketIO initialized");
 
-  io.on("connection", (socket) => {
+  notifNamespace.on("connection", (socket) => {
     initializeUser(socket);
 
     socket.on("notification", (notification) => onNotify(socket, notification));

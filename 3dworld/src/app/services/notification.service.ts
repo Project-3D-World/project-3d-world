@@ -8,6 +8,10 @@ export class NotificationService {
 
   constructor(private socketio: Socket) { }
 
+  connect() {
+    this.socketio.connect();
+  }
+  
   sendNotification(notification: any) {
     // check for required fields
     if (!notification?.receiver ||
