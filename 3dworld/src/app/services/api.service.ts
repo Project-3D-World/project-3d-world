@@ -73,7 +73,7 @@ export class ApiService {
     z: number,
     author: string,
     content: string,
-    rating:number
+    rating: number
   ) {
     return this.http.post(
       this.endpoint + `/api/comments/`,
@@ -83,7 +83,7 @@ export class ApiService {
         x: x,
         z: z,
         content: content,
-        rating:rating
+        rating: rating,
       },
       { withCredentials: true }
     );

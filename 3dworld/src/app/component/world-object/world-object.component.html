@@ -1,11 +1,10 @@
-
-<div id="canvas-container" style="width:90vw; height:115vh">
+<div id="canvas-container" style="width: 90vw; height: 115vh">
   <canvas id="canvas" class="canvas"></canvas>
 </div>
 
 <app-vote
-  [upvotes]='upvotes'
-  [downvotes]='downvotes'
+  [upvotes]="upvotes"
+  [downvotes]="downvotes"
   (vote)="vote($event)"
 ></app-vote>
 
@@ -26,15 +25,15 @@
   (file)="uploadModel($event)"
 ></app-upload-form>
 <!-- upvote/downvote section-->
-<div class = "comment-form-container hidden">
-  <p id = "error">{{error}}</p>
+<div class="comment-form-container hidden">
+  <p id="error">{{ error }}</p>
   <app-commentform
-  [worldId]="worldId"
-  [chunkX]="x"
-  [chunkZ]="z"
-  (newComment)="newComment($event)"
-></app-commentform></div>
-
+    [worldId]="worldId"
+    [chunkX]="x"
+    [chunkZ]="z"
+    (newComment)="newComment($event)"
+  ></app-commentform>
+</div>
 
 <div class="item comment-containers-container hidden">
   <app-comment-view
