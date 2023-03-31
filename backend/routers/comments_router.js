@@ -29,9 +29,14 @@ commentsRouter.post("/", isAuthenticated, async (req, res) => {
   if (!user) {
     return res.status(404).json({ error: "Author not found" });
   }
-  const ogComment = await Comments.findOne({author:author,'chunk.x':x,'chunk.z':z,worldId:worldId});
-  if(ogComment){
-    return res.status(422).json({error:"You already rated this chunk"});
+  const ogComment = await Comments.findOne({
+    author: author,
+    "chunk.x": x,
+    "chunk.z": z,
+    worldId: worldId,
+  });
+  if (ogComment) {
+    return res.status(422).json({ error: "You already rated this chunk" });
   }
   const comment = new Comments({
     author: author,
@@ -41,7 +46,7 @@ commentsRouter.post("/", isAuthenticated, async (req, res) => {
       z: z,
     },
     content: content,
-    rating:rating,
+    rating: rating,
   });
 
   try {
