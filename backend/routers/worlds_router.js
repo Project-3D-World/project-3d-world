@@ -350,7 +350,7 @@ worldsRouter.ws("/:worldId/live", isWsAuthenticated, async (ws, req) => {
     if (ops[0].p[2] === "upvotes" || ops[0].p[2] === "downvotes") {
       const chunkId = liveWorld.data.chunks[chunkIndex]._id;
       const chunk = world.chunks.id(chunkId);
-      chunk[ops[0].p[2]] += (ops[0].na ? ops[0].na : 0);
+      chunk[ops[0].p[2]] += ops[0].na ? ops[0].na : 0;
       world.save();
     }
   });

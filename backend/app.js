@@ -1,13 +1,16 @@
 import express from "express";
 import expressWs from "express-ws";
-import { createServer } from "http"
+import { createServer } from "http";
 import bodyParser from "body-parser";
 import morgan from "morgan";
 import session from "express-session";
 import cors from "cors";
 import cron from "node-cron";
 import { openMongoSession, closeMongoSession } from "./datasource.js";
-import { initSocketIOFromServer } from "./socketio/notifications.js";
+import {
+  closeRedisConnection,
+  initSocketIOFromServer,
+} from "./socketio/notifications.js";
 import { config } from "./config.js";
 import sgMail from "@sendgrid/mail";
 
@@ -106,6 +109,7 @@ const cleanup = async () => {
   wsInstance.getWss().clients.forEach((client) => {
     client.close();
   });
+  closeRedisConnection();
   await closeMongoSession();
   server.close((err) => {
     console.log("Server closed");

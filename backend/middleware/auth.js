@@ -13,14 +13,9 @@ export const isWsAuthenticated = function (ws, req, next) {
 };
 
 export const isSocketAuthenticated = function (socket, next) {
-  if (!socket.request.session || !socket.request.session.sub ) {
+  if (!socket.request.session || !socket.request.session.sub) {
     next(new Error("Not authenticated"));
   } else {
-    socket.user = {
-      sub: socket.request.session.sub,
-      displayName: socket.request.session.displayName,
-      userId: socket.request.session.userId,
-    }
     next();
   }
-}
+};
