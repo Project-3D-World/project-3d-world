@@ -98,10 +98,7 @@ export class WorldObjectComponent implements AfterViewInit, OnDestroy {
 
   resizeCanvasToDisplaySize(canvas: HTMLCanvasElement) {
     // to be in sync with the body max size, ensure height and width are not greater than 800px
-    let width = Math.min(
-      800,
-      document.getElementById('canvas-container')!.clientWidth
-    );
+    let width = document.getElementById('canvas-container')!.clientWidth;
     let height = (10 / 16) * width;
 
     // If it's resolution does not match change it
