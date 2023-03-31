@@ -1,23 +1,17 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { NotificationComponent } from './notification.component';
+import { WorldObjectComponent } from './world-object.component';
 
-describe('NotificationComponent', () => {
-  let component: NotificationComponent;
-  let fixture: ComponentFixture<NotificationComponent>;
+describe('WorldObjectComponent', () => {
+  let component: WorldObjectComponent;
+  let fixture: ComponentFixture<WorldObjectComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-<<<<<<< HEAD:3dworld/src/app/component/vote/vote.component.spec.ts
-      declarations: [VoteComponent],
+      declarations: [WorldObjectComponent],
     }).compileComponents();
-=======
-      declarations: [ NotificationComponent ]
-    })
-    .compileComponents();
->>>>>>> 4dec677 (minor changes to UI + create notification):3dworld/src/app/component/notification/notification.component.spec.ts
 
-    fixture = TestBed.createComponent(NotificationComponent);
+    fixture = TestBed.createComponent(WorldObjectComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });
