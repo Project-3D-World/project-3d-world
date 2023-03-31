@@ -22,7 +22,7 @@ export const initSocketIOFromServer = (
 
   console.log("SocketIO initialized");
 
-  io.on("connection", (socket) => {
+  notifNamespace.on("connection", (socket) => {
     initializeUser(socket);
 
     socket.on("notification", (notification) => onNotify(socket, notification));
