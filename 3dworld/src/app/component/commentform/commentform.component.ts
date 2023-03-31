@@ -8,7 +8,7 @@ import { ApiService } from 'src/app/services/api.service';
   styleUrls: ['./commentform.component.scss'],
 })
 export class CommentformComponent {
-  @Output() newComment = new EventEmitter<string>();
+  @Output() newComment = new EventEmitter<any>();
   @Input() worldId: string = '';
   @Input() chunkX: number = 0;
   @Input() chunkZ: number = 0;
@@ -20,6 +20,7 @@ export class CommentformComponent {
   constructor(private fb: FormBuilder, private api: ApiService) {
     this.commentForm = this.fb.group({
       comment: ['', Validators.required],
+      ratings: [0, Validators.required],
     });
   }
 
@@ -35,7 +36,10 @@ export class CommentformComponent {
   }
 
   postComment() {
-    this.newComment.emit(this.commentForm.value.comment);
+    this.newComment.emit({
+      comment: this.commentForm.value.comment,
+      rating: this.commentForm.value.ratings,
+    });
 
     this.commentForm.reset();
   }

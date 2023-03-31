@@ -72,7 +72,8 @@ export class ApiService {
     x: number,
     z: number,
     author: string,
-    content: string
+    content: string,
+    rating: number
   ) {
     return this.http.post(
       this.endpoint + `/api/comments/`,
@@ -82,6 +83,7 @@ export class ApiService {
         x: x,
         z: z,
         content: content,
+        rating: rating,
       },
       { withCredentials: true }
     );
