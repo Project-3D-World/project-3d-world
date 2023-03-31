@@ -66,10 +66,6 @@ export class WorldObjectComponent implements AfterViewInit, OnDestroy {
     }
   }
 
-  vote(vote: Event): void {
-    console.log("voted");
-  }
-
   getChunkFile(chunkId: string): Promise<any> {
     return lastValueFrom(this.api.getChunkFile(this.worldId, chunkId)).then(
       (data) => {
@@ -103,14 +99,11 @@ export class WorldObjectComponent implements AfterViewInit, OnDestroy {
 
   resizeCanvasToDisplaySize(canvas: HTMLCanvasElement) {
     // to be in sync with the body max size, ensure height and width are not greater than 800px
-    const width = Math.min(
+    let width = Math.min(
       800,
       document.getElementById('canvas-container')!.clientWidth
     );
-    const height = Math.min(
-      800,
-      document.getElementById('canvas-container')!.clientHeight
-    );
+    let height = 10/16 * width;
 
     // If it's resolution does not match change it
     if (canvas.width !== width || canvas.height !== height) {
@@ -327,13 +320,6 @@ export class WorldObjectComponent implements AfterViewInit, OnDestroy {
         document.querySelector('app-upload-form')?.classList.remove('hidden');
       } else {
         document.querySelector('app-upload-form')?.classList.add('hidden');
-      }
-
-      //vote section
-      if (this.worldData.world.chunks[arrayPosition].chunkFile != null) {
-        this.upvotes = this.worldData.world.chunks[arrayPosition].upvotes;
-        this.downvotes = this.worldData.world.chunks[arrayPosition].downvotes;
-        document.querySelector('app-vote')?.classList.remove('hidden');
       }
 
       break;
