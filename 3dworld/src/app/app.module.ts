@@ -26,9 +26,10 @@ import { ProfileComponent } from './pages/profile/profile.component';
 import { SocketIoConfig, SocketIoModule } from 'ngx-socket-io';
 
 const socketIoCfg: SocketIoConfig = { 
-  url: environment.wsEndpoint, 
+  url: environment.apiEndpoint + "/notifications", 
   options: {
-    path: "/notifications/"
+    transports: ['websocket'],
+    autoConnect: false,
   }
 };
 

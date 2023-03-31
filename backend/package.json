@@ -32,7 +32,7 @@
     "node-cron": "^3.0.2",
     "sharedb": "^3.3.0",
     "sharedb-mongo": "^3.0.1",
-    "socket.io": "^4.6.1"
+    "socket.io": "^4.5.1"
   },
   "devDependencies": {
     "nodemon": "^2.0.20",
