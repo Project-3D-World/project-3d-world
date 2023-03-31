@@ -20,7 +20,7 @@ export class CommentformComponent {
   constructor(private fb: FormBuilder, private api: ApiService) {
     this.commentForm = this.fb.group({
       comment: ['', Validators.required],
-      ratings:[0,Validators.required]
+      ratings: [0, Validators.required],
     });
   }
 
@@ -36,7 +36,10 @@ export class CommentformComponent {
   }
 
   postComment() {
-    this.newComment.emit({comment:this.commentForm.value.comment,rating:this.commentForm.value.ratings});
+    this.newComment.emit({
+      comment: this.commentForm.value.comment,
+      rating: this.commentForm.value.ratings,
+    });
 
     this.commentForm.reset();
   }
