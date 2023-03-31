@@ -96,6 +96,7 @@
   ></app-commentform>
   
   <div class="item comment-containers-container hidden">
+    <p id = "error">{{error}}</p>
     <app-comment-view
       (deleted)="deleteComment($event)"
       class="comment-view"
@@ -123,15 +124,6 @@
   </div>
   <div class="col-1 col-s-3"></div>
 </div>
-
-
-
-
-
-
-
-
-
 
 
 
