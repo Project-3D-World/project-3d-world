@@ -18,6 +18,8 @@ export const initSocketIOFromServer = (
   io.engine.use(sessionMiddleware);
   io.use(isSocketAuthenticated);
 
+  console.log("SocketIO initialized");
+
   io.on("connection", (socket) => {
     initializeUser(socket);
 
