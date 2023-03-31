@@ -24,7 +24,7 @@ import { CommentViewComponent } from './component/comment-view/comment-view.comp
 import { CommentDivComponent } from './component/comment-view/comment-div/comment-div.component';
 import { ChunkFormComponent } from './component/chunk-form/chunk-form.component';
 import { ProfileComponent } from './pages/profile/profile.component';
-import { VoteComponent } from './component/vote/vote.component';
+import { NotificationComponent } from './component/notification/notification.component';
 
 const socketIoCfg: SocketIoConfig = { 
   url: environment.apiEndpoint, 
@@ -52,7 +52,7 @@ const socketIoCfg: SocketIoConfig = {
     CommentDivComponent,
     ChunkFormComponent,
     ProfileComponent,
-    VoteComponent,
+    NotificationComponent,
   ],
   imports: [
     FormsModule,
