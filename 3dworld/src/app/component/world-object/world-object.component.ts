@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, Input, OnDestroy,} from '@angular/core';
+import { AfterViewInit, Component, Input, OnDestroy } from '@angular/core';
 
 import * as THREE from 'three';
 import * as JSZip from 'jszip';
@@ -46,7 +46,7 @@ export class WorldObjectComponent implements AfterViewInit, OnDestroy {
   canvas!: HTMLCanvasElement;
   upvotes: number = 0;
   downvotes: number = 0;
-
+  error: string = '';
   private onInitReplay = new ReplaySubject<any>(1);
 
   constructor(private api: ApiService, private liveWorld: LiveWorldService) {}
@@ -58,11 +58,9 @@ export class WorldObjectComponent implements AfterViewInit, OnDestroy {
     if (userInput && !this.worldData.world.chunks[chunkIndex].claimed) {
       this.worldData.world.chunks[chunkIndex].claimed = true;
       this.worldData.world.chunks[chunkIndex].claimedBy = this.userId;
-      this.api.claimChunk(this.worldId, this.chunkId).subscribe(
-        (data) => {
-          document.querySelector('app-chunk-form')!.classList.add('hidden');
-        }
-      );
+      this.api.claimChunk(this.worldId, this.chunkId).subscribe((data) => {
+        document.querySelector('app-chunk-form')!.classList.add('hidden');
+      });
     }
   }
 
@@ -76,8 +74,9 @@ export class WorldObjectComponent implements AfterViewInit, OnDestroy {
   }
 
   createWorld(): void {
-    this.api.createWorld("newWorld", "newerWorld", "no rules", 5, 4).subscribe((data) => {
-    });
+    this.api
+      .createWorld('newWorld', 'newerWorld', 'no rules', 5, 4)
+      .subscribe((data) => {});
   }
 
   uploadModel(event: any): void {
@@ -103,7 +102,7 @@ export class WorldObjectComponent implements AfterViewInit, OnDestroy {
       800,
       document.getElementById('canvas-container')!.clientWidth
     );
-    let height = 10/16 * width;
+    let height = (10 / 16) * width;
 
     // If it's resolution does not match change it
     if (canvas.width !== width || canvas.height !== height) {
@@ -174,10 +173,7 @@ export class WorldObjectComponent implements AfterViewInit, OnDestroy {
           if (init) {
             this.models.push(gltf.scene);
             this.scene.add(gltf.scene);
-            this.loadedChunks.set(
-              coordX + coordZ * length,
-              this.loadedCount++
-            );
+            this.loadedChunks.set(coordX + coordZ * length, this.loadedCount++);
           } else {
             const key = coordX + coordZ * length;
             if (this.loadedChunks.get(key)) {
@@ -229,10 +225,7 @@ export class WorldObjectComponent implements AfterViewInit, OnDestroy {
         this.scene.add(group);
         this.models.push(group); // add each cube to the array
         const length = this.worldData.world.chunks.length;
-        this.loadedChunks.set(
-          coordX + coordZ * length,
-          this.loadedCount++
-        );
+        this.loadedChunks.set(coordX + coordZ * length, this.loadedCount++);
       }
     }
   }
@@ -242,12 +235,24 @@ export class WorldObjectComponent implements AfterViewInit, OnDestroy {
       this.getComments(0, this.commentLimit);
     });
   }
-  newComment(event: string) {
+  newComment(event: any) {
     this.api
-      .postComment(this.worldId, this.x, this.z, this.user.userId, event)
-      .subscribe((data) => {
-        this.getComments(0, this.commentLimit);
-        this.commentPage = 0;
+      .postComment(
+        this.worldId,
+        this.x,
+        this.z,
+        this.user.userId,
+        event.comment,
+        event.rating
+      )
+      .subscribe({
+        next: (data) => {
+          this.getComments(0, this.commentLimit);
+          this.commentPage = 0;
+        },
+        error: (err) => {
+          this.error = `ERROR: ${err.status} ${err.error.error}`;
+        },
       });
   }
   getComments(page: number, limit: number) {
@@ -288,9 +293,11 @@ export class WorldObjectComponent implements AfterViewInit, OnDestroy {
       this.x = numberX * this.chunkSizeX;
       this.z = numberZ * this.chunkSizeX;
       const length = this.worldData.world.chunks.length;
-      const arrayPosition = this.worldData.world.chunks.findIndex((chunk: any) => {
-        return chunk.location.x === this.x && chunk.location.z === this.z;
-      });
+      const arrayPosition = this.worldData.world.chunks.findIndex(
+        (chunk: any) => {
+          return chunk.location.x === this.x && chunk.location.z === this.z;
+        }
+      );
       this.chunkId = this.worldData.world.chunks[arrayPosition]._id;
       //claim section
       if (this.worldData.world.chunks[arrayPosition].claimedBy === null) {
@@ -301,12 +308,16 @@ export class WorldObjectComponent implements AfterViewInit, OnDestroy {
       // comment section
       if (this.worldData.world.chunks[arrayPosition].chunkFile != null) {
         this.getComments(0, 10);
-        document.querySelector('app-commentform')?.classList.remove('hidden');
+        document
+          .querySelector('.comment-form-container')
+          ?.classList.remove('hidden');
         document
           .querySelector('.comment-containers-container')
           ?.classList.remove('hidden');
       } else {
-        document.querySelector('app-commentform')?.classList.add('hidden');
+        document
+          .querySelector('.comment-form-container')
+          ?.classList.add('hidden');
         document
           .querySelector('.comment-containers-container')
           ?.classList.add('hidden');
@@ -416,7 +427,7 @@ export class WorldObjectComponent implements AfterViewInit, OnDestroy {
 
   ngOnDestroy(): void {
     //disconnect from the live world
-    console.log("disconnecting from live world");
+    console.log('disconnecting from live world');
     this.liveWorld.disconnect();
   }
 }

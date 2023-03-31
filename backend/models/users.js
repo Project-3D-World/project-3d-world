@@ -24,13 +24,9 @@ const userSchema = new mongoose.Schema({
     type: [claimsSchema],
     required: true,
   },
-  upvotes: {
-    type: Number,
-    default: 0,
-  },
-  downvotes: {
-    type: Number,
-    default: 0,
+  ratings: {
+    type: [Number],
+    default: [],
   },
   email: {
     type: String,

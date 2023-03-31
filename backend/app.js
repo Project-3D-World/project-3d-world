@@ -49,7 +49,7 @@ app.use("/api/worlds", worldsRouter);
 app.use("/api/comments", commentsRouter);
 
 //cronjob
-cron.schedule("* * * * *", () => {
+cron.schedule("0 0 * * SUN", () => {
   console.log("running a task every minute");
   /*
   sgMail.setApiKey(config.sendGrid_Api_key);
