@@ -26,14 +26,15 @@
   (file)="uploadModel($event)"
 ></app-upload-form>
 <!-- upvote/downvote section-->
-
-<app-commentform
-  class="hidden"
+<div class = "comment-form-container hidden">
+  <p id = "error">{{error}}</p>
+  <app-commentform
   [worldId]="worldId"
   [chunkX]="x"
   [chunkZ]="z"
   (newComment)="newComment($event)"
-></app-commentform>
+></app-commentform></div>
+
 
 <div class="item comment-containers-container hidden">
   <app-comment-view
