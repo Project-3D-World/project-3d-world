@@ -46,7 +46,7 @@ export class WorldObjectComponent implements AfterViewInit, OnDestroy {
   canvas!: HTMLCanvasElement;
   upvotes: number = 0;
   downvotes: number = 0;
-
+  error:string ="";
   private onInitReplay = new ReplaySubject<any>(1);
 
   constructor(private api: ApiService, private liveWorld: LiveWorldService) {}
@@ -249,12 +249,17 @@ export class WorldObjectComponent implements AfterViewInit, OnDestroy {
       this.getComments(0, this.commentLimit);
     });
   }
-  newComment(event: string) {
+  newComment(event: any) {
     this.api
-      .postComment(this.worldId, this.x, this.z, this.user.userId, event)
-      .subscribe((data) => {
-        this.getComments(0, this.commentLimit);
+      .postComment(this.worldId, this.x, this.z, this.user.userId, event.comment, event.rating)
+      .subscribe({
+        next:(data)=>{
+          this.getComments(0, this.commentLimit);
         this.commentPage = 0;
+        },
+        error:(err)=>{
+          this.error = `ERROR: ${err.status} ${err.error.error}`;
+        }
       });
   }
   getComments(page: number, limit: number) {
@@ -308,12 +313,12 @@ export class WorldObjectComponent implements AfterViewInit, OnDestroy {
       // comment section
       if (this.worldData.world.chunks[arrayPosition].chunkFile != null) {
         this.getComments(0, 10);
-        document.querySelector('app-commentform')?.classList.remove('hidden');
+        document.querySelector('.comment-form-container')?.classList.remove('hidden');
         document
           .querySelector('.comment-containers-container')
           ?.classList.remove('hidden');
       } else {
-        document.querySelector('app-commentform')?.classList.add('hidden');
+        document.querySelector('.comment-form-container')?.classList.add('hidden');
         document
           .querySelector('.comment-containers-container')
           ?.classList.add('hidden');
