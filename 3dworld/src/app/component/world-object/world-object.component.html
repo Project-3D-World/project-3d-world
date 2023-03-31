@@ -22,16 +22,18 @@
     ></app-upload-form>
   </div>
   <div class="col-3 col-s-12">
+    <div class ="comment-form-container hidden ">
+    <p id="error">{{ error }}</p>
     <app-commentform
-      class="hidden"
       [worldId]="worldId"
       [chunkX]="x"
       [chunkZ]="z"
       (newComment)="newComment($event)"
     ></app-commentform>
+    </div>
 
     <div class="item comment-containers-container hidden">
-      <p id="error">{{ error }}</p>
+
       <app-comment-view
         (deleted)="deleteComment($event)"
         class="comment-view"
