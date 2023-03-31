@@ -20,7 +20,8 @@ import { commentsRouter } from "./routers/comments_router.js";
 
 const port = config.port;
 const app = express();
-const wsInstance = expressWs(app);
+const server = createServer(app);
+const wsInstance = expressWs(app, server);
 
 app.use(bodyParser.json());
 app.use(morgan("dev")); // add request logger
@@ -98,7 +99,6 @@ sgMail
     });
 });
 // start server
-const server = createServer(app);
 initSocketIOFromServer(server, sessionMiddleware, corsOptions);
 server.listen(port, () => {
   console.log(`Server started at http://localhost:${port}`);
