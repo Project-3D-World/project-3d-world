@@ -8,7 +8,7 @@ import cors from "cors";
 import cron from "node-cron";
 import { openMongoSession, closeMongoSession } from "./datasource.js";
 import {
-  closeRedisConnection,
+  closeNotification,
   initSocketIOFromServer,
 } from "./socketio/notifications.js";
 import { config } from "./config.js";
@@ -109,7 +109,7 @@ const cleanup = async () => {
   wsInstance.getWss().clients.forEach((client) => {
     client.close();
   });
-  closeRedisConnection();
+  closeNotification();
   await closeMongoSession();
   server.close((err) => {
     console.log("Server closed");
