@@ -1,17 +1,17 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { WorldObjectComponent } from './world-object.component';
+import { NotificationComponent } from './notification.component';
 
-describe('WorldObjectComponent', () => {
-  let component: WorldObjectComponent;
-  let fixture: ComponentFixture<WorldObjectComponent>;
+describe('NotificationComponent', () => {
+  let component: NotificationComponent;
+  let fixture: ComponentFixture<NotificationComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [WorldObjectComponent],
+      declarations: [NotificationComponent],
     }).compileComponents();
 
-    fixture = TestBed.createComponent(WorldObjectComponent);
+    fixture = TestBed.createComponent(NotificationComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });
