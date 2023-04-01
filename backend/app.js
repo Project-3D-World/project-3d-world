@@ -17,6 +17,7 @@ import sgMail from "@sendgrid/mail";
 import { usersRouter } from "./routers/users_router.js";
 import { worldsRouter } from "./routers/worlds_router.js";
 import { commentsRouter } from "./routers/comments_router.js";
+import { notificationsRouter } from "./routers/notifications_router.js";
 
 const port = config.port;
 const app = express();
@@ -52,6 +53,7 @@ try {
 app.use("/api/users", usersRouter);
 app.use("/api/worlds", worldsRouter);
 app.use("/api/comments", commentsRouter);
+app.use("/api/notifications", notificationsRouter);
 
 //cronjob
 cron.schedule("0 0 * * SUN", () => {
