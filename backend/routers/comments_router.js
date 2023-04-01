@@ -29,7 +29,7 @@ commentsRouter.post("/", isAuthenticated, async (req, res) => {
     return res.status(404).json({ error: "World not found" });
   }
   const chunk = world.chunks.find((chunk) => {
-    return chunk.x === x && chunk.z === z;
+    return chunk.location.x === x && chunk.location.z === z;
   });
   if (!chunk) {
     return res.status(404).json({ error: "Chunk not found" });
@@ -62,29 +62,36 @@ commentsRouter.post("/", isAuthenticated, async (req, res) => {
     rating: rating,
   });
 
-  const newNotification = {
-    sender: user.displayName,
-    rating: rating,
-    chunk: {
-      x,
-      z,
-    },
-    worldId: worldId,
-  };
-  const userNotifications = await UserNotifications.findOne({
-    userId: chunk.claimedBy,
-  });
-  userNotifications.notifications.unshift(newNotification);
+  if (chunk.claimedBy.toString() !== author.toString()) {
+    const newNotification = {
+      sender: user.displayName,
+      rating: rating,
+      chunk: {
+        x,
+        z,
+      },
+      worldId: worldId,
+    };
+    let userNotifications;
+    try {
+      userNotifications = await UserNotifications.findOne({
+        user: chunk.claimedBy,
+      });
+      userNotifications.notifications.unshift(newNotification);
+      await userNotifications.save();
+      const receiver = chunk.claimedBy.toString();
+      sendNotification(receiver, newNotification);
+    } catch (err) {
+      next(err);
+    }
+  }
 
   try {
     await comment.save();
-    await userNotifications.save();
   } catch {
     return res.status(422).json({ error: "Comment creation failed" });
   }
 
-  const receiver = chunk.claimedBy.toString();
-  sendNotification(receiver, newNotification);
   return res.json(comment);
 });
 

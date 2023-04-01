@@ -29,7 +29,7 @@ usersRouter.post("/signup", async (req, res) => {
   });
 
   const userNotifications = new UserNotifications({
-    userId: user._id,
+    user: user._id,
     notifications: [],
   });
 
@@ -56,11 +56,11 @@ usersRouter.post("/signin", async (req, res) => {
   }
 
   let userNotifications = await UserNotifications.findOne({
-    userId: user._id,
+    user: user._id,
   });
   if (userNotifications === null) {
     userNotifications = new UserNotifications({
-      userId: user._id,
+      user: user._id,
       notifications: [],
     });
     await userNotifications.save();

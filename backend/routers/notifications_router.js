@@ -1,7 +1,7 @@
 import { Router } from "express";
-import { UserNotifications } from "../models/notifications";
+import { UserNotifications } from "../models/notifications.js";
 
-import { isAuthenticated } from "../middleware/auth";
+import { isAuthenticated } from "../middleware/auth.js";
 
 export const notificationsRouter = Router();
 
@@ -11,7 +11,7 @@ notificationsRouter.get("/", isAuthenticated, async (req, res) => {
   const limit = req.query.limit ? +req.query.limit : 10;
   const page = req.query.page ? +req.query.page : 0;
   const userNotifications = await UserNotifications.findOne({
-    userId: userId,
+    user: userId,
   });
   if (!userNotifications) {
     return res.status(404).json({ error: `user ${userId} not found` });
