@@ -12,6 +12,7 @@ import { environment } from 'src/environments/environment';
 import { HTTP_INTERCEPTORS, HttpClientModule } from '@angular/common/http';
 import { SignUpComponent } from './pages/sign-up/sign-up.component';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { SocketIoConfig, SocketIoModule } from 'ngx-socket-io';
 
 import { WorldObjectComponent } from './component/world-object/world-object.component';
 import { WorldsComponent } from './pages/worlds/worlds.component';
@@ -24,6 +25,15 @@ import { CommentDivComponent } from './component/comment-view/comment-div/commen
 import { ChunkFormComponent } from './component/chunk-form/chunk-form.component';
 import { ProfileComponent } from './pages/profile/profile.component';
 import { NotificationComponent } from './component/notification/notification.component';
+
+const socketIoCfg: SocketIoConfig = {
+  url: environment.apiEndpoint,
+  options: {
+    transports: ['polling'],
+    autoConnect: false,
+    withCredentials: true,
+  },
+};
 
 @NgModule({
   declarations: [
@@ -51,6 +61,7 @@ import { NotificationComponent } from './component/notification/notification.com
     BrowserModule,
     AppRoutingModule,
     AuthModule.forRoot(environment.auth),
+    SocketIoModule.forRoot(socketIoCfg),
   ],
   providers: [],
   bootstrap: [AppComponent],

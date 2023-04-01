@@ -5,8 +5,6 @@ const chunkSchema = new mongoose.Schema({
     x: { type: Number, required: true },
     z: { type: Number, required: true },
   },
-  upvotes: { type: Number, default: 0 },
-  downvotes: { type: Number, default: 0 },
   chunkFile: { type: mongoose.ObjectId, default: null },
   claimedBy: { type: mongoose.ObjectId, default: null },
 });
