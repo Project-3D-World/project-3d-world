@@ -104,15 +104,19 @@ usersRouter.get(
 
 //getSumofUpvotesandDownvotes
 usersRouter.get("/allusers/ratings", async (req, res) => {
-  const items = await User.find().populate('ratings');
-  let returnItems = []
-  items.forEach((item)=>{
-    let sum = 0
-    for(let i = 0;i<item.ratings.length;i++){
+  const items = await User.find().populate("ratings");
+  let returnItems = [];
+  items.forEach((item) => {
+    let sum = 0;
+    for (let i = 0; i < item.ratings.length; i++) {
       sum += item.ratings[0].rating;
     }
-    const avg = sum/item.ratings.length;
-    returnItems.push({email:item.email,name:item.displayName,avgRating:avg})
-  })
+    const avg = sum / item.ratings.length;
+    returnItems.push({
+      email: item.email,
+      name: item.displayName,
+      avgRating: avg,
+    });
+  });
   return res.json(returnItems);
 });

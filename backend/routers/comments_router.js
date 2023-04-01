@@ -27,17 +27,19 @@ commentsRouter.post("/", isAuthenticated, async (req, res) => {
   }
 
   const chunks = world.chunks;
-  const wantedChunk = chunks.find((chunk)=>chunk.location.x === x & chunk.location.z ===z);
-  if(!wantedChunk){
-    return res.status(404).json({error:"Chunk not found"});
+  const wantedChunk = chunks.find(
+    (chunk) => (chunk.location.x === x) & (chunk.location.z === z)
+  );
+  if (!wantedChunk) {
+    return res.status(404).json({ error: "Chunk not found" });
   }
   const claimedBy = await User.findById(wantedChunk.claimedBy);
-  if(!claimedBy){
-    return res.status(404).json({error:"Chunk owner not found"});
+  if (!claimedBy) {
+    return res.status(404).json({ error: "Chunk owner not found" });
   }
 
-  if(!wantedChunk.chunkFile){
-    return res.status(404).json({error:"Chunk file not found"});
+  if (!wantedChunk.chunkFile) {
+    return res.status(404).json({ error: "Chunk file not found" });
   }
   const user = await User.findById(author);
   if (!user) {
