@@ -64,6 +64,10 @@ export class WorldObjectComponent implements AfterViewInit, OnDestroy {
     }
   }
 
+  vote(vote: Event): void {
+    console.log('voted');
+  }
+
   getChunkFile(chunkId: string): Promise<any> {
     return lastValueFrom(this.api.getChunkFile(this.worldId, chunkId)).then(
       (data) => {
