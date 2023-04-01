@@ -6,7 +6,8 @@ import { isSocketAuthenticated } from "../middleware/auth.js";
 let io;
 const redisClient = new Redis(); // connect to default localhost:6379
 
-const wrap = middleware => (socket, next) => middleware(socket.request, {}, next);
+const wrap = (middleware) => (socket, next) =>
+  middleware(socket.request, {}, next);
 
 export const initSocketIOFromServer = (
   server,
@@ -16,13 +17,12 @@ export const initSocketIOFromServer = (
   io = new Server(server, {
     cors: corsOptions,
   });
-  const notifNamespace = io.of("/notifications");
-  notifNamespace.use(wrap(sessionMiddleware));
-  notifNamespace.use(isSocketAuthenticated);
+  io.use(wrap(sessionMiddleware));
+  io.use(isSocketAuthenticated);
 
   console.log("SocketIO initialized");
 
-  notifNamespace.on("connection", (socket) => {
+  io.on("connection", (socket) => {
     initializeUser(socket);
 
     socket.on("notification", (notification) => onNotify(socket, notification));
@@ -47,7 +47,7 @@ const initializeUser = async (socket) => {
 
   redisClient.hmset(`userId:${socket.user.userId}`, {
     online: true,
-    unotifiedReviews: 0
+    unotifiedReviews: 0,
   });
 
   if (status) {
@@ -65,11 +65,7 @@ const onNotify = async (socket, notification) => {
     "online"
   );
   if (receiverStatus === "false") {
-    redisClient.hincrby(
-      `userId:${receiverId}`,
-      `unotifiedReviews`,
-      1
-    );
+    redisClient.hincrby(`userId:${receiverId}`, `unotifiedReviews`, 1);
   } else {
     socket.to(receiverId).emit("notification", {
       sender: socket.user.displayName,
