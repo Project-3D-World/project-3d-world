@@ -2,9 +2,12 @@ import { Router } from "express";
 import { Comments } from "../models/comments.js";
 import { User } from "../models/users.js";
 import { World } from "../models/worlds.js";
+import { UserNotifications } from "../models/notifications.js";
 import { isAuthenticated } from "../middleware/auth.js";
 import mongoose from "mongoose";
 import { usersRouter } from "./users_router.js";
+import { sendNotification } from "../socketio/notifications.js";
+
 export const commentsRouter = Router();
 
 //post
@@ -25,6 +28,16 @@ commentsRouter.post("/", isAuthenticated, async (req, res) => {
   if (!world) {
     return res.status(404).json({ error: "World not found" });
   }
+  const chunk = world.chunks.find((chunk) => {
+    return chunk.x === x && chunk.z === z;
+  });
+  if (!chunk) {
+    return res.status(404).json({ error: "Chunk not found" });
+  }
+  if (chunk.claimedBy === null) {
+    return res.status(422).json({ error: "Chunk not claimed" });
+  }
+
   const user = await User.findById(author);
   if (!user) {
     return res.status(404).json({ error: "Author not found" });
@@ -49,12 +62,28 @@ commentsRouter.post("/", isAuthenticated, async (req, res) => {
     rating: rating,
   });
 
+  const newNotification = {
+    sender: user.displayName,
+    rating: rating,
+    chunk: {
+      x, z
+    },
+    worldId: worldId,
+  }
+  const userNotifications = await UserNotifications.findOne({
+    userId: chunk.claimedBy,
+  });
+  userNotifications.notifications.unshift(newNotification);
+
   try {
     await comment.save();
+    await userNotifications.save();
   } catch {
     return res.status(422).json({ error: "Comment creation failed" });
   }
 
+  const receiver = chunk.claimedBy.toString();
+  sendNotification(receiver, newNotification);
   return res.json(comment);
 });
 
