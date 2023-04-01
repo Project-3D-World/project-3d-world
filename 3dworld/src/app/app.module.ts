@@ -26,13 +26,13 @@ import { ChunkFormComponent } from './component/chunk-form/chunk-form.component'
 import { ProfileComponent } from './pages/profile/profile.component';
 import { NotificationComponent } from './component/notification/notification.component';
 
-const socketIoCfg: SocketIoConfig = { 
-  url: environment.apiEndpoint, 
+const socketIoCfg: SocketIoConfig = {
+  url: environment.apiEndpoint,
   options: {
     transports: ['polling'],
     autoConnect: false,
     withCredentials: true,
-  }
+  },
 };
 
 @NgModule({
