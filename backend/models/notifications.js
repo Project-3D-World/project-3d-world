@@ -23,18 +23,19 @@ const notificationSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-const userNotificationsSchema = new mongoose.Schema(
-  {
-    user: {
-      type: mongoose.SchemaTypes.ObjectId,
-      required: true,
-      ref: "User",
-    },
-    notifications: {
-      type: [notificationSchema],
-      default: [],
-    },
-  }
-);
+const userNotificationsSchema = new mongoose.Schema({
+  user: {
+    type: mongoose.SchemaTypes.ObjectId,
+    required: true,
+    ref: "User",
+  },
+  notifications: {
+    type: [notificationSchema],
+    default: [],
+  },
+});
 
-export const UserNotifications = mongoose.model("UserNotifications", userNotificationsSchema);
+export const UserNotifications = mongoose.model(
+  "UserNotifications",
+  userNotificationsSchema
+);
