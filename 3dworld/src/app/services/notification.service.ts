@@ -5,21 +5,24 @@ import { Socket } from 'ngx-socket-io';
   providedIn: 'root',
 })
 export class NotificationService {
-
-  constructor(private socketio: Socket) { }
+  constructor(private socketio: Socket) {}
 
   connect() {
     this.socketio.connect();
   }
-  
+
   sendNotification(notification: any) {
     // check for required fields
-    if (!notification?.receiver ||
+    if (
+      !notification?.receiver ||
       !notification?.rating ||
       !notification?.worldName ||
-      !notification?.worldId ) {
-        console.log("NotificationService: sendNotification: missing required fields");
-        return;  
+      !notification?.worldId
+    ) {
+      console.log(
+        'NotificationService: sendNotification: missing required fields'
+      );
+      return;
     }
     this.socketio.emit('notification', notification);
   }
