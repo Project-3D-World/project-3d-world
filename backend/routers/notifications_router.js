@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { UserNotifications} from "../models/notifications";
+import { UserNotifications } from "../models/notifications";
 
 import { isAuthenticated } from "../middleware/auth";
 

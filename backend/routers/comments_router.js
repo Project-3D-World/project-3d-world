@@ -66,10 +66,11 @@ commentsRouter.post("/", isAuthenticated, async (req, res) => {
     sender: user.displayName,
     rating: rating,
     chunk: {
-      x, z
+      x,
+      z,
     },
     worldId: worldId,
-  }
+  };
   const userNotifications = await UserNotifications.findOne({
     userId: chunk.claimedBy,
   });

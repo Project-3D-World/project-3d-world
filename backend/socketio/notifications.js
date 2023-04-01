@@ -40,10 +40,7 @@ export const closeNotification = () => {
 };
 
 export const sendNotification = async (receiver, notification) => {
-  const receiverStatus = await redisClient.hget(
-    `userId:${receiver}`,
-    "online"
-  );
+  const receiverStatus = await redisClient.hget(`userId:${receiver}`, "online");
   if (receiverStatus === "false") {
     redisClient.hincrby(`userId:${receiver}`, `unotifiedReviews`, 1);
   } else {
