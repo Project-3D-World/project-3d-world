@@ -3,6 +3,7 @@ import { User } from "../models/users.js";
 import { isAuthenticated } from "../middleware/auth.js";
 import { Db } from "mongodb";
 import { World } from "../models/worlds.js";
+import { UserNotifications } from "../models/notifications.js";
 // TODO: Create a mongoose model for users and import it here
 
 export const usersRouter = Router();
@@ -27,8 +28,14 @@ usersRouter.post("/signup", async (req, res) => {
     claims: [],
   });
 
+  const userNotifications = new UserNotifications({
+    user: user._id,
+    notifications: [],
+  });
+
   try {
     await user.save();
+    await userNotifications.save();
   } catch {
     return res.status(422).json({ error: "user creation failed" });
   }
@@ -47,6 +54,18 @@ usersRouter.post("/signin", async (req, res) => {
       .status(404)
       .json({ error: `User with sub : ${req.body.sub} not found` });
   }
+
+  let userNotifications = await UserNotifications.findOne({
+    user: user._id,
+  });
+  if (userNotifications === null) {
+    userNotifications = new UserNotifications({
+      user: user._id,
+      notifications: [],
+    });
+    await userNotifications.save();
+  }
+
   req.session.sub = user.sub;
   req.session.displayName = user.displayName;
   const userId = user._id.toString();
