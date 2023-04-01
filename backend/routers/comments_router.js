@@ -25,6 +25,20 @@ commentsRouter.post("/", isAuthenticated, async (req, res) => {
   if (!world) {
     return res.status(404).json({ error: "World not found" });
   }
+
+  const chunks = world.chunks;
+  const wantedChunk = chunks.find((chunk)=>chunk.location.x === x & chunk.location.z ===z);
+  if(!wantedChunk){
+    return res.status(404).json({error:"Chunk not found"});
+  }
+  const claimedBy = await User.findById(wantedChunk.claimedBy);
+  if(!claimedBy){
+    return res.status(404).json({error:"Chunk owner not found"});
+  }
+
+  if(!wantedChunk.chunkFile){
+    return res.status(404).json({error:"Chunk file not found"});
+  }
   const user = await User.findById(author);
   if (!user) {
     return res.status(404).json({ error: "Author not found" });
@@ -48,9 +62,10 @@ commentsRouter.post("/", isAuthenticated, async (req, res) => {
     content: content,
     rating: rating,
   });
-
+  claimedBy.ratings.push(comment._id);
   try {
     await comment.save();
+    await claimedBy.save();
   } catch {
     return res.status(422).json({ error: "Comment creation failed" });
   }
