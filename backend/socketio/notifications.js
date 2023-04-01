@@ -30,8 +30,6 @@ export const initSocketIOFromServer = (
   io.on("connection", (socket) => {
     initializeUser(socket);
 
-    socket.on("notification", (notification) => onNotify(socket, notification));
-
     socket.on("disconnect", () => onDisconnect(socket));
   });
 };
@@ -39,6 +37,15 @@ export const initSocketIOFromServer = (
 export const closeNotification = () => {
   redisClient.disconnect();
   io.close();
+};
+
+export const sendNotification = async (receiver, notification) => {
+  const receiverStatus = await redisClient.hget(`userId:${receiver}`, "online");
+  if (receiverStatus === "false") {
+    redisClient.hincrby(`userId:${receiver}`, `unotifiedReviews`, 1);
+  } else {
+    io.to(receiver).emit("notification", notification);
+  }
 };
 
 const initializeUser = async (socket) => {
@@ -63,26 +70,6 @@ const initializeUser = async (socket) => {
   }
 };
 
-const onNotify = async (socket, notification) => {
-  const receiverId = notification.receiver;
-
-  const receiverStatus = await redisClient.hget(
-    `userId:${receiverId}`,
-    "online"
-  );
-  if (receiverStatus === "false") {
-    redisClient.hincrby(`userId:${receiverId}`, `unotifiedReviews`, 1);
-  } else {
-    socket.to(receiverId).emit("notification", {
-      sender: socket.user.displayName,
-      rating: notification.rating,
-      worldId: notification.worldId,
-      worldName: notification.worldName,
-    });
-  }
-};
-
 const onDisconnect = (socket) => {
-  // TODO: update online status of user in redis
   redisClient.hset(`userId:${socket.user.userId}`, "online", false);
 };
