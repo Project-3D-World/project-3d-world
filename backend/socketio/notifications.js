@@ -4,7 +4,12 @@ import { Redis } from "ioredis";
 import { isSocketAuthenticated } from "../middleware/auth.js";
 
 let io;
-const redisClient = new Redis(); // connect to default localhost:6379
+let redisClient;
+try {
+  redisClient = new Redis(); // connect to default localhost:6379
+} catch (err) {
+  console.log(err);
+}
 
 const wrap = (middleware) => (socket, next) =>
   middleware(socket.request, {}, next);
@@ -31,8 +36,9 @@ export const initSocketIOFromServer = (
   });
 };
 
-export const closeRedisConnection = () => {
+export const closeNotification = () => {
   redisClient.disconnect();
+  io.close();
 };
 
 const initializeUser = async (socket) => {
