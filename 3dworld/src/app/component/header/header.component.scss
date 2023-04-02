@@ -1,10 +1,10 @@
-@import url('https://fonts.googleapis.com/css2?family=Comfortaa:wght@500&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Comfortaa:wght@500&display=swap");
 
 * {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
-  background-color: #24252A;
+  background-color: #24252a;
 }
 
 button {
@@ -18,7 +18,6 @@ button {
 
 header {
   display: flex;
-  // height: 64px;
   justify-content: space-between;
   align-items: center;
   padding: 30px 10%;
@@ -26,18 +25,12 @@ header {
 
 header #title {
   color: #edf0f1;
-  font-family: 'Comfortaa', sans-serif;
+  font-family: "Comfortaa", sans-serif;
   font-weight: 500;
   font-size: 45px;
   text-decoration: none;
   cursor: pointer;
 }
-
-// .header-btn {
-//   text-decoration: none;
-//   margin-left: 5px;
-//   margin-right: 5px;
-// }
 
 #nav-container {
   display: flex;
@@ -47,11 +40,10 @@ header #title {
 
 #nav-container .nav-element button {
   margin: 0px 25px;
-
 }
 
 #nav-container .nav-element button:hover {
-  color: #ef2d5e
+  color: #ef2d5e;
 }
 
 #error-box {

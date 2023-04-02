@@ -6,11 +6,13 @@
       <button (click)="goToWorlds()">Worlds</button>
     </div>
     <div class="nav-element notification" *ngIf="auth.isAuthenticated$ | async">
-      <button routerLink="profile">Profile</button>
-      <span class="notification-icon">3</span>
+      <button (click)="goToProfile()">Profile</button>
+      <span class="notification-icon" *ngIf="unseenCount">{{
+        unseenCount
+      }}</span>
     </div>
   </div>
-  
+
   <div *ngIf="auth.isAuthenticated$ | async; else loggedOut">
     <button class="btn btn-warning" (click)="signOut()">Log out</button>
   </div>
