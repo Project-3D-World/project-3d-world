@@ -24,8 +24,8 @@ export class SignInComponent implements OnInit {
         (this.profileJson = JSON.stringify(profile, null, 2)),
         this.api.signIn(this.profileJson).subscribe({
           next: (value) => {
+            this.notification.connect();
             this.router.navigateByUrl('');
-            this.notification.connectToNotifications();
           },
           error: (err) => {
             this.router.navigateByUrl('sign-up');
