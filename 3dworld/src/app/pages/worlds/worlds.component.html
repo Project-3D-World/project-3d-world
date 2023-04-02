@@ -1,6 +1,8 @@
-<div class="worlds-container" *ngFor="let world of worlds">
-  <app-worlddiv
-    class="row world general align-items-center"
-    [world]="world"
-  ></app-worlddiv>
+<div class="row align-items-center">
+  <div class="col-8 worlds-container" *ngFor="let world of worlds">
+    <app-worlddiv
+      class="row world general align-items-center"
+      [world]="world"
+    ></app-worlddiv>
+  </div>  
 </div>

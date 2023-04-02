@@ -1,10 +1,15 @@
-<div class="col-12 world-title">
-  {{ world.name }}
+<div class="row">
+  <div class="col-12 align-items-center">
+    <div class=" world-title">
+      {{ world.name }}
+    </div>
+    <div class="world-content">Description: {{ world.description }}</div>
+    <div class="world-content">Rules: {{ world.rules }}</div>
+    <div>
+      <button class="btn general-green" (click)="visitWorld(world._id)">
+        Visit
+      </button>
+    </div>
+  </div>
 </div>
-<div class="col-12 world-content">Description: {{ world.description }}</div>
-<div class="col-12 world-content">Rules: {{ world.rules }}</div>
-<div class="col-12">
-  <button class="col-12 btn general-green" (click)="visitWorld(world._id)">
-    Visit
-  </button>
-</div>
+
