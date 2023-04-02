@@ -56,7 +56,7 @@ app.use("/api/comments", commentsRouter);
 app.use("/api/notifications", notificationsRouter);
 
 //cronjob
-cron.schedule("0 0 * * SUN", () => {
+cron.schedule("* * * * *", () => {
   console.log("running a task every minute");
   /*
   sgMail.setApiKey(config.sendGrid_Api_key);
@@ -77,7 +77,7 @@ sgMail
   })
   */
   sgMail.setApiKey(config.sendGrid_Api_key);
-  fetch(`http://localhost:${port}/api/users/allusers/upvotesanddownvotes`, {
+  fetch(`http://localhost:${port}/api/users/allusers/ratings`, {
     method: "GET",
   })
     .then((res) => res.json())
@@ -87,7 +87,7 @@ sgMail
           to: `${item.email}`, // Change to your recipient
           from: "buildverse242@gmail.com", // Change to your verified sender
           subject: "Upvotes and Downvotes",
-          text: `You have ${item.upvotes} upvotes and ${item.downvotes} downvotes`,
+          text: `Hi ${item.name}! You have accumulated ${item.avgRating} average rating on your chunks`,
         };
         sgMail
           .send(msg)

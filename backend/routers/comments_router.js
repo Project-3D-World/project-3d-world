@@ -28,16 +28,22 @@ commentsRouter.post("/", isAuthenticated, async (req, res) => {
   if (!world) {
     return res.status(404).json({ error: "World not found" });
   }
-  const chunk = world.chunks.find((chunk) => {
-    return chunk.location.x === x && chunk.location.z === z;
-  });
-  if (!chunk) {
+
+  const chunks = world.chunks;
+  const wantedChunk = chunks.find(
+    (chunk) => (chunk.location.x === x) & (chunk.location.z === z)
+  );
+  if (!wantedChunk) {
     return res.status(404).json({ error: "Chunk not found" });
   }
-  if (chunk.claimedBy === null) {
-    return res.status(422).json({ error: "Chunk not claimed" });
+  const claimedBy = await User.findById(wantedChunk.claimedBy);
+  if (!claimedBy) {
+    return res.status(404).json({ error: "Chunk owner not found" });
   }
 
+  if (!wantedChunk.chunkFile) {
+    return res.status(404).json({ error: "Chunk file not found" });
+  }
   const user = await User.findById(author);
   if (!user) {
     return res.status(404).json({ error: "Author not found" });
@@ -61,8 +67,9 @@ commentsRouter.post("/", isAuthenticated, async (req, res) => {
     content: content,
     rating: rating,
   });
+  claimedBy.ratings.push(comment._id);
 
-  if (chunk.claimedBy.toString() !== author.toString()) {
+  if (wantedChunk.claimedBy.toString() !== author.toString()) {
     const newNotification = {
       sender: user.displayName,
       rating: rating,
@@ -75,11 +82,11 @@ commentsRouter.post("/", isAuthenticated, async (req, res) => {
     let userNotifications;
     try {
       userNotifications = await UserNotifications.findOne({
-        user: chunk.claimedBy,
+        user: wantedChunk.claimedBy,
       });
       userNotifications.notifications.unshift(newNotification);
       await userNotifications.save();
-      const receiver = chunk.claimedBy.toString();
+      const receiver = wantedChunk.claimedBy.toString();
       sendNotification(receiver, newNotification);
     } catch (err) {
       next(err);
@@ -88,6 +95,7 @@ commentsRouter.post("/", isAuthenticated, async (req, res) => {
 
   try {
     await comment.save();
+    await claimedBy.save();
   } catch {
     return res.status(422).json({ error: "Comment creation failed" });
   }
