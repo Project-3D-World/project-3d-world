@@ -1,7 +1,7 @@
 
 
 <div class="row">
-  <div class="col-6">
+  <div class="col-6 col-s-12 center">
     <div>
       <h2 *ngIf="me.displayName">Welcome "{{ me.displayName }}"</h2>
       <img src="{{ user.picture }}" />
@@ -14,7 +14,7 @@
         *ngFor="let message of notifications.slice(0, notifLimit)"
       >
         <app-notificationdiv
-          class="row world general align-items-center"
+          class="row world general center"
           [notification]="message"
         ></app-notificationdiv>
       </div>
@@ -36,11 +36,11 @@
       </div>
     </div>
   </div>
-  <div class="col-6">
+  <div class="col-6 col-s-12 center">
     <h1>You have claims in these worlds:</h1>
     <div class="worlds-container" *ngFor="let claim of claims.slice(0, limit)">
       <app-worlddiv
-        class="row world general align-items-center"
+        class="row world general center"
         [world]="claim.world"
       ></app-worlddiv>
     </div>
