@@ -2,9 +2,12 @@ import { Router } from "express";
 import { Comments } from "../models/comments.js";
 import { User } from "../models/users.js";
 import { World } from "../models/worlds.js";
+import { UserNotifications } from "../models/notifications.js";
 import { isAuthenticated } from "../middleware/auth.js";
 import mongoose from "mongoose";
 import { usersRouter } from "./users_router.js";
+import { sendNotification } from "../socketio/notifications.js";
+
 export const commentsRouter = Router();
 
 //post
@@ -65,6 +68,31 @@ commentsRouter.post("/", isAuthenticated, async (req, res) => {
     rating: rating,
   });
   claimedBy.ratings.push(comment._id);
+
+  if (wantedChunk.claimedBy.toString() !== author.toString()) {
+    const newNotification = {
+      sender: user.displayName,
+      rating: rating,
+      chunk: {
+        x,
+        z,
+      },
+      worldId: worldId,
+    };
+    let userNotifications;
+    try {
+      userNotifications = await UserNotifications.findOne({
+        user: chunk.claimedBy,
+      });
+      userNotifications.notifications.unshift(newNotification);
+      await userNotifications.save();
+      const receiver = chunk.claimedBy.toString();
+      sendNotification(receiver, newNotification);
+    } catch (err) {
+      next(err);
+    }
+  }
+
   try {
     await comment.save();
     await claimedBy.save();

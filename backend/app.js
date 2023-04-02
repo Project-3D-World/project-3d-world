@@ -1,35 +1,41 @@
 import express from "express";
 import expressWs from "express-ws";
+import { createServer } from "http";
 import bodyParser from "body-parser";
 import morgan from "morgan";
 import session from "express-session";
 import cors from "cors";
 import cron from "node-cron";
 import { openMongoSession, closeMongoSession } from "./datasource.js";
+import {
+  closeNotification,
+  initSocketIOFromServer,
+} from "./socketio/notifications.js";
 import { config } from "./config.js";
 import sgMail from "@sendgrid/mail";
 
 import { usersRouter } from "./routers/users_router.js";
 import { worldsRouter } from "./routers/worlds_router.js";
 import { commentsRouter } from "./routers/comments_router.js";
+import { notificationsRouter } from "./routers/notifications_router.js";
 
 const port = config.port;
 const app = express();
-const wsInstance = expressWs(app);
+const server = createServer(app);
+const wsInstance = expressWs(app, server);
 
 app.use(bodyParser.json());
 app.use(morgan("dev")); // add request logger
+
 //create session
-app.use(
-  session({
-    secret: config.sessionSecret,
-    resave: false,
-    saveUninitialized: true,
-  })
-);
+const sessionMiddleware = session({
+  secret: config.sessionSecret,
+  resave: false,
+  saveUninitialized: true,
+});
+app.use(sessionMiddleware);
 
 //cors
-app.use(express.static("static"));
 const corsOptions = {
   origin: config.frontendBaseUrl,
   credentials: true,
@@ -47,6 +53,7 @@ try {
 app.use("/api/users", usersRouter);
 app.use("/api/worlds", worldsRouter);
 app.use("/api/comments", commentsRouter);
+app.use("/api/notifications", notificationsRouter);
 
 //cronjob
 cron.schedule("0 0 * * SUN", () => {
@@ -93,8 +100,16 @@ sgMail
       });
     });
 });
+
+// 500 error handler
+app.use((err, req, res, next) => {
+  console.error(err.stack);
+  res.status(500).send("Internal Server Error");
+});
+
 // start server
-const server = app.listen(port, () => {
+initSocketIOFromServer(server, sessionMiddleware, corsOptions);
+server.listen(port, () => {
   console.log(`Server started at http://localhost:${port}`);
 });
 
@@ -103,6 +118,7 @@ const cleanup = async () => {
   wsInstance.getWss().clients.forEach((client) => {
     client.close();
   });
+  closeNotification();
   await closeMongoSession();
   server.close((err) => {
     console.log("Server closed");
