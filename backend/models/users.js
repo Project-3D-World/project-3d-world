@@ -25,7 +25,7 @@ const userSchema = new mongoose.Schema({
     required: true,
   },
   ratings: {
-    type: [{ type: mongoose.SchemaTypes.ObjectId, ref: "Comments" }],
+    type: [Number],
     default: [],
   },
   email: {
