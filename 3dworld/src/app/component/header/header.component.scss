@@ -1,23 +1,57 @@
+@import url('https://fonts.googleapis.com/css2?family=Comfortaa:wght@500&display=swap');
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  background-color: #24252A;
+}
+
+button {
+  color: #edf0f1;
+  text-decoration: none;
+  font-size: 18px;
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s ease 0s;
+}
+
 header {
   display: flex;
-  margin-top: 36px;
-  height: 64px;
-  justify-content: flex-end;
+  // height: 64px;
+  justify-content: space-between;
+  align-items: center;
+  padding: 30px 10%;
 }
 
 header #title {
-  color: black;
+  color: #edf0f1;
+  font-family: 'Comfortaa', sans-serif;
+  font-weight: 500;
+  font-size: 45px;
   text-decoration: none;
-  margin: 0px;
-  width: 100%;
-  font-size: 48px;
+  cursor: pointer;
 }
 
-.header-btn {
-  text-decoration: none;
-  font-size: 16px;
-  margin-left: 5px;
-  margin-right: 5px;
+// .header-btn {
+//   text-decoration: none;
+//   margin-left: 5px;
+//   margin-right: 5px;
+// }
+
+#nav-container {
+  display: flex;
+  justify-content: space-between;
+  padding: 0px, 20px;
+}
+
+#nav-container .nav-element button {
+  margin: 0px 25px;
+
+}
+
+#nav-container .nav-element button:hover {
+  color: #ef2d5e
 }
 
 #error-box {
@@ -29,10 +63,14 @@ header #title {
   content: "Error: ";
 }
 
+.btn {
+  padding: 9px 25px;
+  background: rgba(239, 45, 94, 1);
+  border-radius: 50px;
+}
+
 .btn:hover {
-  background: brown;
-  color: #ffffff;
-  cursor: pointer;
+  background: rgba(239, 45, 94, 0.8);
 }
 
 .notification {
