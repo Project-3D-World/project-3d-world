@@ -3,8 +3,9 @@
   <div *ngIf="auth.isAuthenticated$ | async">
     <button class="general btn" (click)="goToWorlds()">Worlds</button>
   </div>
-  <div *ngIf="auth.isAuthenticated$ | async">
+  <div class="notification" *ngIf="auth.isAuthenticated$ | async">
     <button class="general btn" routerLink="profile">Profile</button>
+    <span class="notification-icon">2</span>
   </div>
   <div *ngIf="auth.isAuthenticated$ | async; else loggedOut">
     <button class="btn general btn-warning" (click)="signOut()">Log out</button>
