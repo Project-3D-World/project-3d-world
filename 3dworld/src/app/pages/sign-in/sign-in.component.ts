@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { Route, Router } from '@angular/router';
 import { AuthService } from '@auth0/auth0-angular';
 import { ApiService } from 'src/app/services/api.service';
-
+import { NotificationService } from 'src/app/services/notification.service';
 @Component({
   selector: 'app-sign-in',
   templateUrl: './sign-in.component.html',
@@ -14,7 +14,8 @@ export class SignInComponent implements OnInit {
   constructor(
     private api: ApiService,
     public auth: AuthService,
-    private router: Router
+    private router: Router,
+    private notification: NotificationService
   ) {}
 
   ngOnInit(): void {
@@ -24,6 +25,7 @@ export class SignInComponent implements OnInit {
         this.api.signIn(this.profileJson).subscribe({
           next: (value) => {
             this.router.navigateByUrl('');
+            this.notification.connectToNotifications();
           },
           error: (err) => {
             this.router.navigateByUrl('sign-up');

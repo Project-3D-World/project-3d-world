@@ -1,1 +1,21 @@
-<p>notification works!</p>
+<div class="row worlds-container" *ngFor="let message of notifications.slice(0, limit)">
+    <app-notificationdiv>
+        [notification]='notifcations'
+    </app-notificationdiv>
+  </div>
+<div class="row comment-button-container">
+    <button
+      *ngIf="page > 0"
+      class="btn prev-btn"
+      (click)="getNotifications(page - 1, limit)"
+    >
+      Prev
+    </button>
+    <button
+      *ngIf="notifications.length === limit + 1"
+      class="btn next-btn"
+      (click)="getNotifications(page + 1, limit)"
+    >
+      Next
+    </button>
+  </div>
