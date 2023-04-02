@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
 import { AuthService } from '@auth0/auth0-angular';
+import { lastValueFrom } from 'rxjs';
 import { ApiService } from 'src/app/services/api.service';
 
 @Component({
@@ -13,6 +14,10 @@ export class ProfileComponent {
   user: any;
   me: any = {};
   claims: any = [];
+  notifications: any = [];
+  notifPage: number = 0;
+  notifLimit: number = 10;
+
   constructor(public auth: AuthService, private api: ApiService) {
     this.user = {};
   }
@@ -24,8 +29,14 @@ export class ProfileComponent {
         this.me = data;
       });
     });
-    this.api.getMyClaims(0, this.limit).subscribe((data) => {
+
+    lastValueFrom(this.api.getMyClaims(0, this.limit)).then((data) => {
+      console.log(data)
       this.claims = data;
+      });
+    lastValueFrom(this.api.getNotifications(0, this.limit)).then((data) => {
+      console.log(data)
+      this.notifications = data;
     });
   }
 
@@ -33,6 +44,13 @@ export class ProfileComponent {
     this.api.getMyClaims(page, limit).subscribe((data) => {
       this.claims = data;
       this.page = page;
+    });
+  }
+
+  getNotifications(page: number, limit: number) {
+    this.api.getNotifications(page, limit).subscribe((data) => {
+      this.notifications = data;
+      this.notifPage = page;
     });
   }
 }

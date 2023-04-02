@@ -2,6 +2,34 @@
   <h2 *ngIf="me.displayName">Welcome "{{ me.displayName }}"</h2>
   <img src="{{ user.picture }}" />
 </div>
+
+<h1>notifications</h1>
+<div *ngIf="notifications">
+  <div class="worlds-container" *ngFor="let message of notifications.slice(0, notifLimit)">
+    <app-notificationdiv
+        class="row world general align-items-center"
+        [notification]="message"
+    ></app-notificationdiv>
+  </div>
+  <div class="row comment-button-container">
+    <button
+      *ngIf="notifPage > 0"
+      class="btn prev-btn"
+      (click)="getNotifications(notifPage - 1, notifLimit)"
+    >
+      Prev
+    </button>
+    <button
+      *ngIf="notifications.length === notifLimit + 1"
+      class="btn next-btn"
+      (click)="getNotifications(notifPage + 1, notifLimit)"
+    >
+      Next
+    </button>
+  </div>
+</div>
+
+
 <h1>You have claims in these worlds:</h1>
 <div class="worlds-container" *ngFor="let claim of claims.slice(0, limit)">
   <app-worlddiv

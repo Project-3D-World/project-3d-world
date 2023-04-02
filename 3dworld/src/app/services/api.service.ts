@@ -180,4 +180,10 @@ export class ApiService {
       { withCredentials: true }
     );
   }
+
+  getNotifications(page: number, limit: number) {
+    return this.http.get(this.endpoint + `/api/notifications/page=${page}&limit=${limit}`, {
+      withCredentials: true,
+    });
+  }
 }
