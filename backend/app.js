@@ -56,8 +56,8 @@ app.use("/api/comments", commentsRouter);
 app.use("/api/notifications", notificationsRouter);
 
 //cronjob
-cron.schedule("* * * * *", () => {
-  console.log("running a task every minute");
+cron.schedule("0 0 * * SUN", () => {
+  console.log("running a task every Sunday");
   /*
   sgMail.setApiKey(config.sendGrid_Api_key);
 const msg = {
