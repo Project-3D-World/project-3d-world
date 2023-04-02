@@ -11,3 +11,11 @@ export const isWsAuthenticated = function (ws, req, next) {
   }
   next();
 };
+
+export const isSocketAuthenticated = function (socket, next) {
+  if (!socket.request.session || !socket.request.session.sub) {
+    next(new Error("Not authenticated"));
+  } else {
+    next();
+  }
+};
