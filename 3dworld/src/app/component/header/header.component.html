@@ -1,18 +1,22 @@
 <header>
   <a href="/" id="title">Buildverse</a>
-  <div *ngIf="auth.isAuthenticated$ | async">
-    <button class="general btn" (click)="goToWorlds()">Worlds</button>
+
+  <div id="nav-container">
+    <div class="nav-element" *ngIf="auth.isAuthenticated$ | async">
+      <button (click)="goToWorlds()">Worlds</button>
+    </div>
+    <div class="nav-element notification" *ngIf="auth.isAuthenticated$ | async">
+      <button routerLink="profile">Profile</button>
+      <span class="notification-icon">3</span>
+    </div>
   </div>
-  <div class="notification" *ngIf="auth.isAuthenticated$ | async">
-    <button class="general btn" routerLink="profile">Profile</button>
-    <span class="notification-icon">2</span>
-  </div>
+  
   <div *ngIf="auth.isAuthenticated$ | async; else loggedOut">
-    <button class="btn general btn-warning" (click)="signOut()">Log out</button>
+    <button class="btn btn-warning" (click)="signOut()">Log out</button>
   </div>
 
   <ng-template #loggedOut>
-    <button class="btn general btn-primary" (click)="loginWithRedirect()">
+    <button class="btn btn-primary" (click)="loginWithRedirect()">
       Log in
     </button>
   </ng-template>
