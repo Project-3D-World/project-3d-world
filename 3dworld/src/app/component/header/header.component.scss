@@ -40,3 +40,28 @@ header #title {
   color: #ffffff;
   cursor: pointer;
 }
+
+.notification {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #333333;
+  border: none;
+  outline: none;
+  border-radius: 50%;
+}
+
+.notification-icon {
+  position: absolute;
+  top: -10px;
+  right: -10px;
+  width: 25px;
+  height: 25px;
+  background: red;
+  color: #ffffff;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 50%;
+}
