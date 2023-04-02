@@ -1,11 +1,10 @@
-<div class="col-12 comment-title">Author: {{ comment.author.displayName }}</div>
-<div class="col-12 comment-rating">Rating: {{ comment.rating }}</div>
-<div class="col-12 world-content">Content: {{ comment.content }}</div>
-<div class="col-12 world-content">CreatedAt: {{ comment.createdAt }}</div>
+<div class="col-12 comment-title text">Author: {{ comment.author.displayName }}</div>
+<div class="col-12 comment-rating text">Rating: {{ comment.rating }}</div>
+<div class="col-12 world-content text">Content: {{ comment.content }}</div>
+<div class="col-12 world-content text">CreatedAt: {{ comment.createdAt }}</div>
 <div *ngIf="mine" class="col-12">
   <button (click)="deleteComment()" class="col-12 btn general-green">
     Delete
   </button>
 </div>
 <hr />
-<br />
