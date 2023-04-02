@@ -24,7 +24,6 @@ import { CommentViewComponent } from './component/comment-view/comment-view.comp
 import { CommentDivComponent } from './component/comment-view/comment-div/comment-div.component';
 import { ChunkFormComponent } from './component/chunk-form/chunk-form.component';
 import { ProfileComponent } from './pages/profile/profile.component';
-import { NotificationComponent } from './component/notification/notification.component';
 import { NotificationdivComponent } from './component/notificationdiv/notificationdiv.component';
 
 const socketIoCfg: SocketIoConfig = {
@@ -53,7 +52,6 @@ const socketIoCfg: SocketIoConfig = {
     CommentDivComponent,
     ChunkFormComponent,
     ProfileComponent,
-    NotificationComponent,
     NotificationdivComponent,
   ],
   imports: [
