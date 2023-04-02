@@ -4,6 +4,7 @@ import { Auth0Client } from '@auth0/auth0-spa-js';
 import { ApiService } from 'src/app/services/api.service';
 import { Location } from '@angular/common';
 import { Route, Router } from '@angular/router';
+import { NotificationService } from 'src/app/services/notification.service';
 @Component({
   selector: 'app-index',
   templateUrl: './index.component.html',
@@ -14,7 +15,8 @@ export class IndexComponent implements OnInit {
     public auth: AuthService,
     private api: ApiService,
     private location: Location,
-    private router: Router
+    private router: Router,
+    private notification: NotificationService
   ) {}
   ngOnInit(): void {
     this.api.getMe().subscribe({
@@ -22,6 +24,8 @@ export class IndexComponent implements OnInit {
         this.auth.isAuthenticated$.subscribe((data) => {
           if (data === false) {
             this.api.signOut().subscribe();
+          } else {
+            this.notification.connect();
           }
         });
       },
