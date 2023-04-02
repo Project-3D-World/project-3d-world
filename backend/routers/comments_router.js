@@ -82,11 +82,11 @@ commentsRouter.post("/", isAuthenticated, async (req, res) => {
     let userNotifications;
     try {
       userNotifications = await UserNotifications.findOne({
-        user: chunk.claimedBy,
+        user: wantedChunk.claimedBy,
       });
       userNotifications.notifications.unshift(newNotification);
       await userNotifications.save();
-      const receiver = chunk.claimedBy.toString();
+      const receiver = wantedChunk.claimedBy.toString();
       sendNotification(receiver, newNotification);
     } catch (err) {
       next(err);
