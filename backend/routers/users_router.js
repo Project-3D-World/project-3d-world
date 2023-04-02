@@ -3,6 +3,7 @@ import { User } from "../models/users.js";
 import { isAuthenticated } from "../middleware/auth.js";
 import { Db } from "mongodb";
 import { World } from "../models/worlds.js";
+import { Comments } from "../models/comments.js";
 import { UserNotifications } from "../models/notifications.js";
 // TODO: Create a mongoose model for users and import it here
 
@@ -121,16 +122,20 @@ usersRouter.get(
 );
 
 //getSumofUpvotesandDownvotes
-usersRouter.get("/allusers/upvotesanddownvotes", async (req, res) => {
-  const items = await User.find().select("email upvotes downvotes");
-  return res.json(items);
+usersRouter.get("/allusers/ratings", async (req, res) => {
+  const items = await User.find().populate("ratings");
+  let returnItems = [];
+  items.forEach((item) => {
+    let sum = 0;
+    for (let i = 0; i < item.ratings.length; i++) {
+      sum += item.ratings[i].rating;
+    }
+    const avg = sum / item.ratings.length;
+    returnItems.push({
+      email: item.email,
+      name: item.displayName,
+      avgRating: avg,
+    });
+  });
+  return res.json(returnItems);
 });
-
-//getting one
-usersRouter.get("/:id", async (req, res) => {});
-
-//updating one
-usersRouter.patch("/:id", async (req, res) => {});
-
-//deleting one
-usersRouter.delete("/:id", async (req, res) => {});
