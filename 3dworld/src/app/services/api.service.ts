@@ -182,8 +182,11 @@ export class ApiService {
   }
 
   getNotifications(page: number, limit: number) {
-    return this.http.get(this.endpoint + `/api/notifications/page=${page}&limit=${limit}`, {
-      withCredentials: true,
-    });
+    return this.http.get(
+      this.endpoint + `/api/notifications/page=${page}&limit=${limit}`,
+      {
+        withCredentials: true,
+      }
+    );
   }
 }
