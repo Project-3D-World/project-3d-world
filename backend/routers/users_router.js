@@ -128,7 +128,7 @@ usersRouter.get("/allusers/ratings", async (req, res) => {
   items.forEach((item) => {
     let sum = 0;
     for (let i = 0; i < item.ratings.length; i++) {
-      sum += item.ratings[0].rating;
+      sum += item.ratings[i].rating;
     }
     const avg = sum / item.ratings.length;
     returnItems.push({
