@@ -7,8 +7,11 @@ import { Socket } from 'ngx-socket-io';
 export class NotificationService {
   constructor(private socketio: Socket) {}
 
-  connectToNotifications() {
+  connect() {
     this.socketio.connect();
+  }
+
+  getListener() {
     return this.socketio.fromEvent('notification');
   }
 }
