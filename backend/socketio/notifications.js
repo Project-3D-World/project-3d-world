@@ -28,6 +28,7 @@ export const initSocketIOFromServer = (
   console.log("SocketIO initialized");
 
   io.on("connection", (socket) => {
+    console.log("SocketIO connected");
     initializeUser(socket);
 
     socket.on("disconnect", () => onDisconnect(socket));
@@ -35,7 +36,7 @@ export const initSocketIOFromServer = (
 };
 
 export const closeNotification = () => {
-  redisClient.disconnect();
+  redisClient.quit();
   io.close();
 };
 
@@ -64,12 +65,13 @@ const initializeUser = async (socket) => {
   });
 
   if (status) {
-    socket.emit("summaryNotification", {
-      reviews: status.unotifiedReviews,
+    socket.emit("notification", {
+      unseen: +status.unotifiedReviews,
     });
   }
 };
 
 const onDisconnect = (socket) => {
+  console.log("SocketIO disconnected");
   redisClient.hset(`userId:${socket.user.userId}`, "online", false);
 };
