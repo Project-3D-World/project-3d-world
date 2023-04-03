@@ -1,12 +1,17 @@
 .world {
   border-radius: 10px;
   font-size: 20px;
-  color: #3c3d3f;
-  border: 2px solid brown;
+  color: white;
+  background: #24252a;
   padding: 10px 20px 10px 20px;
   margin: 10px;
 }
 
 .message-content {
   font-size: 24px;
+}
+
+.center {
+  align-items: center;
+  text-align: center;
 }
