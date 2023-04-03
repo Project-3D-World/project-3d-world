@@ -1,12 +1,16 @@
-.text{
-    text-align: center;
+.text {
+  text-align: center;
 }
 
-p{
-    font-size: 24px;
+p {
+  font-size: 24px;
 }
 
-img{
-    margin:20px;
-    width:100%;
+img {
+  margin: 20px;
+  width: 50%;
+}
+.img-container {
+  display: flex;
+  justify-content: center;
 }
