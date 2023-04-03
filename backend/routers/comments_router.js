@@ -77,6 +77,7 @@ commentsRouter.post("/", isAuthenticated, async (req, res) => {
         x,
         z,
       },
+      worldName: world.name,
       worldId: worldId,
     };
     let userNotifications;
