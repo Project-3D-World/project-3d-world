@@ -15,6 +15,10 @@ const notificationSchema = new mongoose.Schema(
       type: mongoose.SchemaTypes.ObjectId,
       required: true,
     },
+    worldName: {
+      type: String,
+      required: true,
+    },
     chunk: {
       x: Number,
       z: Number,
