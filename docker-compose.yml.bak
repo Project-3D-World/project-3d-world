@@ -1,0 +1,34 @@
+version: "3.8"
+services:
+  backend:
+    container_name: backend
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    ports:
+      - 3000:3000
+    volumes:
+      - ./backend:/usr/src/app
+    depends_on:
+      - mongodb
+      - redis
+    environment:
+      - MONGO_URI=mongodb://<username>:<password>@mongodb:27017 # same as mongodb env username and password
+      - MONGO_DB_NAME=
+      - REDIS_URI=redis
+      - ADMIN_SUB=admin|<password>
+      - FRONTEND_BASE_URL=
+      - SESSION_SECRET=
+      - SEND_GRID_API_KEY=
+  mongodb:
+    container_name: mongodb
+    image: mongo
+    ports:
+      - 27017:27017
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=
+      - MONGO_INITDB_ROOT_PASSWORD=
+      - MONGO_INITDB_DATABASE=
+  redis:
+    container_name: redis
+    image: redis
