@@ -4,7 +4,7 @@ services:
     container_name: backend
     build:
       context: ./backend
-      dockerfile: dockerfile
+      dockerfile: Dockerfile
     ports:
       - 3000:3000
     volumes:
@@ -16,6 +16,7 @@ services:
       - MONGO_URI=mongodb://<username>:<password>@mongodb:27017 # same as mongodb env username and password
       - MONGO_DB_NAME=
       - REDIS_URI=redis
+      - ADMIN_SUB=admin|<password>
       - FRONTEND_BASE_URL=
       - SESSION_SECRET=
       - SEND_GRID_API_KEY=
