@@ -1,12 +1,16 @@
 import { Server } from "socket.io";
 import { Redis } from "ioredis";
 
+import { config } from "../config.js";
 import { isSocketAuthenticated } from "../middleware/auth.js";
 
 let io;
 let redisClient;
 try {
-  redisClient = new Redis(); // connect to default localhost:6379
+  redisClient = new Redis({
+    port: 6379,
+    host: config.redisURI,
+  });
 } catch (err) {
   console.log(err);
 }

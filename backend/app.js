@@ -18,8 +18,9 @@ import { usersRouter } from "./routers/users_router.js";
 import { worldsRouter } from "./routers/worlds_router.js";
 import { commentsRouter } from "./routers/comments_router.js";
 import { notificationsRouter } from "./routers/notifications_router.js";
+import { initAdmin } from "./adminInit.js";
 
-const port = config.port;
+const port = 3000; // fix port number and expose it in docker
 const app = express();
 const server = createServer(app);
 const wsInstance = expressWs(app, server);
@@ -106,6 +107,13 @@ app.use((err, req, res, next) => {
   console.error(err.stack);
   res.status(500).send("Internal Server Error");
 });
+
+// Create an admin account
+try {
+  await initAdmin();
+} catch (err) {
+  console.error(err);
+}
 
 // start server
 initSocketIOFromServer(server, sessionMiddleware, corsOptions);

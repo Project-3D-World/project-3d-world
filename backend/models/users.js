@@ -39,6 +39,10 @@ const userSchema = new mongoose.Schema({
       "Please fill a valid email address",
     ],
   },
+  isAdmin: {
+    type: Boolean,
+    default: false,
+  },
 });
 
 export const User = mongoose.model("User", userSchema);
