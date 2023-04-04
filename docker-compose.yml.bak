@@ -1,18 +1,56 @@
 version: "3.8"
 services:
+  nginx-proxy:
+    image: jwilder/nginx-proxy
+    container_name: nginx-proxy
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - /var/run/docker.sock:/tmp/docker.sock:ro
+      - ./certs:/etc/nginx/certs
+      - ./vhost:/etc/nginx/vhost.d
+      - ./html:/usr/share/nginx/html
+  nginx-proxy-acme:
+    image: nginxproxy/acme-companion
+    container_name: nginx-proxy-acme
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - ./certs:/etc/nginx/certs
+      - ./vhost:/etc/nginx/vhost.d
+      - ./html:/usr/share/nginx/html
+      - ./acme:/etc/acme.sh
+    environment:
+      - DEfAULT_EMAIL=
+    depends_on:
+      - nginx-proxy
+  frontend:
+    container_name: frontend
+    build:
+      context: ./3dworld
+      dockerfile: Dockerfile
+    expose:
+      - 80
+    volumes:
+      - ./3dworld:/usr/src/app
+    environment:
+      - VIRTUAL_HOST=buildverse.live
+      - LETSENCRYPT_HOST=buildverse.live
   backend:
     container_name: backend
     build:
       context: ./backend
       dockerfile: Dockerfile
-    ports:
-      - 3000:3000
+    expose:
+      - 3000
     volumes:
       - ./backend:/usr/src/app
     depends_on:
       - mongodb
       - redis
     environment:
+      - VIRTUAL_HOST=
+      - LETSENCRYPT_HOST=
       - MONGO_URI=mongodb://<username>:<password>@mongodb:27017 # same as mongodb env username and password
       - MONGO_DB_NAME=
       - REDIS_URI=redis
