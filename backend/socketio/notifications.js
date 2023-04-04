@@ -1,7 +1,7 @@
 import { Server } from "socket.io";
 import { Redis } from "ioredis";
 
-import { config } from "../config.js"
+import { config } from "../config.js";
 import { isSocketAuthenticated } from "../middleware/auth.js";
 
 let io;
@@ -9,7 +9,7 @@ let redisClient;
 try {
   redisClient = new Redis({
     port: 6379,
-    host: config.redisURI
+    host: config.redisURI,
   });
 } catch (err) {
   console.log(err);

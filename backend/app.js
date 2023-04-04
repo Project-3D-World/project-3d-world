@@ -20,7 +20,7 @@ import { commentsRouter } from "./routers/comments_router.js";
 import { notificationsRouter } from "./routers/notifications_router.js";
 import { initAdmin } from "./adminInit.js";
 
-const port = 3000;  // fix port number and expose it in docker
+const port = 3000; // fix port number and expose it in docker
 const app = express();
 const server = createServer(app);
 const wsInstance = expressWs(app, server);
