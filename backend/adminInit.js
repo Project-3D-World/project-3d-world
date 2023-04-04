@@ -1,5 +1,5 @@
 import { User } from "./models/users.js";
-import { config } from "./config.js"
+import { config } from "./config.js";
 
 const adminSub = config.adminSub;
 

@@ -92,7 +92,9 @@ worldsRouter.post("/", isAuthenticated, async (req, res) => {
   // Check for admin permissions
   const user = await User.findById(req.session.userId);
   if (!user.isAdmin) {
-    res.status(403).json({ error: "You do not have permission to add a world" });
+    res
+      .status(403)
+      .json({ error: "You do not have permission to add a world" });
     return;
   }
   if (
