@@ -22,15 +22,6 @@ const routes: Routes = [
     canActivate: [Auth0Guard, SessionGuard],
   },
   {
-    path: 'sign-in',
-    component: SignInComponent,
-  },
-  {
-    path: 'sign-up',
-    component: SignUpComponent,
-    canActivate: [Auth0Guard],
-  },
-  {
     path: 'world-view',
     component: WorldViewComponent,
     canActivate: [Auth0Guard, SessionGuard],
