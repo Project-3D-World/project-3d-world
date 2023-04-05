@@ -66,6 +66,16 @@ export class ApiService {
     );
   }
 
+  changeDisplayName(name: string) {
+    return this.http.patch(
+      this.endpoint + `/api/users/displayName`,
+      {
+        displayName: name,
+      },
+      { withCredentials: true }
+    );
+  }
+
   //postComment
   postComment(
     worldId: string,
