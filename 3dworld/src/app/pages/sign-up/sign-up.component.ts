@@ -39,7 +39,6 @@ export class SignUpComponent implements OnInit {
   postMessage() {
     this.newName.emit(this.nameForm.value.name);
     if (this.profileJson.length !== 0) {
-    
     }
   }
 }
