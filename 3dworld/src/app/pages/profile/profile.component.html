@@ -5,7 +5,22 @@
       <img src="{{ user.picture }}" />
     </div>
 
-    <h1>notifications</h1>
+    <h1>Change Display Name</h1>
+    <form
+      id="change-display-name-form"
+      (submit)="changeDisplayName()"
+      [formGroup]="nameForm"
+    >
+      <input
+        type="text"
+        name="displayName"
+        formControlName="name"
+        placeholder="Display Name"
+      />
+      <button class="btn" type="submit">Update</button>
+    </form>
+
+    <h1>Notifications</h1>
     <div *ngIf="notifications">
       <div
         class="worlds-container"

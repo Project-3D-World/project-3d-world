@@ -140,22 +140,26 @@ usersRouter.get("/allusers/ratings", async (req, res) => {
   return res.json(returnItems);
 });
 
-
 //change displayName
-usersRouter.patch("/displayName",isAuthenticated,async(req,res)=>{
+usersRouter.patch("/displayName", isAuthenticated, async (req, res) => {
   const userId = req.session.userId;
   const newName = req.body.displayName;
 
   const user = await User.findById(userId);
-  if (!user){
-    return res.status(404).json({error:"User not found"});
+  if (!user) {
+    return res.status(404).json({ error: "User not found" });
   }
 
   user.displayName = newName;
-  try{
+  try {
     await user.save();
-  }
-  catch{
-    return res.status(422).json({error:`Changing displayName for user ${user._id} failed`});
+    req.session.displayName = newName;
+    return res.json({
+      displayName: user.displayName,
+    });
+  } catch {
+    return res
+      .status(422)
+      .json({ error: `Changing displayName for user ${user._id} failed` });
   }
 });
