@@ -10,6 +10,7 @@ import { WorldsComponent } from './pages/worlds/worlds.component';
 import { WorldViewComponent } from './pages/world-view/world-view.component';
 import { WorldObjectComponent } from './component/world-object/world-object.component';
 import { ProfileComponent } from './pages/profile/profile.component';
+import { CreditsComponent } from './pages/credits/credits.component';
 
 const routes: Routes = [
   {
@@ -35,6 +36,10 @@ const routes: Routes = [
     path: 'world-object',
     component: WorldObjectComponent,
     canActivate: [Auth0Guard],
+  },
+  {
+    path: 'credits',
+    component: CreditsComponent,
   },
 ];
 

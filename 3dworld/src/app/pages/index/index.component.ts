@@ -56,4 +56,8 @@ export class IndexComponent implements OnInit {
       },
     });
   }
+
+  goCredits(): void {
+    this.router.navigateByUrl('credits');
+  }
 }
