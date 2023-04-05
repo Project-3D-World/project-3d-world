@@ -14,14 +14,13 @@ services:
   nginx-proxy-acme:
     image: nginxproxy/acme-companion
     container_name: nginx-proxy-acme
+    volumes_from:
+      - nginx-proxy
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
-      - ./certs:/etc/nginx/certs
-      - ./vhost:/etc/nginx/vhost.d
-      - ./html:/usr/share/nginx/html
       - ./acme:/etc/acme.sh
     environment:
-      - DEfAULT_EMAIL=
+      - DEFAULT_EMAIL=
     depends_on:
       - nginx-proxy
   frontend:
@@ -36,6 +35,8 @@ services:
     environment:
       - VIRTUAL_HOST=buildverse.live
       - LETSENCRYPT_HOST=buildverse.live
+    depends_on:
+      - nginx-proxy-acme
   backend:
     container_name: backend
     build:
@@ -46,6 +47,7 @@ services:
     volumes:
       - ./backend:/usr/src/app
     depends_on:
+      - nginx-proxy-acme
       - mongodb
       - redis
     environment:
