@@ -41,11 +41,9 @@ export class ProfileComponent {
     });
 
     lastValueFrom(this.api.getMyClaims(0, this.limit)).then((data) => {
-      console.log(data);
       this.claims = data;
     });
     lastValueFrom(this.api.getNotifications(0, this.limit)).then((data) => {
-      console.log(data);
       this.notifications = data;
     });
   }
