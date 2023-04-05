@@ -17,15 +17,6 @@ const routes: Routes = [
     component: IndexComponent,
   },
   {
-    path: 'sign-in',
-    component: SignInComponent,
-  },
-  {
-    path: 'sign-up',
-    component: SignUpComponent,
-    canActivate: [Auth0Guard],
-  },
-  {
     path: 'worlds',
     component: WorldsComponent,
     canActivate: [Auth0Guard, SessionGuard],
