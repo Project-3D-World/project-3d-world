@@ -37,16 +37,7 @@ export class IndexComponent implements OnInit {
                 this.api.signIn(JSON.stringify(data, null, 2)).subscribe({
                   next: (value) => {},
                   error: (value) => {
-                    this.api.signUp(JSON.stringify(data, null, 2)).subscribe({
-                      next: (value) => {
-                        this.api
-                          .signIn(JSON.stringify(data, null, 2))
-                          .subscribe();
-                      },
-                      error: (err) => {
-                        this.auth.logout().subscribe();
-                      },
-                    });
+                    this.auth.logout().subscribe();
                   },
                 });
               });

@@ -38,8 +38,9 @@ export class HeaderComponent {
 
   async loginWithRedirect(): Promise<void> {
     this.auth.loginWithRedirect({
+      appState: { target: 'sign-in' },
       authorizationParams: {
-        redirect_uri: 'http://localhost:4200',
+        redirect_uri: 'http://localhost:4200/sign-in',
       },
     });
   }
