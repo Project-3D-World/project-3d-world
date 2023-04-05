@@ -27,7 +27,6 @@ export class HeaderComponent {
 
   ngAfterViewInit(): void {
     this.notificationObserver.subscribe((data) => {
-      console.log(data);
       if ('unseen' in data) {
         this.unseenCount = data.unseen;
       } else {

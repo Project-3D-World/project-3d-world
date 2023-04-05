@@ -26,7 +26,6 @@ export class UploadFormComponent {
   }
 
   newUpload(): void {
-    console.log(this.realFile);
     this.file.emit(this.realFile);
     this.uploadForm.reset();
   }

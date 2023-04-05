@@ -64,14 +64,11 @@ export class WorldObjectComponent implements AfterViewInit, OnDestroy {
     }
   }
 
-  vote(vote: Event): void {
-    console.log('voted');
-  }
+  vote(vote: Event): void {}
 
   getChunkFile(chunkId: string): Promise<any> {
     return lastValueFrom(this.api.getChunkFile(this.worldId, chunkId)).then(
       (data) => {
-        console.log(data);
         return data;
       }
     );
@@ -89,7 +86,6 @@ export class WorldObjectComponent implements AfterViewInit, OnDestroy {
       .uploadModel(this.worldId, this.chunkId, event)
       .subscribe((data) => {
         document.querySelector('app-upload-form')!.classList.add('hidden');
-        console.log(data);
       });
   }
 
@@ -265,9 +261,6 @@ export class WorldObjectComponent implements AfterViewInit, OnDestroy {
       error: (err) => {
         console.error(err);
       },
-      complete: () => {
-        console.log('attempted get comments');
-      },
     });
   }
 
@@ -428,7 +421,6 @@ export class WorldObjectComponent implements AfterViewInit, OnDestroy {
 
   ngOnDestroy(): void {
     //disconnect from the live world
-    console.log('disconnecting from live world');
     this.liveWorld.disconnect();
   }
 }

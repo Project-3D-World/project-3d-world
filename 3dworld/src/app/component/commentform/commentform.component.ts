@@ -31,7 +31,6 @@ export class CommentformComponent {
         this.authorName = x.displayName;
       },
       error: (err: any) => console.error(err),
-      complete: () => console.log('finished init'),
     });
   }
 
