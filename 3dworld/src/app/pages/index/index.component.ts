@@ -44,7 +44,7 @@ export class IndexComponent implements OnInit {
                           .subscribe();
                       },
                       error: (err) => {
-                        this.auth.logout().subscribe();
+                        console.error(err);
                       },
                     });
                   },
