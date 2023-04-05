@@ -26,14 +26,14 @@ export class ApiService {
     }
   }
 
-  signUp(profile: string, displayName: string) {
+  signUp(profile: string) {
     const profileJson = JSON.parse(profile);
     if (profileJson?.sub) {
       return this.http.post(
         this.endpoint + '/api/users/signup',
         {
           sub: profileJson.sub,
-          displayName: displayName,
+          displayName: profileJson.name,
           email: profileJson.email,
         },
         { withCredentials: true }
