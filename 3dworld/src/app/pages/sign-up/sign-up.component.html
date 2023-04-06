@@ -1,0 +1,19 @@
+<form
+  class="complex-form"
+  id="create-message-form"
+  (submit)="postMessage()"
+  [formGroup]="nameForm"
+>
+  <div class="form-title">Choose a displayName</div>
+  <input
+    formControlName="name"
+    type="text"
+    id="post-content"
+    class="form-element"
+    placeholder="Enter your displayName"
+  />
+  <button type="submit" class="btn">Link Account to DisplayName</button>
+  <p>displayName: {{ nameForm.value.name }}</p>
+  <p>Form Status: {{ nameForm.status }}</p>
+  <p>Sign Up Status: {{ signUpStatus }}</p>
+</form>

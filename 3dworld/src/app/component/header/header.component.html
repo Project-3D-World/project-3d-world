@@ -1,0 +1,27 @@
+<header>
+  <a href="/" id="title">Buildverse</a>
+
+  <div id="nav-container">
+    <div class="nav-element" *ngIf="auth.isAuthenticated$ | async">
+      <button (click)="goToWorlds()">Worlds</button>
+    </div>
+    <div class="nav-element notification" *ngIf="auth.isAuthenticated$ | async">
+      <button (click)="goToProfile()">Profile</button>
+      <span class="notification-icon" *ngIf="unseenCount">{{
+        unseenCount
+      }}</span>
+    </div>
+  </div>
+
+  <div *ngIf="auth.isAuthenticated$ | async; else loggedOut">
+    <button class="btn btn-warning" (click)="signOut()">Log out</button>
+  </div>
+
+  <ng-template #loggedOut>
+    <button class="btn btn-primary" (click)="loginWithRedirect()">
+      Log in/Sign Up
+    </button>
+  </ng-template>
+</header>
+
+<p id="error-box"></p>

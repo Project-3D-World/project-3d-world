@@ -1,0 +1,91 @@
+@import url("https://fonts.googleapis.com/css2?family=Comfortaa:wght@500&display=swap");
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  background-color: #24252a;
+}
+
+button {
+  color: #edf0f1;
+  text-decoration: none;
+  font-size: 18px;
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s ease 0s;
+}
+
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 30px 10%;
+}
+
+header #title {
+  color: #edf0f1;
+  font-family: "Comfortaa", sans-serif;
+  font-weight: 500;
+  font-size: 45px;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+#nav-container {
+  display: flex;
+  justify-content: space-between;
+  padding: 0px, 20px;
+}
+
+#nav-container .nav-element button {
+  margin: 0px 25px;
+}
+
+#nav-container .nav-element button:hover {
+  color: #ef2d5e;
+}
+
+#error-box {
+  color: red;
+  visibility: hidden;
+}
+
+#error-box::before {
+  content: "Error: ";
+}
+
+.btn {
+  padding: 9px 25px;
+  background: rgba(239, 45, 94, 1);
+  border-radius: 50px;
+}
+
+.btn:hover {
+  background: rgba(239, 45, 94, 0.8);
+}
+
+.notification {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #333333;
+  border: none;
+  outline: none;
+  border-radius: 50%;
+}
+
+.notification-icon {
+  position: absolute;
+  top: -10px;
+  right: -10px;
+  width: 25px;
+  height: 25px;
+  background: red;
+  color: #ffffff;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 50%;
+}

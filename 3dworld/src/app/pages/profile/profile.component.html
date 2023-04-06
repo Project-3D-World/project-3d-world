@@ -1,0 +1,77 @@
+<div class="row">
+  <div class="col-6 col-sm-12 center">
+    <div>
+      <h2 *ngIf="me.displayName">Welcome "{{ me.displayName }}"</h2>
+      <img src="{{ user.picture }}" />
+    </div>
+
+    <h1>Change Display Name</h1>
+    <form
+      id="change-display-name-form"
+      (submit)="changeDisplayName()"
+      [formGroup]="nameForm"
+    >
+      <input
+        type="text"
+        name="displayName"
+        formControlName="name"
+        placeholder="Display Name"
+      />
+      <button class="btn" type="submit">Update</button>
+    </form>
+
+    <h1>Notifications</h1>
+    <div *ngIf="notifications">
+      <div
+        class="worlds-container"
+        *ngFor="let message of notifications.slice(0, notifLimit)"
+      >
+        <app-notificationdiv
+          class="row world general center"
+          [notification]="message"
+        ></app-notificationdiv>
+      </div>
+      <div class="row comment-button-container">
+        <button
+          *ngIf="notifPage > 0"
+          class="btn prev-btn"
+          (click)="getNotifications(notifPage - 1, notifLimit)"
+        >
+          Prev
+        </button>
+        <button
+          *ngIf="notifications.length === notifLimit + 1"
+          class="btn next-btn"
+          (click)="getNotifications(notifPage + 1, notifLimit)"
+        >
+          Next
+        </button>
+      </div>
+    </div>
+  </div>
+  <div class="col-6 col-sm-12 center">
+    <h1>You have claims in these worlds:</h1>
+    <div class="worlds-container" *ngFor="let claim of claims.slice(0, limit)">
+      <app-worlddiv
+        class="row world general center"
+        [world]="claim.world"
+      ></app-worlddiv>
+    </div>
+    <div class="row comment-button-container">
+      <button
+        *ngIf="page > 0"
+        class="btn prev-btn"
+        (click)="getClaims(page - 1, limit)"
+      >
+        Prev
+      </button>
+      <button
+        *ngIf="claims.length === limit + 1"
+        class="btn next-btn"
+        (click)="getClaims(page + 1, limit)"
+      >
+        Next
+      </button>
+    </div>
+  </div>
+</div>

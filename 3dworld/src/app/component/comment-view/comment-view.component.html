@@ -1,0 +1,8 @@
+<div class="title">Ratings For Chunk (x,z) = ({{ x }},{{ z }})</div>
+<div class="comments-container" *ngFor="let comment of comments">
+  <app-comment-div
+    [comment]="comment"
+    (deleted)="deleteComment($event)"
+    [userId]="userId"
+  ></app-comment-div>
+</div>

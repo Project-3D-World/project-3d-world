@@ -1,0 +1,62 @@
+<div class="row">
+  <div class="col-9 col-sm-12 container">
+    <div id="canvas-container" class="canvas-container-style">
+      <canvas id="canvas" class="canvas"></canvas>
+    </div>
+    <!--claim plot section-->
+    <app-chunk-form
+      class="hidden"
+      [worldId]="worldId"
+      [chunkX]="x"
+      [chunkZ]="z"
+      (answer)="claimPlot($event)"
+    ></app-chunk-form>
+    <!-- upload form section-->
+    <app-upload-form
+      class="hidden"
+      [worldId]="worldId"
+      [chunkX]="x"
+      [chunkZ]="z"
+      (file)="uploadModel($event)"
+    ></app-upload-form>
+  </div>
+  <div class="col-3 col-sm-12">
+    <div class="comment-form-container hidden">
+      <p id="error">{{ error }}</p>
+      <app-commentform
+        [worldId]="worldId"
+        [chunkX]="x"
+        [chunkZ]="z"
+        (newComment)="newComment($event)"
+      ></app-commentform>
+    </div>
+
+    <div class="item comment-containers-container hidden">
+      <app-comment-view
+        (deleted)="deleteComment($event)"
+        class="comment-view"
+        [comments]="comments.slice(0, commentLimit)"
+        [userId]="userId"
+        [x]="x"
+        [z]="z"
+      ></app-comment-view>
+
+      <div class="row comment-button-container">
+        <button
+          *ngIf="commentPage > 0"
+          class="btn prev-btn"
+          (click)="getComments(commentPage - 1, commentLimit)"
+        >
+          Prev
+        </button>
+        <button
+          *ngIf="comments.length === commentLimit + 1"
+          class="btn next-btn"
+          (click)="getComments(commentPage + 1, commentLimit)"
+        >
+          Next
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
