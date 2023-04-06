@@ -35,7 +35,9 @@ export class IndexComponent implements OnInit {
             if (data === true) {
               this.auth.user$.subscribe((data) => {
                 this.api.signIn(JSON.stringify(data, null, 2)).subscribe({
-                  next: (value) => {},
+                  next: (value) => {
+                    this.notification.connect();
+                  },
                   error: (value) => {
                     this.api.signUp(JSON.stringify(data, null, 2)).subscribe({
                       next: (value) => {
